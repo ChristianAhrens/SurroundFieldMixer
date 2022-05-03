@@ -16,29 +16,31 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#pragma once
-
-#include <JuceHeader.h>
-
-class SurroundSoundMatrix;
+#include "SurroundSoundMatrix.h"
 
 //==============================================================================
-/*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
-class MainComponent   :  public juce::Component
+SurroundSoundMatrix::SurroundSoundMatrix() :
+    Component(),
+    JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement()
 {
-public:
-    MainComponent();
-    ~MainComponent() override;
-    
-    //==========================================================================
-    void paint(Graphics&) override;
-    void resized() override;
 
-private:
-    std::unique_ptr<SurroundSoundMatrix>    m_ssm;
+}
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
-};
+SurroundSoundMatrix::~SurroundSoundMatrix()
+{
+}
+
+juce::Component* SurroundSoundMatrix::getUIComponent()
+{
+    return nullptr;
+}
+
+std::unique_ptr<XmlElement> SurroundSoundMatrix::createStateXml()
+{
+    return nullptr;
+}
+
+bool SurroundSoundMatrix::setStateXml(XmlElement* stateXml)
+{
+    return false;
+}

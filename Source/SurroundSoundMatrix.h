@@ -20,25 +20,28 @@
 
 #include <JuceHeader.h>
 
-class SurroundSoundMatrix;
+#include "AppConfigurationBase.h"
+
 
 //==============================================================================
 /*
-    This component lives inside our window, and this is where you should put all
-    your controls and content.
-*/
-class MainComponent   :  public juce::Component
+ *
+ */
+class SurroundSoundMatrix   :   public Component,
+                                public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
 {
 public:
-    MainComponent();
-    ~MainComponent() override;
+    SurroundSoundMatrix();
+    ~SurroundSoundMatrix() override;
     
     //==========================================================================
-    void paint(Graphics&) override;
-    void resized() override;
+    juce::Component* getUIComponent();
+
+    //==========================================================================
+    std::unique_ptr<XmlElement> createStateXml() override;
+    bool setStateXml(XmlElement* stateXml) override;
 
 private:
-    std::unique_ptr<SurroundSoundMatrix>    m_ssm;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrix)
 };

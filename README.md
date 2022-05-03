@@ -1,6 +1,6 @@
 ![Showreel.001.png](Resources/Documentation/Showreel/Showreel.001.png "SurroundSoundMatrix Headline Icons")
 
-SurroundSoundMatrix is a programming experiment to try out ideas on a gain/delay processing matrix to feed ITU 775 surround sound systems using JUCE framework.
+SurroundSoundMatrix is a programming experiment to try out ideas on a gain/delay processing matrix to feed ITU-775 surround sound systems using JUCE framework.
 
 Its sourcecode and prebuilt binaries are made publicly available to enable interested users to experiment, extend and create own adaptations.
 
