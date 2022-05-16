@@ -61,8 +61,16 @@ void SurroundSoundMatrixEditor::resized()
 {
     auto bounds = getLocalBounds();
 
-    m_meterBank->setBounds(bounds.removeFromBottom(bounds.getHeight() * 0.25f).reduced(5, 5));
-    m_surroundField->setBounds(bounds.reduced(5, 5));
+    auto meterBankBounds = bounds.removeFromBottom(bounds.getHeight() * 0.25f);
+    meterBankBounds.reduce(5, 0);
+    meterBankBounds.removeFromTop(5);
+    meterBankBounds.removeFromBottom(5);
+    m_meterBank->setBounds(meterBankBounds);
+
+    auto surroundFieldBounds = bounds;
+    surroundFieldBounds.reduce(5, 0);
+    surroundFieldBounds.removeFromTop(5);
+    m_surroundField->setBounds(surroundFieldBounds);
 }
 
 void SurroundSoundMatrixEditor::lookAndFeelChanged()
