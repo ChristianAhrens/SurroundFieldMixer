@@ -67,14 +67,26 @@
               resource="0" file="Source/SurroundSoundMatrixProcessor/SurroundSoundMatrixProcessor.h"/>
       </GROUP>
       <GROUP id="{AF25450F-8701-DE78-7FDC-5248917C6388}" name="SurroundSoundMatrixEditor">
+        <FILE id="vkxnkz" name="AbstractAudioVisualizer.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixEditor/AbstractAudioVisualizer.cpp"/>
+        <FILE id="HSGpnb" name="AbstractAudioVisualizer.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixEditor/AbstractAudioVisualizer.h"/>
         <FILE id="QY29Eh" name="AudioSelectComponent.cpp" compile="1" resource="0"
               file="Source/SurroundSoundMatrixEditor/AudioSelectComponent.cpp"/>
         <FILE id="EJ7QTb" name="AudioSelectComponent.h" compile="0" resource="0"
               file="Source/SurroundSoundMatrixEditor/AudioSelectComponent.h"/>
+        <FILE id="E2lQVU" name="MultiMeterAudioVisualizer.cpp" compile="1"
+              resource="0" file="Source/SurroundSoundMatrixEditor/MultiMeterAudioVisualizer.cpp"/>
+        <FILE id="RI7BTa" name="MultiMeterAudioVisualizer.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixEditor/MultiMeterAudioVisualizer.h"/>
         <FILE id="bAQKqK" name="SurroundSoundMatrixEditor.cpp" compile="1"
               resource="0" file="Source/SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.cpp"/>
         <FILE id="P93YUo" name="SurroundSoundMatrixEditor.h" compile="0" resource="0"
               file="Source/SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.h"/>
+        <FILE id="yUf9Ve" name="TwoDFieldAudioVisualizer.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixEditor/TwoDFieldAudioVisualizer.cpp"/>
+        <FILE id="oYDM1s" name="TwoDFieldAudioVisualizer.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixEditor/TwoDFieldAudioVisualizer.h"/>
       </GROUP>
       <FILE id="wRpAWq" name="SurroundSoundMatrix.cpp" compile="1" resource="0"
             file="Source/SurroundSoundMatrix.cpp"/>

@@ -20,43 +20,41 @@
 
 #include <JuceHeader.h>
 
-#include "AppConfigurationBase.h"
-
+#include "AbstractAudioVisualizer.h"
 
 namespace SurroundSoundMatrix
 {
 
-class MultiMeterAudioVisualizer;
-class TwoDFieldAudioVisualizer;
-
-
 //==============================================================================
 /*
 */
-class SurroundSoundMatrixEditor :   public AudioProcessorEditor,
-                                    public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
+class TwoDFieldAudioVisualizer    : public AbstractAudioVisualizer
 {
 public:
-    SurroundSoundMatrixEditor(AudioProcessor& processor);
-    SurroundSoundMatrixEditor(AudioProcessor* processor);
-    ~SurroundSoundMatrixEditor();
-
+    TwoDFieldAudioVisualizer();
+    ~TwoDFieldAudioVisualizer();
+    
     //==============================================================================
-    void paint(Graphics&) override;
+    void paint (Graphics&) override;
     void resized() override;
-
-    //==========================================================================
-    void lookAndFeelChanged() override;
-
-    //==========================================================================
-    std::unique_ptr<XmlElement> createStateXml() override;
-    bool setStateXml(XmlElement* stateXml) override;
+    
+    //==============================================================================
+    void processingDataChanged(AbstractProcessorData *data) override;
+    
+    //==============================================================================
+    VisuType getType() override;
+    void processChangedChannelMapping() override;
 
 private:
-    std::unique_ptr<MultiMeterAudioVisualizer>  m_meterBank;
-    std::unique_ptr<TwoDFieldAudioVisualizer>   m_surroundField;
+    unsigned long   m_channelL{ 1 };
+    unsigned long   m_channelC{ 2 };
+    unsigned long   m_channelR{ 3 };
+    unsigned long   m_channelLS{ 5 };
+    unsigned long   m_channelRS{ 4 };
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrixEditor)
+    ProcessorLevelData  m_levelData;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TwoDFieldAudioVisualizer)
 };
 
 }

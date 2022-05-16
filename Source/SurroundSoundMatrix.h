@@ -48,8 +48,8 @@ public:
     bool setStateXml(XmlElement* stateXml) override;
 
 private:
-    std::unique_ptr<SurroundSoundMatrixProcessor>          m_SurroundSoundMatrixProcessor;
-    std::unique_ptr<SurroundSoundMatrixEditor> m_audioVisuComponent;
+    std::unique_ptr<SurroundSoundMatrixProcessor>   m_SurroundSoundMatrixProcessor;
+    std::unique_ptr<SurroundSoundMatrixEditor>      m_audioVisuComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrix)
 };

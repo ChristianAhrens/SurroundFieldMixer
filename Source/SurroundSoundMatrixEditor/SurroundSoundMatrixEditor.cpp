@@ -20,6 +20,9 @@
 
 #include <JuceHeader.h>
 
+#include "../SurroundSoundMatrixEditor/MultiMeterAudioVisualizer.h"
+#include "../SurroundSoundMatrixEditor/TwoDFieldAudioVisualizer.h"
+
 
 namespace SurroundSoundMatrix
 {
@@ -28,6 +31,11 @@ namespace SurroundSoundMatrix
 SurroundSoundMatrixEditor::SurroundSoundMatrixEditor(AudioProcessor& processor)
     : AudioProcessorEditor(processor)
 {
+    m_meterBank = std::make_unique<MultiMeterAudioVisualizer>();
+    addAndMakeVisible(m_meterBank.get());
+    m_surroundField = std::make_unique<TwoDFieldAudioVisualizer>();
+    addAndMakeVisible(m_surroundField.get());
+
     setSize(800, 600);
 }
 
@@ -42,48 +50,24 @@ SurroundSoundMatrixEditor::~SurroundSoundMatrixEditor()
 
 void SurroundSoundMatrixEditor::paint (Graphics& g)
 {
-    g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+    auto bounds = getLocalBounds();
 
-    g.setColour(getLookAndFeel().findColour(TextButton::textColourOnId));
-    g.drawLine(juce::Line<float>(getLocalBounds().getTopLeft().toFloat(), getLocalBounds().getBottomRight().toFloat()));
-    g.drawLine(juce::Line<float>(getLocalBounds().getBottomLeft().toFloat(), getLocalBounds().getTopRight().toFloat()));
+    // Background
+    g.setColour(getLookAndFeel().findColour(AlertWindow::backgroundColourId).darker());
+    g.fillRect(bounds.toFloat());
 }
 
 void SurroundSoundMatrixEditor::resized()
 {
-    //int rowCount = 1;
-    //int colCount = 1;
-    //
-    //int visuCount = int(m_AudioVisualizers.size());
-    //
-    //if(visuCount == 2)
-    //{
-    //    rowCount = m_isPortrait ? 2 : 1;
-    //    colCount = m_isPortrait ? 1 : 2;
-    //}
-    //else if(visuCount != 1)
-    //{
-    //    int halfVisuCount = int(0.5f * visuCount + 0.5f);
-    //    
-    //    rowCount = m_isPortrait ? halfVisuCount : 2;
-    //    colCount = m_isPortrait ? 2 : halfVisuCount;
-    //}
-    
-	Grid grid;
-    using Track = Grid::TrackInfo;
-    
-    //while(rowCount--)
-    //    grid.templateRows.add(Track (1_fr));
-    //while(colCount--)
-    //    grid.templateColumns.add(Track (1_fr));
-    //
-    //for(const auto &p : m_AudioVisualizers)
-    //{
-    //    if(p.second)
-    //        grid.items.add(*p.second);
-    //}
-    
-    grid.performLayout (getLocalBounds());
+    auto bounds = getLocalBounds();
+
+    m_meterBank->setBounds(bounds.removeFromBottom(bounds.getHeight() * 0.25f).reduced(5, 5));
+    m_surroundField->setBounds(bounds.reduced(5, 5));
+}
+
+void SurroundSoundMatrixEditor::lookAndFeelChanged()
+{
+    AudioProcessorEditor::lookAndFeelChanged();
 }
 
 std::unique_ptr<XmlElement> SurroundSoundMatrixEditor::createStateXml()
