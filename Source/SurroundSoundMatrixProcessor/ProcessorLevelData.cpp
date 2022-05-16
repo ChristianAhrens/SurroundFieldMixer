@@ -16,28 +16,49 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#pragma once
-
-#include <JuceHeader.h>
+#include "ProcessorLevelData.h"
 
 namespace SurroundSoundMatrix
 {
-    class SurroundSoundMatrix;
+
+ProcessorLevelData::ProcessorLevelData()
+{
+    m_type = Level;
 }
 
-
-class MainComponent   :  public juce::Component
+ProcessorLevelData::~ProcessorLevelData()
 {
-public:
-    MainComponent();
-    ~MainComponent() override;
+
+}
+
+void ProcessorLevelData::SetLevel(unsigned long channel, ProcessorLevelData::LevelVal level)
+{
+    m_levelMap[channel] = level;
+}
+
+ProcessorLevelData::LevelVal ProcessorLevelData::GetLevel(unsigned long channel)
+{
+    if(m_levelMap.count(channel))
+        return m_levelMap.at(channel);
+    else
+        return ProcessorLevelData::LevelVal(0,0,0);
+}
+
+void ProcessorLevelData::SetChannelCount(unsigned long count)
+{
+    if(GetChannelCount()==count)
+        return;
     
-    //==========================================================================
-    void paint(Graphics&) override;
-    void resized() override;
+    for(unsigned long i=1; i<=count; i++)
+    {
+        if (!m_levelMap.count(i))
+            m_levelMap[i] = LevelVal(0, 0, 0);
+    }
+}
 
-private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
+unsigned long ProcessorLevelData::GetChannelCount()
+{
+    return m_levelMap.size();
+}
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
-};
+}

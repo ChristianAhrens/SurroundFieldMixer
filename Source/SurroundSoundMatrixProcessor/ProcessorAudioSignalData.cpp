@@ -16,28 +16,41 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#pragma once
-
-#include <JuceHeader.h>
+#include "ProcessorAudioSignalData.h"
 
 namespace SurroundSoundMatrix
 {
-    class SurroundSoundMatrix;
+
+ProcessorAudioSignalData::ProcessorAudioSignalData()
+{
+    m_type = AudioSignal;
+
+    m_sampleRate = 0;
 }
 
-
-class MainComponent   :  public juce::Component
+ProcessorAudioSignalData::~ProcessorAudioSignalData()
 {
-public:
-    MainComponent();
-    ~MainComponent() override;
-    
-    //==========================================================================
-    void paint(Graphics&) override;
-    void resized() override;
 
-private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
+}
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
-};
+void ProcessorAudioSignalData::SetChannelCount(unsigned long count)
+{
+    setSize(static_cast<int>(count), getNumSamples(), true, false, true);
+}
+
+unsigned long ProcessorAudioSignalData::GetChannelCount()
+{
+    return getNumChannels();
+}
+
+void ProcessorAudioSignalData::SetSampleRate(unsigned long rate)
+{
+    m_sampleRate = rate;
+}
+
+unsigned long ProcessorAudioSignalData::GetSampleRate()
+{
+    return m_sampleRate;
+}
+
+}

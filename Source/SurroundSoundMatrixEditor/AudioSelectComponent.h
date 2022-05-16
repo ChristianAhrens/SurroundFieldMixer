@@ -22,22 +22,30 @@
 
 namespace SurroundSoundMatrix
 {
-    class SurroundSoundMatrix;
-}
 
-
-class MainComponent   :  public juce::Component
+//==============================================================================
+/*
+*/
+class AudioSelectComponent    : public AudioDeviceSelectorComponent
 {
 public:
-    MainComponent();
-    ~MainComponent() override;
-    
-    //==========================================================================
-    void paint(Graphics&) override;
+    AudioSelectComponent(	AudioDeviceManager *deviceManager,
+							int minAudioInputChannels,
+							int maxAudioInputChannels,
+							int minAudioOutputChannels,
+							int maxAudioOutputChannels,
+							bool showMidiInputOptions,
+							bool showMidiOutputSelector,
+							bool showChannelsAsStereoPairs,
+							bool hideAdvancedOptionsWithButton);
+    ~AudioSelectComponent();
+
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioSelectComponent)
 };
+
+}

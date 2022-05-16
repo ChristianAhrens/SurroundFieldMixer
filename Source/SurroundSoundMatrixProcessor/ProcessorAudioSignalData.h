@@ -15,29 +15,31 @@
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-
 #pragma once
 
 #include <JuceHeader.h>
 
+#include "AbstractProcessorData.h"
+
 namespace SurroundSoundMatrix
 {
-    class SurroundSoundMatrix;
-}
 
-
-class MainComponent   :  public juce::Component
+class ProcessorAudioSignalData :    public AbstractProcessorData,
+                                    public AudioBuffer<float>
 {
 public:
-    MainComponent();
-    ~MainComponent() override;
+    ProcessorAudioSignalData();
+    ~ProcessorAudioSignalData();
     
-    //==========================================================================
-    void paint(Graphics&) override;
-    void resized() override;
+    void SetChannelCount(unsigned long count) override;
+    unsigned long GetChannelCount() override;
+
+    void SetSampleRate(unsigned long rate);
+    unsigned long GetSampleRate();
 
 private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    unsigned long m_sampleRate;
+    
 };
+
+}

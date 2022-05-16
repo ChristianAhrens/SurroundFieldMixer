@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SpaConBridge>
+ * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -18,21 +18,33 @@
 
 #include "SurroundSoundMatrix.h"
 
+namespace SurroundSoundMatrix
+{
+
 //==============================================================================
 SurroundSoundMatrix::SurroundSoundMatrix() :
     Component(),
     JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement()
 {
-
+    m_SurroundSoundMatrixProcessor = std::make_unique<SurroundSoundMatrixProcessor>();
 }
 
 SurroundSoundMatrix::~SurroundSoundMatrix()
 {
+    if (m_SurroundSoundMatrixProcessor)
+        m_SurroundSoundMatrixProcessor->editorBeingDeleted(m_SurroundSoundMatrixProcessor->getActiveEditor());
 }
 
 juce::Component* SurroundSoundMatrix::getUIComponent()
 {
-    return nullptr;
+    if (m_SurroundSoundMatrixProcessor)
+    {
+        if (nullptr == m_SurroundSoundMatrixProcessor->getActiveEditor())
+            m_SurroundSoundMatrixProcessor->createEditorIfNeeded();
+        return m_SurroundSoundMatrixProcessor->getActiveEditor();
+    }
+    else
+        return nullptr;
 }
 
 std::unique_ptr<XmlElement> SurroundSoundMatrix::createStateXml()
@@ -43,4 +55,6 @@ std::unique_ptr<XmlElement> SurroundSoundMatrix::createStateXml()
 bool SurroundSoundMatrix::setStateXml(XmlElement* stateXml)
 {
     return false;
+}
+
 }

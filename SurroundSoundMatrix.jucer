@@ -44,6 +44,38 @@
       </GROUP>
     </GROUP>
     <GROUP id="{0480E33C-041F-2346-F9AA-44BBEAD80CFE}" name="Source">
+      <GROUP id="{F4572078-D4AC-0012-4EA9-0F40E9C23763}" name="SurroundSoundMatrixProcessor">
+        <FILE id="qIcbbS" name="AbstractProcessorData.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/AbstractProcessorData.cpp"/>
+        <FILE id="NkFsxv" name="AbstractProcessorData.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/AbstractProcessorData.h"/>
+        <FILE id="rWhmz9" name="ProcessorAudioSignalData.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorAudioSignalData.cpp"/>
+        <FILE id="DWHiJQ" name="ProcessorAudioSignalData.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorAudioSignalData.h"/>
+        <FILE id="HNrKlg" name="ProcessorLevelData.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorLevelData.cpp"/>
+        <FILE id="mmy0Eo" name="ProcessorLevelData.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorLevelData.h"/>
+        <FILE id="CxftaG" name="ProcessorSpectrumData.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorSpectrumData.cpp"/>
+        <FILE id="KQtR9X" name="ProcessorSpectrumData.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorSpectrumData.h"/>
+        <FILE id="yv9Zvx" name="SurroundSoundMatrixProcessor.cpp" compile="1"
+              resource="0" file="Source/SurroundSoundMatrixProcessor/SurroundSoundMatrixProcessor.cpp"/>
+        <FILE id="AztdtH" name="SurroundSoundMatrixProcessor.h" compile="0"
+              resource="0" file="Source/SurroundSoundMatrixProcessor/SurroundSoundMatrixProcessor.h"/>
+      </GROUP>
+      <GROUP id="{AF25450F-8701-DE78-7FDC-5248917C6388}" name="SurroundSoundMatrixEditor">
+        <FILE id="QY29Eh" name="AudioSelectComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixEditor/AudioSelectComponent.cpp"/>
+        <FILE id="EJ7QTb" name="AudioSelectComponent.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixEditor/AudioSelectComponent.h"/>
+        <FILE id="bAQKqK" name="SurroundSoundMatrixEditor.cpp" compile="1"
+              resource="0" file="Source/SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.cpp"/>
+        <FILE id="P93YUo" name="SurroundSoundMatrixEditor.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.h"/>
+      </GROUP>
       <FILE id="wRpAWq" name="SurroundSoundMatrix.cpp" compile="1" resource="0"
             file="Source/SurroundSoundMatrix.cpp"/>
       <FILE id="zdakTI" name="SurroundSoundMatrix.h" compile="0" resource="0"

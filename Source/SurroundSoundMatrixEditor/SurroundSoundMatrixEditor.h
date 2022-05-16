@@ -20,24 +20,32 @@
 
 #include <JuceHeader.h>
 
+#include "AppConfigurationBase.h"
+
+
 namespace SurroundSoundMatrix
 {
-    class SurroundSoundMatrix;
-}
 
-
-class MainComponent   :  public juce::Component
+//==============================================================================
+/*
+*/
+class SurroundSoundMatrixEditor :  public AudioProcessorEditor,
+                            public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
 {
 public:
-    MainComponent();
-    ~MainComponent() override;
-    
-    //==========================================================================
-    void paint(Graphics&) override;
+    SurroundSoundMatrixEditor(AudioProcessor& processor);
+    SurroundSoundMatrixEditor(AudioProcessor* processor);
+    ~SurroundSoundMatrixEditor();
+
+    void paint (Graphics&) override;
     void resized() override;
 
-private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
+    std::unique_ptr<XmlElement> createStateXml() override;
+    bool setStateXml(XmlElement* stateXml) override;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+private:
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrixEditor)
 };
+
+}

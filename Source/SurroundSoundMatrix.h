@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SpaConBridge>
+ * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -22,6 +22,12 @@
 
 #include "AppConfigurationBase.h"
 
+#include "SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.h"
+#include "SurroundSoundMatrixProcessor/SurroundSoundMatrixProcessor.h"
+
+
+namespace SurroundSoundMatrix
+{
 
 //==============================================================================
 /*
@@ -42,6 +48,10 @@ public:
     bool setStateXml(XmlElement* stateXml) override;
 
 private:
+    std::unique_ptr<SurroundSoundMatrixProcessor>          m_SurroundSoundMatrixProcessor;
+    std::unique_ptr<SurroundSoundMatrixEditor> m_audioVisuComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrix)
+};
+
 };

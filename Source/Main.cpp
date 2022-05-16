@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SpaConBridge>
+ * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -18,6 +18,8 @@
 
 #include <JuceHeader.h>
 #include "MainComponent.h"
+
+#include "../submodules/JUCE-AppBasics/Source/CustomLookAndFeel.h"
 
 //==============================================================================
 class MainApplication  : public JUCEApplication
@@ -71,11 +73,11 @@ public:
                                                                           .findColour (ResizableWindow::backgroundColourId),
                                                     DocumentWindow::allButtons)
         {
+            m_customLookAndFeel = std::unique_ptr<LookAndFeel>(new JUCEAppBasics::CustomLookAndFeel);
+            Desktop::getInstance().setDefaultLookAndFeel(m_customLookAndFeel.get());
+
             setUsingNativeTitleBar (true);
             setContentOwned (new MainComponent(), true);
-
-            // fix for unclear issue regarding black DrawableButton background in ON state
-            getLookAndFeel().setColour(DrawableButton::backgroundOnColourId, Colours::transparentWhite);
 
            #if JUCE_IOS || JUCE_ANDROID
             setFullScreen (true);

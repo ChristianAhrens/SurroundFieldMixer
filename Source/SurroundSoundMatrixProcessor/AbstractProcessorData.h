@@ -22,22 +22,28 @@
 
 namespace SurroundSoundMatrix
 {
-    class SurroundSoundMatrix;
-}
 
-
-class MainComponent   :  public juce::Component
+class AbstractProcessorData
 {
 public:
-    MainComponent();
-    ~MainComponent() override;
+    enum Type
+    {
+        Invalid,
+		AudioSignal,
+        Level,
+        Spectrum,
+    };
     
-    //==========================================================================
-    void paint(Graphics&) override;
-    void resized() override;
-
-private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
+    AbstractProcessorData();
+    virtual ~AbstractProcessorData();
+    
+    Type GetDataType();
+    
+    virtual void SetChannelCount(unsigned long count) = 0;
+    virtual unsigned long GetChannelCount() = 0;
+    
+protected:
+    Type    m_type;
 };
+
+}

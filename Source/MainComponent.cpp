@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SpaConBridge>
+ * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -20,14 +20,13 @@
 
 #include "SurroundSoundMatrix.h"
 
-//==============================================================================
 MainComponent::MainComponent()
     : juce::Component()
 {
-    m_ssm = std::make_unique<SurroundSoundMatrix>();
+    m_ssm = std::make_unique<SurroundSoundMatrix::SurroundSoundMatrix>();
     addAndMakeVisible(m_ssm->getUIComponent());
 
-    setSize(300, 550);
+    setSize(800, 600);
 }
 
 MainComponent::~MainComponent()
@@ -36,7 +35,6 @@ MainComponent::~MainComponent()
 
 void MainComponent::paint(Graphics &g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
 }
 
