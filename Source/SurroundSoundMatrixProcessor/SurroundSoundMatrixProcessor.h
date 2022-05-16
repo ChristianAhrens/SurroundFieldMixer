@@ -151,6 +151,8 @@ private:
 
     const float* inputChans[128]; // this is only a member to enshure it is not recreated on every function call
 
+    std::unique_ptr<AudioDeviceManager>			m_deviceManager;
+
     //==============================================================================
     enum
     {

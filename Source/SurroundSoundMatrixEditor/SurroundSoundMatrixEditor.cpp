@@ -33,8 +33,16 @@ SurroundSoundMatrixEditor::SurroundSoundMatrixEditor(AudioProcessor& processor)
 {
     m_meterBank = std::make_unique<MultiMeterAudioVisualizer>();
     addAndMakeVisible(m_meterBank.get());
+
     m_surroundField = std::make_unique<TwoDFieldAudioVisualizer>();
     addAndMakeVisible(m_surroundField.get());
+
+    auto surroundSoundMatrixProc = dynamic_cast<SurroundSoundMatrixProcessor*>(&processor);
+    if (surroundSoundMatrixProc)
+    {
+        surroundSoundMatrixProc->addListener(m_surroundField.get());
+        surroundSoundMatrixProc->addListener(m_meterBank.get());
+    }
 
     setSize(800, 600);
 }

@@ -48,6 +48,25 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 	m_pauseProcessing = false;
 
 	setHoldTime(500);
+
+	m_deviceManager = std::make_unique<AudioDeviceManager>();
+	m_deviceManager->addAudioCallback(this);
+
+	// Hacky bit of device manager initialization:
+	// We first intialize it to be able to get a valid device setup,
+	// then initialize with a dummy xml config to trigger the internal xml structure being reset
+	// and finally apply the original initialized device setup again to have the audio running correctly.
+	// If we did not do so, either the internal xml would not be present as long as the first configuration change was made
+	// and therefor no valid config file could be written by Auvi or the audio would not be running
+	// on first start and manual config would be required.
+	m_deviceManager->initialiseWithDefaultDevices(64, 8/*7.1 setup as temp dev default*/);
+	auto audioDeviceSetup = m_deviceManager->getAudioDeviceSetup();
+	m_deviceManager->initialise(64, 8, nullptr/*std::make_unique<XmlElement>(AppConfiguration::getTagName(AppConfiguration::TagID::DEVCFG)).get()*/, true, {}, &audioDeviceSetup);
+#if JUCE_IOS
+	if (audioDeviceSetup.bufferSize < 512)
+		audioDeviceSetup.bufferSize = 512; // temp. workaround for iOS where buffersizes <512 lead to no sample data being delivered?
+#endif
+	m_deviceManager->setAudioDeviceSetup(audioDeviceSetup, true);
 }
 
 SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
