@@ -26,6 +26,27 @@ MainComponent::MainComponent()
     m_ssm = std::make_unique<SurroundSoundMatrix::SurroundSoundMatrix>();
     addAndMakeVisible(m_ssm->getUIComponent());
 
+    m_setupToggleButton = std::make_unique<TextButton>("Setup");
+    m_setupToggleButton->onClick = [this] {
+        auto deviceSetup = m_ssm->getDeviceSetupComponent();
+        if (deviceSetup)
+        {
+            if (deviceSetup->isVisible())
+            {
+                removeChildComponent(deviceSetup);
+                deviceSetup->setVisible(false);
+            }
+            else
+            {
+                deviceSetup->setVisible(true);
+                addAndMakeVisible(deviceSetup);
+            }
+
+            resized();
+        }
+    };
+    addAndMakeVisible(m_setupToggleButton.get());
+
     setSize(800, 600);
 }
 
@@ -43,4 +64,11 @@ void MainComponent::resized()
     auto surroundSoundMatrixComponent = m_ssm->getUIComponent();
     if (surroundSoundMatrixComponent)
         surroundSoundMatrixComponent->setBounds(getLocalBounds());
+
+    if (m_setupToggleButton)
+        m_setupToggleButton->setBounds(getLocalBounds().reduced(6).removeFromRight(50).removeFromTop(20));
+
+    auto setupComponent = m_ssm->getDeviceSetupComponent();
+    if (setupComponent && setupComponent->isVisible())
+        setupComponent->setBounds(getLocalBounds().reduced(15));
 }

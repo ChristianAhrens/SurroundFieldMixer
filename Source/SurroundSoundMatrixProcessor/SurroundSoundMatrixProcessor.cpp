@@ -45,7 +45,6 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 {
 	m_FFTdataPos = 0;
 	zeromem(m_FFTdata, sizeof(m_FFTdata));
-	m_pauseProcessing = false;
 
 	setHoldTime(500);
 
@@ -73,11 +72,6 @@ SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
 {
 }
 
-void SurroundSoundMatrixProcessor::setPauseProcessing(bool pause)
-{
-	m_pauseProcessing = pause;
-}
-
 void SurroundSoundMatrixProcessor::setHoldTime(int holdTimeMs)
 {
 	m_holdTimeMs = holdTimeMs;
@@ -95,6 +89,14 @@ void SurroundSoundMatrixProcessor::removeListener(Listener* listener)
 	m_callbackListeners.remove(m_callbackListeners.indexOf(listener));
 }
 
+AudioDeviceManager* SurroundSoundMatrixProcessor::getDeviceManager()
+{
+	if (m_deviceManager)
+		return m_deviceManager.get();
+	else
+		return nullptr;
+}
+
 //==============================================================================
 const String SurroundSoundMatrixProcessor::getName() const
 {
@@ -103,8 +105,8 @@ const String SurroundSoundMatrixProcessor::getName() const
 
 void SurroundSoundMatrixProcessor::prepareToPlay(double sampleRate, int maximumExpectedSamplesPerBlock)
 {
-	m_sampleRate = sampleRate;
-	m_samplesPerCentiSecond = std::round(sampleRate * 0.01f);
+	m_sampleRate = static_cast<unsigned long>(sampleRate);
+	m_samplesPerCentiSecond = static_cast<int>(sampleRate * 0.01f);
 	m_bufferSize = maximumExpectedSamplesPerBlock;
 	m_missingSamplesForCentiSecond = static_cast<int>(m_samplesPerCentiSecond + 0.5f);
 	m_centiSecondBuffer.setSize(2, m_missingSamplesForCentiSecond, false, true, false);
@@ -128,9 +130,6 @@ void SurroundSoundMatrixProcessor::processBlock(AudioBuffer<float>& buffer, Midi
 
 void SurroundSoundMatrixProcessor::handleMessage(const Message& message)
 {
-	if (m_pauseProcessing)
-		return;
-
 	if (auto m = dynamic_cast<const AudioBufferMessage*> (&message))
 	{
 		auto buffer = m->getAudioBuffer();
@@ -157,7 +156,7 @@ void SurroundSoundMatrixProcessor::handleMessage(const Message& message)
 				auto peak = m_centiSecondBuffer.getMagnitude(i, 0, m_samplesPerCentiSecond);
 				auto rms = m_centiSecondBuffer.getRMSLevel(i, 0, m_samplesPerCentiSecond);
 				auto hold = std::max(peak, m_level.GetLevel(i + 1).hold);
-				m_level.SetLevel(i + 1, ProcessorLevelData::LevelVal(peak, rms, hold, getGlobalMindB()));
+				m_level.SetLevel(i + 1, ProcessorLevelData::LevelVal(peak, rms, hold, static_cast<float>(getGlobalMindB())));
 
 				// generate spectrum data
 				{
@@ -184,15 +183,15 @@ void SurroundSoundMatrixProcessor::handleMessage(const Message& message)
 						m_fwdFFT.performFrequencyOnlyForwardTransform(m_FFTdata);
 						ProcessorSpectrumData::SpectrumBands spectrumBands = m_spectrum.GetSpectrum(i);
 
-						spectrumBands.mindB = getGlobalMindB();
-						spectrumBands.maxdB = getGlobalMaxdB();
+						spectrumBands.mindB = static_cast<float>(getGlobalMindB());
+						spectrumBands.maxdB = static_cast<float>(getGlobalMaxdB());
 
-						spectrumBands.minFreq = m_sampleRate / ProcessorSpectrumData::SpectrumBands::count;
-						spectrumBands.maxFreq = m_sampleRate / 2;
-						spectrumBands.freqRes = (spectrumBands.maxFreq - spectrumBands.minFreq) / ProcessorSpectrumData::SpectrumBands::count;
+						spectrumBands.minFreq = static_cast<float>(m_sampleRate / ProcessorSpectrumData::SpectrumBands::count);
+						spectrumBands.maxFreq = static_cast<float>(m_sampleRate / 2);
+						spectrumBands.freqRes = static_cast<float>((spectrumBands.maxFreq - spectrumBands.minFreq) / ProcessorSpectrumData::SpectrumBands::count);
 
-						int spectrumStepWidth = 0.5f * (fftSize / ProcessorSpectrumData::SpectrumBands::count);
-						int spectrumPos = 0;
+						auto spectrumStepWidth = static_cast<int>(0.5f * (fftSize / ProcessorSpectrumData::SpectrumBands::count));
+						auto spectrumPos = 0;
 						for (int j = 0; j < ProcessorSpectrumData::SpectrumBands::count && spectrumPos < fftSize; ++j)
 						{
 							float spectrumVal = 0;
@@ -398,18 +397,18 @@ void SurroundSoundMatrixProcessor::timerCallback()
 void SurroundSoundMatrixProcessor::FlushHold()
 {
 	// clear level hold values
-	auto channelCount = m_level.GetChannelCount();
-	for (int i = 0; i < channelCount; ++i)
+	auto channelCount = static_cast<int>(m_level.GetChannelCount());
+	for (auto i = 0; i < channelCount; ++i)
 	{
 		m_level.SetLevel(i + 1, ProcessorLevelData::LevelVal(0.0f, 0.0f, 0.0f));
 	}
 
 	// clear spectrum hold values	auto channelCount = m_level.GetChannelCount();
-	channelCount = m_spectrum.GetChannelCount();
-	for (int i = 0; i < channelCount; ++i)
+	channelCount = static_cast<int>(m_spectrum.GetChannelCount());
+	for (auto i = 0; i < channelCount; ++i)
 	{
 		ProcessorSpectrumData::SpectrumBands spectrumBands = m_spectrum.GetSpectrum(i);
-		for (int j = 0; j < ProcessorSpectrumData::SpectrumBands::count; ++j)
+		for (auto j = 0; j < ProcessorSpectrumData::SpectrumBands::count; ++j)
 		{
 			spectrumBands.bandsPeak[j] = 0.0f;
 			spectrumBands.bandsHold[j] = 0.0f;

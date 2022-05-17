@@ -67,12 +67,14 @@ public:
     ~SurroundSoundMatrixProcessor();
 
     //==============================================================================
-    void setPauseProcessing(bool pause);
     void setHoldTime(int holdTimeMs);
 
     //==============================================================================
     void addListener(Listener* listener);
     void removeListener(Listener* listener);
+
+    //==============================================================================
+    AudioDeviceManager* getDeviceManager();
 
     //==============================================================================
     const String getName() const override;
@@ -136,22 +138,24 @@ private:
     ProcessorLevelData          m_level;
     ProcessorSpectrumData       m_spectrum;
 
-    String              m_Name;
-    Array<Listener*>    m_callbackListeners;
+    String                      m_Name;
+    Array<Listener*>            m_callbackListeners;
 
     //==============================================================================
-    CriticalSection m_readLock;
-    double m_sampleRate = 0;
-    double m_samplesPerCentiSecond = 0;
-    int m_bufferSize = 0;
+    CriticalSection     m_readLock;
+    unsigned long       m_sampleRate = 0;
+    int                 m_samplesPerCentiSecond = 0;
+    int                 m_bufferSize = 0;
 
-    float* m_processorChannels[128];
-    AudioBuffer<float> m_buffer;
-    int m_missingSamplesForCentiSecond;
+    float*              m_processorChannels[128];
+    AudioBuffer<float>  m_buffer;
+    int                 m_missingSamplesForCentiSecond;
 
+    //==============================================================================
     const float* inputChans[128]; // this is only a member to enshure it is not recreated on every function call
 
-    std::unique_ptr<AudioDeviceManager>			m_deviceManager;
+    //==============================================================================
+    std::unique_ptr<AudioDeviceManager> m_deviceManager;
 
     //==============================================================================
     enum
@@ -163,8 +167,6 @@ private:
     dsp::WindowingFunction<float>               m_windowF;
     float                                       m_FFTdata[2 * fftSize];
     int                                         m_FFTdataPos;
-
-    bool                                        m_pauseProcessing;
 
     int                                         m_holdTimeMs;
 

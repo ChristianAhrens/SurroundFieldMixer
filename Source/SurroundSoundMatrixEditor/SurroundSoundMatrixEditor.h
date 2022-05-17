@@ -21,6 +21,7 @@
 #include <JuceHeader.h>
 
 #include "AppConfigurationBase.h"
+#include "AudioSelectComponent.h"
 
 
 namespace SurroundSoundMatrix

@@ -42,6 +42,7 @@ public:
     
     //==========================================================================
     juce::Component* getUIComponent();
+    juce::Component* getDeviceSetupComponent();
 
     //==========================================================================
     std::unique_ptr<XmlElement> createStateXml() override;
@@ -50,6 +51,7 @@ public:
 private:
     std::unique_ptr<SurroundSoundMatrixProcessor>   m_SurroundSoundMatrixProcessor;
     std::unique_ptr<SurroundSoundMatrixEditor>      m_audioVisuComponent;
+    std::unique_ptr<AudioSelectComponent>           m_audioDeviceSelectComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrix)
 };

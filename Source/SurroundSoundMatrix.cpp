@@ -27,6 +27,7 @@ SurroundSoundMatrix::SurroundSoundMatrix() :
     JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement()
 {
     m_SurroundSoundMatrixProcessor = std::make_unique<SurroundSoundMatrixProcessor>();
+    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundSoundMatrixProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
 }
 
 SurroundSoundMatrix::~SurroundSoundMatrix()
@@ -43,6 +44,14 @@ juce::Component* SurroundSoundMatrix::getUIComponent()
             m_SurroundSoundMatrixProcessor->createEditorIfNeeded();
         return m_SurroundSoundMatrixProcessor->getActiveEditor();
     }
+    else
+        return nullptr;
+}
+
+juce::Component* SurroundSoundMatrix::getDeviceSetupComponent()
+{
+    if (m_audioDeviceSelectComponent)
+        return m_audioDeviceSelectComponent.get();
     else
         return nullptr;
 }

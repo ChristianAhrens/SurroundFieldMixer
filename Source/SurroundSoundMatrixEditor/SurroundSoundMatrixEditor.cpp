@@ -69,7 +69,7 @@ void SurroundSoundMatrixEditor::resized()
 {
     auto bounds = getLocalBounds();
 
-    auto meterBankBounds = bounds.removeFromBottom(bounds.getHeight() * 0.25f);
+    auto meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.25f));
     meterBankBounds.reduce(5, 0);
     meterBankBounds.removeFromTop(5);
     meterBankBounds.removeFromBottom(5);

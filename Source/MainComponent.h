@@ -39,5 +39,7 @@ public:
 private:
     std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
 
+    std::unique_ptr<TextButton> m_setupToggleButton;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainComponent)
 };
