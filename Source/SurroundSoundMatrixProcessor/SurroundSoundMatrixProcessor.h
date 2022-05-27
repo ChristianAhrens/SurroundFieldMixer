@@ -50,8 +50,8 @@ private:
 */
 class SurroundSoundMatrixProcessor :    public AudioProcessor,
 					                    public AudioIODeviceCallback,
-public MessageListener,
-public Timer
+                                        public MessageListener,
+                                        public Timer
 {
 public:
     class Listener
@@ -130,6 +130,9 @@ public:
         return dBRange::max;
     }
 
+    static constexpr int s_maxChannelCount = 64;
+    static constexpr int s_maxNumSamples = 1024;
+
 private:
     void BroadcastData(AbstractProcessorData* data);
     void FlushHold();
@@ -143,16 +146,14 @@ private:
 
     //==============================================================================
     CriticalSection     m_readLock;
+
+    float**             m_processorChannels;
+
     unsigned long       m_sampleRate = 0;
     int                 m_samplesPerCentiSecond = 0;
     int                 m_bufferSize = 0;
 
-    float*              m_processorChannels[128];
-    AudioBuffer<float>  m_buffer;
     int                 m_missingSamplesForCentiSecond;
-
-    //==============================================================================
-    const float* inputChans[128]; // this is only a member to enshure it is not recreated on every function call
 
     //==============================================================================
     std::unique_ptr<AudioDeviceManager> m_deviceManager;

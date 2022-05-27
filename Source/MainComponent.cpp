@@ -28,18 +28,18 @@ MainComponent::MainComponent()
 
     m_setupToggleButton = std::make_unique<TextButton>("Setup");
     m_setupToggleButton->onClick = [this] {
-        auto deviceSetup = m_ssm->getDeviceSetupComponent();
-        if (deviceSetup)
+        auto setupComponent = m_ssm->getDeviceSetupComponent();
+        if (setupComponent)
         {
-            if (deviceSetup->isVisible())
+            if (setupComponent->isVisible())
             {
-                removeChildComponent(deviceSetup);
-                deviceSetup->setVisible(false);
+                removeChildComponent(setupComponent);
+                setupComponent->setVisible(false);
             }
             else
             {
-                deviceSetup->setVisible(true);
-                addAndMakeVisible(deviceSetup);
+                setupComponent->setVisible(true);
+                addAndMakeVisible(setupComponent);
             }
 
             resized();
@@ -72,3 +72,4 @@ void MainComponent::resized()
     if (setupComponent && setupComponent->isVisible())
         setupComponent->setBounds(getLocalBounds().reduced(15));
 }
+

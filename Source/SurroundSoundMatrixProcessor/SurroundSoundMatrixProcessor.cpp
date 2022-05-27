@@ -48,6 +48,17 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 
 	setHoldTime(500);
 
+	// prepare max sized processing data buffer
+	m_processorChannels = new float* [s_maxChannelCount];
+	for (auto i = 0; i < s_maxChannelCount; i++)
+	{
+		m_processorChannels[i] = new float[s_maxNumSamples];
+		for (auto j = 0; j < s_maxNumSamples; j++)
+		{
+			m_processorChannels[i][j] = 0.0f;
+		}
+	}
+
 	m_deviceManager = std::make_unique<AudioDeviceManager>();
 	m_deviceManager->addAudioCallback(this);
 
@@ -70,6 +81,10 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 
 SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
 {
+	// cleanup processing data buffer (do this elsewhere in productive code to avoid excessive mem alloc/free)
+	for (auto i = 0; i < s_maxChannelCount; i++)
+		delete[] m_processorChannels[i];
+	delete[] m_processorChannels;
 }
 
 void SurroundSoundMatrixProcessor::setHoldTime(int holdTimeMs)
@@ -315,59 +330,34 @@ void SurroundSoundMatrixProcessor::setStateInformation(const void* data, int siz
 void SurroundSoundMatrixProcessor::audioDeviceIOCallback(const float** inputChannelData, int numInputChannels,
 	float** outputChannelData, int numOutputChannels, int numSamples)
 {
-	ignoreUnused(outputChannelData);
-	ignoreUnused(numOutputChannels);
-
 	// these should have been prepared by audioDeviceAboutToStart()...
 	jassert(m_sampleRate > 0 && m_bufferSize > 0);
 
 	const ScopedLock sl(m_readLock);
 
-	int numActiveChans = 0;
-	int numInputs = 0;
+	auto maxActiveChannels = std::max(numInputChannels, numOutputChannels);
 
-	// messy stuff needed to compact the channels down into an array
-	// of non-zero pointers..
-	for (int i = 0; i < numInputChannels; ++i)
+	// copy incoming data to processing data buffer
+	for (auto i = 0; i < numInputChannels && i < maxActiveChannels; i++)
 	{
-		if (inputChannelData[i] != nullptr)
-		{
-			inputChans[numInputs++] = inputChannelData[i];
-			if (numInputs >= numElementsInArray(inputChans))
-				break;
-		}
+		memcpy(m_processorChannels[i], inputChannelData[i], (size_t)numSamples * sizeof(float));
 	}
 
-	if (numInputs > m_buffer.getNumChannels())
-	{
-		numActiveChans = m_buffer.getNumChannels();
+	// from juce doxygen: buffer must be the size of max(inCh, outCh) and feeds the input data into the method and is returned with output data
+	AudioBuffer<float> audioBufferToProcess(m_processorChannels, maxActiveChannels, numSamples);
+	processBlock(audioBufferToProcess, MidiBuffer());
 
-		// if there aren't enough output channels for the number of
-		// inputs, we need to create some temporary extra ones (can't
-		// use the input data in case it gets written to)
-		m_buffer.setSize(numInputs, numSamples,
-			false, false, true);
-
-		for (int i = numActiveChans; i < numInputs; ++i)
-		{
-			m_processorChannels[numActiveChans] = m_buffer.getWritePointer(i);
-			memcpy(m_processorChannels[numActiveChans], inputChans[i], (size_t)numSamples * sizeof(float));
-			++numActiveChans;
-		}
-	}
-	else
+	// copy the processed data buffer data to outgoing data
+	auto processedChannelCount = audioBufferToProcess.getNumChannels();
+	auto processedSampleCount = audioBufferToProcess.getNumSamples();
+	auto processedData = audioBufferToProcess.getArrayOfReadPointers();
+	jassert(processedChannelCount == numOutputChannels);
+	jassert(processedSampleCount == numSamples);
+	for (auto i = 0; i < numOutputChannels && i < maxActiveChannels; i++)
 	{
-		for (int i = 0; i < numInputs; ++i)
-		{
-			memcpy(m_processorChannels[numActiveChans], inputChans[i], (size_t)numSamples * sizeof(float));
-			++numActiveChans;
-		}
+		memcpy(outputChannelData[i], processedData[i], (size_t)processedSampleCount * sizeof(float));
 	}
 
-	AudioBuffer<float> newAudioBuffer(m_processorChannels, numActiveChans, numSamples);
-	MidiBuffer newMidiBuffer;
-
-	processBlock(newAudioBuffer, newMidiBuffer);
 }
 
 void SurroundSoundMatrixProcessor::audioDeviceAboutToStart(AudioIODevice* device)

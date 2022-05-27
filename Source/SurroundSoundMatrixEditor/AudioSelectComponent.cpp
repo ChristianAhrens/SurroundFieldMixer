@@ -22,10 +22,24 @@ namespace SurroundSoundMatrix
 {
 
 //==============================================================================
-AudioSelectComponent::AudioSelectComponent(AudioDeviceManager *deviceManager, int minAudioInputChannels, int maxAudioInputChannels, int minAudioOutputChannels, 
-	int maxAudioOutputChannels, bool showMidiInputOptions, bool showMidiOutputSelector, bool showChannelsAsStereoPairs, bool hideAdvancedOptionsWithButton)
-	: AudioDeviceSelectorComponent(*deviceManager, minAudioInputChannels, maxAudioInputChannels, minAudioOutputChannels, 
-		maxAudioOutputChannels, showMidiInputOptions, showMidiOutputSelector, showChannelsAsStereoPairs, hideAdvancedOptionsWithButton)
+AudioSelectComponent::AudioSelectComponent(AudioDeviceManager *deviceManager,
+	int minAudioInputChannels, 
+	int maxAudioInputChannels, 
+	int minAudioOutputChannels, 
+	int maxAudioOutputChannels, 
+	bool showMidiInputOptions, 
+	bool showMidiOutputSelector, 
+	bool showChannelsAsStereoPairs, 
+	bool hideAdvancedOptionsWithButton)
+	: AudioDeviceSelectorComponent(*deviceManager, 
+		minAudioInputChannels, 
+		maxAudioInputChannels, 
+		minAudioOutputChannels, 
+		maxAudioOutputChannels, 
+		showMidiInputOptions, 
+		showMidiOutputSelector, 
+		showChannelsAsStereoPairs, 
+		hideAdvancedOptionsWithButton)
 {
 }
 

@@ -40,6 +40,7 @@ public:
 							bool hideAdvancedOptionsWithButton);
     ~AudioSelectComponent();
 
+	//==========================================================================
     void paint (Graphics&) override;
     void resized() override;
 

@@ -58,11 +58,13 @@ juce::Component* SurroundSoundMatrix::getDeviceSetupComponent()
 
 std::unique_ptr<XmlElement> SurroundSoundMatrix::createStateXml()
 {
+    jassertfalse;
     return nullptr;
 }
 
 bool SurroundSoundMatrix::setStateXml(XmlElement* stateXml)
 {
+    jassertfalse;
     return false;
 }
 
