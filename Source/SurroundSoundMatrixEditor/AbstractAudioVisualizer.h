@@ -123,7 +123,7 @@ private:
 /*
 */
 class AbstractAudioVisualizer : public Component, 
-                                public SurroundSoundMatrixProcessor::Listener,
+                                public ProcessorDataAnalyzer::Listener,
                                 public DrawableButton::Listener
 {
 public:

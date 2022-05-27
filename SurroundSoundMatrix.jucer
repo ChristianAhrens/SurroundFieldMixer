@@ -53,6 +53,10 @@
               file="Source/SurroundSoundMatrixProcessor/ProcessorAudioSignalData.cpp"/>
         <FILE id="DWHiJQ" name="ProcessorAudioSignalData.h" compile="0" resource="0"
               file="Source/SurroundSoundMatrixProcessor/ProcessorAudioSignalData.h"/>
+        <FILE id="KSJ1fx" name="ProcessorDataAnalyzer.cpp" compile="1" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorDataAnalyzer.cpp"/>
+        <FILE id="Yx6NtL" name="ProcessorDataAnalyzer.h" compile="0" resource="0"
+              file="Source/SurroundSoundMatrixProcessor/ProcessorDataAnalyzer.h"/>
         <FILE id="HNrKlg" name="ProcessorLevelData.cpp" compile="1" resource="0"
               file="Source/SurroundSoundMatrixProcessor/ProcessorLevelData.cpp"/>
         <FILE id="mmy0Eo" name="ProcessorLevelData.h" compile="0" resource="0"

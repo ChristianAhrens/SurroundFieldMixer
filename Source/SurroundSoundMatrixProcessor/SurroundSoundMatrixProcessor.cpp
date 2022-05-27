@@ -21,33 +21,11 @@
 namespace SurroundSoundMatrix
 {
 
-//==============================================================================
-AudioBufferMessage::AudioBufferMessage(AudioBuffer<float>& buffer)
-{
-	m_buffer = buffer;
-}
-
-AudioBufferMessage::~AudioBufferMessage()
-{
-
-}
-
-const AudioBuffer<float>& AudioBufferMessage::getAudioBuffer() const
-{
-	return m_buffer;
-}
 
 //==============================================================================
 SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
-	AudioProcessor(),
-	m_fwdFFT(fftOrder),
-	m_windowF(fftSize, dsp::WindowingFunction<float>::hann)
+	AudioProcessor()
 {
-	m_FFTdataPos = 0;
-	zeromem(m_FFTdata, sizeof(m_FFTdata));
-
-	setHoldTime(500);
-
 	// prepare max sized processing data buffer
 	m_processorChannels = new float* [s_maxChannelCount];
 	for (auto i = 0; i < s_maxChannelCount; i++)
@@ -58,6 +36,9 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 			m_processorChannels[i][j] = 0.0f;
 		}
 	}
+
+	m_inputDataAnalyzer = std::make_unique<ProcessorDataAnalyzer>();
+	m_outputDataAnalyzer = std::make_unique<ProcessorDataAnalyzer>();
 
 	m_deviceManager = std::make_unique<AudioDeviceManager>();
 	m_deviceManager->addAudioCallback(this);
@@ -87,21 +68,28 @@ SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
 	delete[] m_processorChannels;
 }
 
-void SurroundSoundMatrixProcessor::setHoldTime(int holdTimeMs)
+void SurroundSoundMatrixProcessor::addInputListener(ProcessorDataAnalyzer::Listener* listener)
 {
-	m_holdTimeMs = holdTimeMs;
-
-	startTimer(m_holdTimeMs);
+	if (m_inputDataAnalyzer)
+		m_inputDataAnalyzer->addListener(listener);
 }
 
-void SurroundSoundMatrixProcessor::addListener(Listener* listener)
+void SurroundSoundMatrixProcessor::removeInputListener(ProcessorDataAnalyzer::Listener* listener)
 {
-	m_callbackListeners.add(listener);
+	if (m_inputDataAnalyzer)
+		m_inputDataAnalyzer->removeListener(listener);
 }
 
-void SurroundSoundMatrixProcessor::removeListener(Listener* listener)
+void SurroundSoundMatrixProcessor::addOutputListener(ProcessorDataAnalyzer::Listener* listener)
 {
-	m_callbackListeners.remove(m_callbackListeners.indexOf(listener));
+	if (m_outputDataAnalyzer)
+		m_outputDataAnalyzer->addListener(listener);
+}
+
+void SurroundSoundMatrixProcessor::removeOutputListener(ProcessorDataAnalyzer::Listener* listener)
+{
+	if (m_outputDataAnalyzer)
+		m_outputDataAnalyzer->removeListener(listener);
 }
 
 AudioDeviceManager* SurroundSoundMatrixProcessor::getDeviceManager()
@@ -120,144 +108,47 @@ const String SurroundSoundMatrixProcessor::getName() const
 
 void SurroundSoundMatrixProcessor::prepareToPlay(double sampleRate, int maximumExpectedSamplesPerBlock)
 {
-	m_sampleRate = static_cast<unsigned long>(sampleRate);
-	m_samplesPerCentiSecond = static_cast<int>(sampleRate * 0.01f);
-	m_bufferSize = maximumExpectedSamplesPerBlock;
-	m_missingSamplesForCentiSecond = static_cast<int>(m_samplesPerCentiSecond + 0.5f);
-	m_centiSecondBuffer.setSize(2, m_missingSamplesForCentiSecond, false, true, false);
+	if (m_inputDataAnalyzer)
+		m_inputDataAnalyzer->initializeParameters(sampleRate, maximumExpectedSamplesPerBlock);
+	if (m_outputDataAnalyzer)
+		m_outputDataAnalyzer->initializeParameters(sampleRate, maximumExpectedSamplesPerBlock);
 }
 
 void SurroundSoundMatrixProcessor::releaseResources()
 {
-	m_sampleRate = 0;
-	m_samplesPerCentiSecond = 0;
-	m_bufferSize = 0;
-	m_centiSecondBuffer.clear();
-	m_missingSamplesForCentiSecond = 0;
+	if (m_inputDataAnalyzer)
+		m_inputDataAnalyzer->clearParameters();
+	if (m_outputDataAnalyzer)
+		m_outputDataAnalyzer->clearParameters();
 }
 
 void SurroundSoundMatrixProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
 	ignoreUnused(midiMessages);
 
-	postMessage(new AudioBufferMessage(buffer));
+	postMessage(new AudioInputBufferMessage(buffer));
+
+	// process data in buffer to be what shall be used as output
+	AudioBuffer<float> processedBuffer;
+	processedBuffer.setSize(5, buffer.getNumSamples(), false, false, true);
+	processedBuffer.copyFrom(0, 0, buffer.getReadPointer(0), buffer.getNumSamples());
+	processedBuffer.copyFrom(1, 0, buffer.getReadPointer(1), buffer.getNumSamples());
+	processedBuffer.copyFrom(2, 0, buffer.getReadPointer(0), buffer.getNumSamples());
+	processedBuffer.copyFrom(3, 0, buffer.getReadPointer(0), buffer.getNumSamples());
+	processedBuffer.copyFrom(4, 0, buffer.getReadPointer(1), buffer.getNumSamples());
+	buffer.makeCopyOf(processedBuffer, true);
+
+	postMessage(new AudioOutputBufferMessage(buffer));
 }
 
 void SurroundSoundMatrixProcessor::handleMessage(const Message& message)
 {
 	if (auto m = dynamic_cast<const AudioBufferMessage*> (&message))
 	{
-		auto buffer = m->getAudioBuffer();
-
-		int numChannels = buffer.getNumChannels();
-
-		if (numChannels != m_centiSecondBuffer.getNumChannels())
-			m_centiSecondBuffer.setSize(numChannels, m_samplesPerCentiSecond, false, true, true);
-		if (m_sampleRate != m_centiSecondBuffer.GetSampleRate())
-			m_centiSecondBuffer.SetSampleRate(m_sampleRate);
-
-		int availableSamples = buffer.getNumSamples();
-
-		int readPos = 0;
-		int writePos = m_samplesPerCentiSecond - m_missingSamplesForCentiSecond;
-		while (availableSamples >= m_missingSamplesForCentiSecond)
-		{
-			for (int i = 0; i < numChannels; ++i)
-			{
-				// generate signal buffer data
-				m_centiSecondBuffer.copyFrom(i, writePos, buffer.getReadPointer(i) + readPos, m_missingSamplesForCentiSecond);
-
-				// generate level data
-				auto peak = m_centiSecondBuffer.getMagnitude(i, 0, m_samplesPerCentiSecond);
-				auto rms = m_centiSecondBuffer.getRMSLevel(i, 0, m_samplesPerCentiSecond);
-				auto hold = std::max(peak, m_level.GetLevel(i + 1).hold);
-				m_level.SetLevel(i + 1, ProcessorLevelData::LevelVal(peak, rms, hold, static_cast<float>(getGlobalMindB())));
-
-				// generate spectrum data
-				{
-					int unprocessedSamples = 0;
-					if (m_FFTdataPos < fftSize)
-					{
-						int missingSamples = fftSize - m_FFTdataPos;
-						if (missingSamples < m_samplesPerCentiSecond)
-						{
-							memcpy(m_FFTdata, m_centiSecondBuffer.getReadPointer(i), missingSamples);
-							m_FFTdataPos += missingSamples;
-							unprocessedSamples = m_samplesPerCentiSecond - missingSamples;
-						}
-						else
-						{
-							memcpy(m_FFTdata, m_centiSecondBuffer.getReadPointer(i), m_samplesPerCentiSecond);
-							m_FFTdataPos += m_samplesPerCentiSecond;
-						}
-					}
-
-					if (m_FFTdataPos >= fftSize)
-					{
-						m_windowF.multiplyWithWindowingTable(m_FFTdata, fftSize);
-						m_fwdFFT.performFrequencyOnlyForwardTransform(m_FFTdata);
-						ProcessorSpectrumData::SpectrumBands spectrumBands = m_spectrum.GetSpectrum(i);
-
-						spectrumBands.mindB = static_cast<float>(getGlobalMindB());
-						spectrumBands.maxdB = static_cast<float>(getGlobalMaxdB());
-
-						spectrumBands.minFreq = static_cast<float>(m_sampleRate / ProcessorSpectrumData::SpectrumBands::count);
-						spectrumBands.maxFreq = static_cast<float>(m_sampleRate / 2);
-						spectrumBands.freqRes = static_cast<float>((spectrumBands.maxFreq - spectrumBands.minFreq) / ProcessorSpectrumData::SpectrumBands::count);
-
-						auto spectrumStepWidth = static_cast<int>(0.5f * (fftSize / ProcessorSpectrumData::SpectrumBands::count));
-						auto spectrumPos = 0;
-						for (int j = 0; j < ProcessorSpectrumData::SpectrumBands::count && spectrumPos < fftSize; ++j)
-						{
-							float spectrumVal = 0;
-
-							for (int k = 0; k < spectrumStepWidth; ++k, ++spectrumPos)
-								spectrumVal += m_FFTdata[spectrumPos];
-							spectrumVal = spectrumVal / spectrumStepWidth;
-
-							auto leveldB = jlimit(spectrumBands.mindB, spectrumBands.maxdB, Decibels::gainToDecibels(spectrumVal));
-							auto level = jmap(leveldB, spectrumBands.mindB, spectrumBands.maxdB, 0.0f, 1.0f);
-
-							spectrumBands.bandsPeak[j] = level;
-							spectrumBands.bandsHold[j] = std::max(level, spectrumBands.bandsHold[j]);
-						}
-
-						m_spectrum.SetSpectrum(i, spectrumBands);
-
-						zeromem(m_FFTdata, sizeof(m_FFTdata));
-						m_FFTdataPos = 0;
-					}
-
-					if (unprocessedSamples != 0)
-					{
-						memcpy(m_FFTdata, m_centiSecondBuffer.getReadPointer(i, m_samplesPerCentiSecond - unprocessedSamples), unprocessedSamples);
-						m_FFTdataPos += unprocessedSamples;
-					}
-				}
-			}
-
-			BroadcastData(&m_level);
-			BroadcastData(&m_centiSecondBuffer);
-			BroadcastData(&m_spectrum);
-
-			readPos += m_missingSamplesForCentiSecond;
-			availableSamples -= m_missingSamplesForCentiSecond;
-
-			m_missingSamplesForCentiSecond = m_samplesPerCentiSecond;
-
-			writePos = m_samplesPerCentiSecond - m_missingSamplesForCentiSecond;
-
-			if (availableSamples <= 0)
-				break;
-		}
-
-		if (availableSamples > 0)
-		{
-			for (int i = 0; i < numChannels; ++i)
-			{
-				m_centiSecondBuffer.copyFrom(i, writePos, buffer.getReadPointer(i) + readPos, availableSamples);
-			}
-		}
+		if (m->getFlowDirection() == AudioBufferMessage::FlowDirection::Input && m_inputDataAnalyzer)
+			m_inputDataAnalyzer->analyzeData(m->getAudioBuffer());
+		else if (m->getFlowDirection() == AudioBufferMessage::FlowDirection::Output && m_outputDataAnalyzer)
+			m_outputDataAnalyzer->analyzeData(m->getAudioBuffer());
 	}
 }
 
@@ -330,9 +221,6 @@ void SurroundSoundMatrixProcessor::setStateInformation(const void* data, int siz
 void SurroundSoundMatrixProcessor::audioDeviceIOCallback(const float** inputChannelData, int numInputChannels,
 	float** outputChannelData, int numOutputChannels, int numSamples)
 {
-	// these should have been prepared by audioDeviceAboutToStart()...
-	jassert(m_sampleRate > 0 && m_bufferSize > 0);
-
 	const ScopedLock sl(m_readLock);
 
 	auto maxActiveChannels = std::max(numInputChannels, numOutputChannels);
@@ -345,13 +233,14 @@ void SurroundSoundMatrixProcessor::audioDeviceIOCallback(const float** inputChan
 
 	// from juce doxygen: buffer must be the size of max(inCh, outCh) and feeds the input data into the method and is returned with output data
 	AudioBuffer<float> audioBufferToProcess(m_processorChannels, maxActiveChannels, numSamples);
-	processBlock(audioBufferToProcess, MidiBuffer());
+	MidiBuffer midiBufferToProcess;
+	processBlock(audioBufferToProcess, midiBufferToProcess);
 
 	// copy the processed data buffer data to outgoing data
 	auto processedChannelCount = audioBufferToProcess.getNumChannels();
 	auto processedSampleCount = audioBufferToProcess.getNumSamples();
 	auto processedData = audioBufferToProcess.getArrayOfReadPointers();
-	jassert(processedChannelCount == numOutputChannels);
+	jassert(processedChannelCount >= numOutputChannels);
 	jassert(processedSampleCount == numSamples);
 	for (auto i = 0; i < numOutputChannels && i < maxActiveChannels; i++)
 	{
@@ -371,41 +260,6 @@ void SurroundSoundMatrixProcessor::audioDeviceAboutToStart(AudioIODevice* device
 void SurroundSoundMatrixProcessor::audioDeviceStopped()
 {
 	releaseResources();
-}
-
-void SurroundSoundMatrixProcessor::BroadcastData(AbstractProcessorData* data)
-{
-	for (Listener* l : m_callbackListeners)
-		l->processingDataChanged(data);
-}
-
-void SurroundSoundMatrixProcessor::timerCallback()
-{
-	FlushHold();
-}
-
-void SurroundSoundMatrixProcessor::FlushHold()
-{
-	// clear level hold values
-	auto channelCount = static_cast<int>(m_level.GetChannelCount());
-	for (auto i = 0; i < channelCount; ++i)
-	{
-		m_level.SetLevel(i + 1, ProcessorLevelData::LevelVal(0.0f, 0.0f, 0.0f));
-	}
-
-	// clear spectrum hold values	auto channelCount = m_level.GetChannelCount();
-	channelCount = static_cast<int>(m_spectrum.GetChannelCount());
-	for (auto i = 0; i < channelCount; ++i)
-	{
-		ProcessorSpectrumData::SpectrumBands spectrumBands = m_spectrum.GetSpectrum(i);
-		for (auto j = 0; j < ProcessorSpectrumData::SpectrumBands::count; ++j)
-		{
-			spectrumBands.bandsPeak[j] = 0.0f;
-			spectrumBands.bandsHold[j] = 0.0f;
-		}
-
-		m_spectrum.SetSpectrum(i, spectrumBands);
-	}
 }
 
 } // namespace SurroundSoundMatrix

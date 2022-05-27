@@ -20,58 +20,30 @@
 
 #include <JuceHeader.h>
 
-#include "ProcessorAudioSignalData.h"
-#include "ProcessorLevelData.h"
-#include "ProcessorSpectrumData.h"
-
+#include "ProcessorDataAnalyzer.h"
 #include "../SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.h"
 
 
 namespace SurroundSoundMatrix
 {
 
-//==============================================================================
-/*
-*/
-class AudioBufferMessage : public Message
-{
-public:
-    AudioBufferMessage(AudioBuffer<float>& buffer);
-    ~AudioBufferMessage();
-
-    const AudioBuffer<float>& getAudioBuffer() const;
-
-private:
-    AudioBuffer<float> m_buffer;
-};
 
 //==============================================================================
 /*
 */
 class SurroundSoundMatrixProcessor :    public AudioProcessor,
 					                    public AudioIODeviceCallback,
-                                        public MessageListener,
-                                        public Timer
+                                        public MessageListener
 {
-public:
-    class Listener
-    {
-    public:
-        virtual ~Listener() {};
-
-        virtual void processingDataChanged(AbstractProcessorData* data) = 0;
-    };
-
 public:
     SurroundSoundMatrixProcessor();
     ~SurroundSoundMatrixProcessor();
 
     //==============================================================================
-    void setHoldTime(int holdTimeMs);
-
-    //==============================================================================
-    void addListener(Listener* listener);
-    void removeListener(Listener* listener);
+    void addInputListener(ProcessorDataAnalyzer::Listener* listener);
+    void removeInputListener(ProcessorDataAnalyzer::Listener* listener);
+    void addOutputListener(ProcessorDataAnalyzer::Listener* listener);
+    void removeOutputListener(ProcessorDataAnalyzer::Listener* listener);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
@@ -111,9 +83,6 @@ public:
     void handleMessage(const Message& message) override;
 
     //==============================================================================
-    void timerCallback() override;
-
-    //==============================================================================
     enum dBRange
     {
         min = -90,
@@ -134,43 +103,21 @@ public:
     static constexpr int s_maxNumSamples = 1024;
 
 private:
-    void BroadcastData(AbstractProcessorData* data);
-    void FlushHold();
-
-    ProcessorAudioSignalData    m_centiSecondBuffer;
-    ProcessorLevelData          m_level;
-    ProcessorSpectrumData       m_spectrum;
-
     String                      m_Name;
-    Array<Listener*>            m_callbackListeners;
 
     //==============================================================================
     CriticalSection     m_readLock;
 
     float**             m_processorChannels;
 
-    unsigned long       m_sampleRate = 0;
-    int                 m_samplesPerCentiSecond = 0;
-    int                 m_bufferSize = 0;
-
-    int                 m_missingSamplesForCentiSecond;
-
     //==============================================================================
     std::unique_ptr<AudioDeviceManager> m_deviceManager;
 
     //==============================================================================
-    enum
-    {
-        fftOrder = 12,
-        fftSize = 1 << fftOrder
-    };
-    dsp::FFT                                    m_fwdFFT;
-    dsp::WindowingFunction<float>               m_windowF;
-    float                                       m_FFTdata[2 * fftSize];
-    int                                         m_FFTdataPos;
+    std::unique_ptr<ProcessorDataAnalyzer>  m_inputDataAnalyzer;
+    std::unique_ptr<ProcessorDataAnalyzer>  m_outputDataAnalyzer;
 
-    int                                         m_holdTimeMs;
-
+    //==============================================================================
     std::unique_ptr<SurroundSoundMatrixEditor>  m_processorEditor;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundSoundMatrixProcessor)
