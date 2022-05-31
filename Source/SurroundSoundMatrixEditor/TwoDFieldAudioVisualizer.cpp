@@ -63,52 +63,32 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
     // fill our visualization area background
     g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
-    g.fillRect(visuArea);
+    g.fillEllipse(visuArea.toFloat());
 
-    // draw a simple frame
-    g.setColour(Colours::white);
-    g.drawLine(Line<float>(visuAreaOrigX, visuAreaOrigY, visuAreaOrigX + visuAreaWidth, visuAreaOrigY));
-    g.drawLine(Line<float>(visuAreaOrigX, visuAreaOrigY - visuAreaHeight, visuAreaOrigX + visuAreaWidth, visuAreaOrigY - visuAreaHeight));
-    g.drawLine(Line<float>(visuAreaOrigX, visuAreaOrigY, visuAreaOrigX, visuAreaOrigY - visuAreaHeight));
-    g.drawLine(Line<float>(visuAreaOrigX + visuAreaWidth, visuAreaOrigY, visuAreaOrigX + visuAreaWidth, visuAreaOrigY - visuAreaHeight));
-    
-    // draw dashed field dimension indication lines
-    float dparam[]{ 4.0f, 5.0f };
-    g.drawDashedLine(Line<float>(visuAreaOrigX, visuAreaOrigY, visuAreaOrigX + visuAreaWidth, visuAreaOrigY - visuAreaHeight), dparam, 2);
-    g.drawDashedLine(Line<float>(visuAreaOrigX, visuAreaOrigY - visuAreaHeight, visuAreaOrigX + visuAreaWidth, visuAreaOrigY), dparam, 2);
-    g.drawDashedLine(Line<float>(visuAreaOrigX + 0.5f*visuAreaWidth, visuAreaOrigY - 0.5f*visuAreaHeight, visuAreaOrigX + 0.5f*visuAreaWidth, visuAreaOrigY - visuAreaHeight), dparam, 2);
+    auto visuAreaHalfHeight = static_cast<float>(visuArea.getHeight()) * 0.5f;
+    auto cornerOffset = visuAreaHalfHeight - (cosf(juce::MathConstants<float>::pi / 4) * visuAreaHalfHeight);
 
-    // draw L C R LS RS legend
-    g.drawText("L", Rectangle<float>(visuAreaOrigX - 20.0f, visuAreaOrigY - visuAreaHeight - float(outerMargin), 40.0f, float(outerMargin)), Justification::centred, true);
-    g.drawText("C", Rectangle<float>(visuAreaOrigX + 0.5f*visuAreaWidth - 20.0f, visuAreaOrigY - visuAreaHeight - float(outerMargin), 40.0f, float(outerMargin)), Justification::centred, true);
-    g.drawText("R", Rectangle<float>(visuAreaOrigX + visuAreaWidth - 20.0f, visuAreaOrigY - visuAreaHeight - float(outerMargin), 40.0f, float(outerMargin)), Justification::centred, true);
-    g.drawText("LS", Rectangle<float>(visuAreaOrigX - 20.0f, visuAreaOrigY, 40.0f, float(outerMargin)), Justification::centred, true);
-    g.drawText("RS", Rectangle<float>(visuAreaOrigX + visuAreaWidth - 20.0f, visuAreaOrigY, 40.0f, float(outerMargin)), Justification::centred, true);
+    auto levelOrig = juce::Point<float>(visuAreaOrigX + 0.5f * visuAreaWidth, visuAreaOrigY - 0.5f * visuAreaHeight);
+    auto centerMaxPoint = juce::Point<float>(visuAreaOrigX + 0.5f * visuAreaWidth, visuAreaOrigY - visuAreaHeight);
+    auto leftMaxPoint = juce::Point<float>(visuAreaOrigX + cornerOffset, visuAreaOrigY - visuAreaHeight + cornerOffset);
+    auto rightMaxPoint = juce::Point<float>(visuAreaOrigX + visuAreaWidth - cornerOffset, visuAreaOrigY - visuAreaHeight + cornerOffset);
+    auto leftSurroundMaxPoint = juce::Point<float>(visuAreaOrigX + cornerOffset, visuAreaOrigY - cornerOffset);
+    auto rightSurroundMaxPoint = juce::Point<float>(visuAreaOrigX + visuAreaWidth - cornerOffset, visuAreaOrigY - cornerOffset);
 
-    // draw dBFS
-    g.setFont(12.0f);
-    g.setColour(Colours::grey);
-    String rangeText;
-    if (getUsesValuesInDB())
-        rangeText = String(SurroundSoundMatrixProcessor::getGlobalMindB()) + " ... " + String(SurroundSoundMatrixProcessor::getGlobalMaxdB()) + " dBFS";
-    else
-        rangeText = "0 ... 1";
-    g.drawText(rangeText, Rectangle<float>(visuAreaOrigX + visuAreaWidth - 110.0f, visuAreaOrigY - visuAreaHeight - 5.0f, 110.0f, float(outerMargin)), Justification::centred, true);
 
     // draw level indication lines
-    juce::Point<float> levelOrig(visuAreaOrigX + 0.5f*visuAreaWidth, visuAreaOrigY - 0.5f*visuAreaHeight);
-    juce::Point<float> leftMax = levelOrig - juce::Point<float>(visuAreaOrigX, visuAreaOrigY - visuAreaHeight);
-    juce::Point<float> centerMax = levelOrig - juce::Point<float>(visuAreaOrigX + 0.5f*visuAreaWidth, visuAreaOrigY - visuAreaHeight);
-    juce::Point<float> rightMax = levelOrig - juce::Point<float>(visuAreaOrigX + visuAreaWidth, visuAreaOrigY - visuAreaHeight);
-    juce::Point<float> rightSurroundMax = levelOrig - juce::Point<float>(visuAreaOrigX + visuAreaWidth, visuAreaOrigY);
-    juce::Point<float> leftSurroundMax = levelOrig - juce::Point<float>(visuAreaOrigX, visuAreaOrigY);
+    juce::Point<float> leftMax = levelOrig - leftMaxPoint;
+    juce::Point<float> centerMax = levelOrig - centerMaxPoint;
+    juce::Point<float> rightMax = levelOrig - rightMaxPoint;
+    juce::Point<float> rightSurroundMax = levelOrig - rightSurroundMaxPoint;
+    juce::Point<float> leftSurroundMax = levelOrig - leftSurroundMaxPoint;
 
     // hold values
-    float holdLevelL  {0};
-    float holdLevelC  {0};
-    float holdLevelR  {0};
-    float holdLevelLS {0};
-    float holdLevelRS {0};
+    float holdLevelL{ 0 };
+    float holdLevelC{ 0 };
+    float holdLevelR{ 0 };
+    float holdLevelLS{ 0 };
+    float holdLevelRS{ 0 };
     if (getUsesValuesInDB())
     {
         holdLevelL = m_levelData.GetLevel(m_channelL).GetFactorHOLDdB();
@@ -137,11 +117,11 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     g.strokePath(holdPath, PathStrokeType(1));
 
     // peak values
-    float peakLevelL  {0};
-    float peakLevelC  {0};
-    float peakLevelR  {0};
-    float peakLevelLS {0};
-    float peakLevelRS {0};
+    float peakLevelL{ 0 };
+    float peakLevelC{ 0 };
+    float peakLevelR{ 0 };
+    float peakLevelLS{ 0 };
+    float peakLevelRS{ 0 };
     if (getUsesValuesInDB())
     {
         peakLevelL = m_levelData.GetLevel(m_channelL).GetFactorPEAKdB();
@@ -167,14 +147,14 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     peakPath.lineTo(levelOrig - rightSurroundMax * peakLevelRS);
     peakPath.lineTo(levelOrig - leftSurroundMax * peakLevelLS);
     peakPath.lineTo(levelOrig - leftMax * peakLevelL);
-    g.strokePath(peakPath, PathStrokeType(3));
+    g.fillPath(peakPath);
 
     // rms values
-    float rmsLevelL  {0};
-    float rmsLevelC  {0};
-    float rmsLevelR  {0};
-    float rmsLevelLS {0};
-    float rmsLevelRS {0};
+    float rmsLevelL{ 0 };
+    float rmsLevelC{ 0 };
+    float rmsLevelR{ 0 };
+    float rmsLevelLS{ 0 };
+    float rmsLevelRS{ 0 };
     if (getUsesValuesInDB())
     {
         rmsLevelL = m_levelData.GetLevel(m_channelL).GetFactorRMSdB();
@@ -200,7 +180,47 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     rmsPath.lineTo(levelOrig - rightSurroundMax * rmsLevelRS);
     rmsPath.lineTo(levelOrig - leftSurroundMax * rmsLevelLS);
     rmsPath.lineTo(levelOrig - leftMax * rmsLevelL);
-    g.strokePath(rmsPath, PathStrokeType(2));
+    g.fillPath(rmsPath);
+
+
+    // draw a simple circle surrounding
+    g.setColour(Colours::white);
+    g.drawEllipse(visuArea.toFloat(), 1);
+
+    // draw dashed field dimension indication lines
+    float dparam[]{ 4.0f, 5.0f };
+    g.drawDashedLine(juce::Line<float>(leftMaxPoint, rightSurroundMaxPoint), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(leftSurroundMaxPoint, rightMaxPoint), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(levelOrig, centerMaxPoint), dparam, 2);
+
+    // draw L C R LS RS legend
+    auto textRectSize = juce::Point<float>(25.0f, 25.0f);
+    g.drawText("L", juce::Rectangle<float>(leftMaxPoint, leftMaxPoint - textRectSize),
+        Justification::centred,
+        true);
+    g.drawText("C", juce::Rectangle<float>(centerMaxPoint - 0.5f * textRectSize, centerMaxPoint + 0.5f * textRectSize),
+        Justification::centred, 
+        true);
+    g.drawText("R", juce::Rectangle<float>(rightMaxPoint, rightMaxPoint + textRectSize),
+        Justification::centred,
+        true);
+    g.drawText("LS", juce::Rectangle<float>(leftSurroundMaxPoint, leftSurroundMaxPoint - textRectSize),
+        Justification::centred,
+        true);
+    g.drawText("RS", juce::Rectangle<float>(rightSurroundMaxPoint, rightSurroundMaxPoint + textRectSize),
+        Justification::centred,
+        true);
+
+    // draw dBFS
+    g.setFont(12.0f);
+    g.setColour(Colours::grey);
+    String rangeText;
+    if (getUsesValuesInDB())
+        rangeText = String(SurroundSoundMatrixProcessor::getGlobalMindB()) + " ... " + String(SurroundSoundMatrixProcessor::getGlobalMaxdB()) + " dBFS";
+    else
+        rangeText = "0 ... 1";
+    g.drawText(rangeText, Rectangle<float>(visuAreaOrigX + visuAreaWidth - 110.0f, visuAreaOrigY - visuAreaHeight - 5.0f, 110.0f, float(outerMargin)), Justification::centred, true);
+
 }
 
 void TwoDFieldAudioVisualizer::resized()
