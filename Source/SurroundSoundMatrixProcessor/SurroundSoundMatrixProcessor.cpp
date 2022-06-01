@@ -62,6 +62,8 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 
 SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
 {
+	m_deviceManager->removeAudioCallback(this);
+
 	// cleanup processing data buffer (do this elsewhere in productive code to avoid excessive mem alloc/free)
 	for (auto i = 0; i < s_maxChannelCount; i++)
 		delete[] m_processorChannels[i];
