@@ -51,7 +51,7 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     // calculate what we need for our center circle
     auto width = getWidth();
     auto height = getHeight();
-    auto outerMargin = 30.0f;
+    auto outerMargin = 20.0f;
     
     auto visuAreaWidth = static_cast<float>(width < height ? width : height) - 2 * outerMargin;
     auto visuAreaHeight = static_cast<float>(width < height ? width : height) - 2 * outerMargin;
@@ -59,21 +59,37 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     auto visuAreaOrigX = float(0.5f * (width - visuAreaWidth));
     auto visuAreaOrigY = height - float(0.5f * (height - visuAreaHeight));
 
-    Rectangle<int> visuArea(visuAreaOrigX, visuAreaOrigY - visuAreaHeight, visuAreaWidth, visuAreaHeight);
+    auto visuArea = juce::Rectangle<float>(visuAreaOrigX, visuAreaOrigY - visuAreaHeight, visuAreaWidth, visuAreaHeight);
+
+    /*dbg*/g.setColour(juce::Colours::red);
+    /*dbg*/g.drawRect(visuArea);
 
     // fill our visualization area background
     g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
-    g.fillEllipse(visuArea.toFloat());
+    g.fillEllipse(visuArea);
 
-    auto visuAreaHalfHeight = static_cast<float>(visuArea.getHeight()) * 0.5f;
+    auto visuAreaHalfHeight = visuArea.getHeight() * 0.5f;
+    auto visuAreaHalfWidth = visuArea.getWidth() * 0.5f;
     auto cornerOffset = visuAreaHalfHeight - (cosf(juce::MathConstants<float>::pi / 4) * visuAreaHalfHeight);
 
     auto levelOrig = juce::Point<float>(visuAreaOrigX + 0.5f * visuAreaWidth, visuAreaOrigY - 0.5f * visuAreaHeight);
     auto centerMaxPoint = juce::Point<float>(visuAreaOrigX + 0.5f * visuAreaWidth, visuAreaOrigY - visuAreaHeight);
-    auto leftMaxPoint = juce::Point<float>(visuAreaOrigX + cornerOffset, visuAreaOrigY - visuAreaHeight + cornerOffset);
-    auto rightMaxPoint = juce::Point<float>(visuAreaOrigX + visuAreaWidth - cornerOffset, visuAreaOrigY - visuAreaHeight + cornerOffset);
-    auto leftSurroundMaxPoint = juce::Point<float>(visuAreaOrigX + cornerOffset, visuAreaOrigY - cornerOffset);
-    auto rightSurroundMaxPoint = juce::Point<float>(visuAreaOrigX + visuAreaWidth - cornerOffset, visuAreaOrigY - cornerOffset);
+
+    auto leftXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto leftYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto leftMaxPoint = levelOrig + juce::Point<float>(-leftXLength, -leftYLength);
+    
+    auto rightXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto rightYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto rightMaxPoint = levelOrig + juce::Point<float>(rightXLength, -rightYLength);
+    
+    auto leftSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto leftSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto leftSurroundMaxPoint = levelOrig + juce::Point<float>(-leftSurroundXLength, leftSurroundYLength);
+    
+    auto rightSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto rightSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto rightSurroundMaxPoint = levelOrig + juce::Point<float>(rightSurroundXLength, rightSurroundYLength);
 
 
     // draw level indication lines
@@ -189,9 +205,11 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
     // draw dashed field dimension indication lines
     float dparam[]{ 4.0f, 5.0f };
-    g.drawDashedLine(juce::Line<float>(leftMaxPoint, rightSurroundMaxPoint), dparam, 2);
-    g.drawDashedLine(juce::Line<float>(leftSurroundMaxPoint, rightMaxPoint), dparam, 2);
-    g.drawDashedLine(juce::Line<float>(levelOrig, centerMaxPoint), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(leftMaxPoint, levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(leftSurroundMaxPoint, levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(rightMaxPoint, levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(rightSurroundMaxPoint, levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(centerMaxPoint, levelOrig), dparam, 2);
 
     // draw L C R LS RS legend
     auto textRectSize = juce::Point<float>(25.0f, 25.0f);
