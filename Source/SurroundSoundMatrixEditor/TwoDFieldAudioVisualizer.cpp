@@ -50,6 +50,10 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
+    // fill circle background
+    g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
+    g.fillEllipse(m_visuArea);
+
 #if defined DEBUG && defined PAINTINGHELPER
     g.setColour(juce::Colours::red);
     g.drawRect(m_visuArea);
@@ -177,7 +181,7 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
     // draw a simple circle surrounding
     g.setColour(Colours::white);
-    g.drawEllipse(m_visuArea.toFloat(), 1);
+    g.drawEllipse(m_visuArea, 1);
 
     // draw dashed field dimension indication lines
     float dparam[]{ 4.0f, 5.0f };
