@@ -188,14 +188,15 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     g.drawDashedLine(juce::Line<float>(m_centerMaxPoint, m_levelOrig), dparam, 2);
 
     // draw L C R LS RS legend
-    auto textRectSize = juce::Point<float>(25.0f, 25.0f);
+    auto textRectSize = juce::Point<float>(20.0f, 20.0f);
+    auto textRectSizeInv = juce::Point<float>(20.0f, -20.0f);
     auto textLRect = juce::Rectangle<float>(m_leftMaxPoint, m_leftMaxPoint - textRectSize);
     g.drawText("L", textLRect, Justification::centred, true);
-    auto textCRect = juce::Rectangle<float>(m_centerMaxPoint - 0.5f * textRectSize, m_centerMaxPoint + 0.5f * textRectSize);
+    auto textCRect = juce::Rectangle<float>(m_centerMaxPoint, m_centerMaxPoint - textRectSize) + juce::Point<float>(0.5f * textRectSize.getX(), 0.0f);
     g.drawText("C", textCRect, Justification::centred, true);
-    auto textRRect = juce::Rectangle<float>(m_rightMaxPoint, m_rightMaxPoint + textRectSize);
+    auto textRRect = juce::Rectangle<float>(m_rightMaxPoint, m_rightMaxPoint + textRectSizeInv);
     g.drawText("R", textRRect, Justification::centred, true);
-    auto textLSRect = juce::Rectangle<float>(m_leftSurroundMaxPoint, m_leftSurroundMaxPoint - textRectSize);
+    auto textLSRect = juce::Rectangle<float>(m_leftSurroundMaxPoint, m_leftSurroundMaxPoint - textRectSizeInv);
     g.drawText("LS", textLSRect, Justification::centred, true);
     auto textRSRect = juce::Rectangle<float>(m_rightSurroundMaxPoint, m_rightSurroundMaxPoint + textRectSize);
     g.drawText("RS", textRSRect, Justification::centred, true);
@@ -241,19 +242,19 @@ void TwoDFieldAudioVisualizer::resized()
     m_centerMaxPoint = juce::Point<float>(m_visuAreaOrigX + 0.5f * m_visuAreaWidth, m_visuAreaOrigY - m_visuAreaHeight);
 
     auto leftXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
-    auto leftYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto leftYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfHeight;
     m_leftMaxPoint = m_levelOrig + juce::Point<float>(-leftXLength, -leftYLength);
 
     auto rightXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
-    auto rightYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto rightYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfHeight;
     m_rightMaxPoint = m_levelOrig + juce::Point<float>(rightXLength, -rightYLength);
 
     auto leftSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
-    auto leftSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto leftSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfHeight;
     m_leftSurroundMaxPoint = m_levelOrig + juce::Point<float>(-leftSurroundXLength, leftSurroundYLength);
 
     auto rightSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
-    auto rightSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto rightSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfHeight;
     m_rightSurroundMaxPoint = m_levelOrig + juce::Point<float>(rightSurroundXLength, rightSurroundYLength);
 
     AbstractAudioVisualizer::resized();
