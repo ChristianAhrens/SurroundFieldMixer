@@ -52,6 +52,19 @@ private:
     unsigned long   m_channelLS{ 5 };
     unsigned long   m_channelRS{ 4 };
 
+    float m_outerMargin{ 20.0f };
+    float m_visuAreaWidth{ 0.0f };
+    float m_visuAreaHeight{ 0.0f };
+    float                   m_visuAreaOrigX{ 0.0f };
+    float                   m_visuAreaOrigY{ 0.0f };
+    juce::Rectangle<float>  m_visuArea;
+    juce::Point<float>      m_levelOrig;
+    juce::Point<float>      m_centerMaxPoint;
+    juce::Point<float>      m_leftMaxPoint;
+    juce::Point<float>      m_rightMaxPoint;
+    juce::Point<float>      m_leftSurroundMaxPoint;
+    juce::Point<float>      m_rightSurroundMaxPoint;
+
     ProcessorLevelData  m_levelData;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TwoDFieldAudioVisualizer)

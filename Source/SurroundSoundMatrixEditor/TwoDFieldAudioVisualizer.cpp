@@ -21,6 +21,8 @@
 namespace SurroundSoundMatrix
 {
 
+#define PAINTINGHELPER
+
 //==============================================================================
 TwoDFieldAudioVisualizer::TwoDFieldAudioVisualizer()
     : AbstractAudioVisualizer()
@@ -48,56 +50,19 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    // calculate what we need for our center circle
-    auto width = getWidth();
-    auto height = getHeight();
-    auto outerMargin = 20.0f;
-    
-    auto visuAreaWidth = static_cast<float>(width < height ? width : height) - 2 * outerMargin;
-    auto visuAreaHeight = static_cast<float>(width < height ? width : height) - 2 * outerMargin;
-    
-    auto visuAreaOrigX = float(0.5f * (width - visuAreaWidth));
-    auto visuAreaOrigY = height - float(0.5f * (height - visuAreaHeight));
-
-    auto visuArea = juce::Rectangle<float>(visuAreaOrigX, visuAreaOrigY - visuAreaHeight, visuAreaWidth, visuAreaHeight);
-
-    /*dbg*/g.setColour(juce::Colours::red);
-    /*dbg*/g.drawRect(visuArea);
-
-    // fill our visualization area background
-    g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
-    g.fillEllipse(visuArea);
-
-    auto visuAreaHalfHeight = visuArea.getHeight() * 0.5f;
-    auto visuAreaHalfWidth = visuArea.getWidth() * 0.5f;
-    auto cornerOffset = visuAreaHalfHeight - (cosf(juce::MathConstants<float>::pi / 4) * visuAreaHalfHeight);
-
-    auto levelOrig = juce::Point<float>(visuAreaOrigX + 0.5f * visuAreaWidth, visuAreaOrigY - 0.5f * visuAreaHeight);
-    auto centerMaxPoint = juce::Point<float>(visuAreaOrigX + 0.5f * visuAreaWidth, visuAreaOrigY - visuAreaHeight);
-
-    auto leftXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
-    auto leftYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
-    auto leftMaxPoint = levelOrig + juce::Point<float>(-leftXLength, -leftYLength);
-    
-    auto rightXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
-    auto rightYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
-    auto rightMaxPoint = levelOrig + juce::Point<float>(rightXLength, -rightYLength);
-    
-    auto leftSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
-    auto leftSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
-    auto leftSurroundMaxPoint = levelOrig + juce::Point<float>(-leftSurroundXLength, leftSurroundYLength);
-    
-    auto rightSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
-    auto rightSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
-    auto rightSurroundMaxPoint = levelOrig + juce::Point<float>(rightSurroundXLength, rightSurroundYLength);
-
+#if defined DEBUG && defined PAINTINGHELPER
+    g.setColour(juce::Colours::red);
+    g.drawRect(m_visuArea);
+    g.setColour(juce::Colours::blue);
+    g.drawRect(getLocalBounds());
+#endif
 
     // draw level indication lines
-    juce::Point<float> leftMax = levelOrig - leftMaxPoint;
-    juce::Point<float> centerMax = levelOrig - centerMaxPoint;
-    juce::Point<float> rightMax = levelOrig - rightMaxPoint;
-    juce::Point<float> rightSurroundMax = levelOrig - rightSurroundMaxPoint;
-    juce::Point<float> leftSurroundMax = levelOrig - leftSurroundMaxPoint;
+    juce::Point<float> leftMax = m_levelOrig - m_leftMaxPoint;
+    juce::Point<float> centerMax = m_levelOrig - m_centerMaxPoint;
+    juce::Point<float> rightMax = m_levelOrig - m_rightMaxPoint;
+    juce::Point<float> rightSurroundMax = m_levelOrig - m_rightSurroundMaxPoint;
+    juce::Point<float> leftSurroundMax = m_levelOrig - m_leftSurroundMaxPoint;
 
     // hold values
     float holdLevelL{ 0 };
@@ -124,13 +89,17 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
     g.setColour(Colours::grey);
     Path holdPath;
-    holdPath.startNewSubPath(levelOrig - leftMax * holdLevelL);
-    holdPath.lineTo(levelOrig - centerMax * holdLevelC);
-    holdPath.lineTo(levelOrig - rightMax * holdLevelR);
-    holdPath.lineTo(levelOrig - rightSurroundMax * holdLevelRS);
-    holdPath.lineTo(levelOrig - leftSurroundMax * holdLevelLS);
-    holdPath.lineTo(levelOrig - leftMax * holdLevelL);
+    holdPath.startNewSubPath(m_levelOrig - leftMax * holdLevelL);
+    holdPath.lineTo(m_levelOrig - centerMax * holdLevelC);
+    holdPath.lineTo(m_levelOrig - rightMax * holdLevelR);
+    holdPath.lineTo(m_levelOrig - rightSurroundMax * holdLevelRS);
+    holdPath.lineTo(m_levelOrig - leftSurroundMax * holdLevelLS);
+    holdPath.lineTo(m_levelOrig - leftMax * holdLevelL);
     g.strokePath(holdPath, PathStrokeType(1));
+#if defined DEBUG && defined PAINTINGHELPER
+    g.setColour(juce::Colours::yellow);
+    g.drawRect(holdPath.getBounds());
+#endif
 
     // peak values
     float peakLevelL{ 0 };
@@ -157,13 +126,17 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
     g.setColour(Colours::forestgreen.darker());
     Path peakPath;
-    peakPath.startNewSubPath(levelOrig - leftMax * peakLevelL);
-    peakPath.lineTo(levelOrig - centerMax * peakLevelC);
-    peakPath.lineTo(levelOrig - rightMax * peakLevelR);
-    peakPath.lineTo(levelOrig - rightSurroundMax * peakLevelRS);
-    peakPath.lineTo(levelOrig - leftSurroundMax * peakLevelLS);
-    peakPath.lineTo(levelOrig - leftMax * peakLevelL);
+    peakPath.startNewSubPath(m_levelOrig - leftMax * peakLevelL);
+    peakPath.lineTo(m_levelOrig - centerMax * peakLevelC);
+    peakPath.lineTo(m_levelOrig - rightMax * peakLevelR);
+    peakPath.lineTo(m_levelOrig - rightSurroundMax * peakLevelRS);
+    peakPath.lineTo(m_levelOrig - leftSurroundMax * peakLevelLS);
+    peakPath.lineTo(m_levelOrig - leftMax * peakLevelL);
     g.fillPath(peakPath);
+#if defined DEBUG && defined PAINTINGHELPER
+    g.setColour(juce::Colours::orange);
+    g.drawRect(peakPath.getBounds());
+#endif
 
     // rms values
     float rmsLevelL{ 0 };
@@ -190,44 +163,50 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
     g.setColour(Colours::forestgreen);
     Path rmsPath;
-    rmsPath.startNewSubPath(levelOrig - leftMax * rmsLevelL);
-    rmsPath.lineTo(levelOrig - centerMax * rmsLevelC);
-    rmsPath.lineTo(levelOrig - rightMax * rmsLevelR);
-    rmsPath.lineTo(levelOrig - rightSurroundMax * rmsLevelRS);
-    rmsPath.lineTo(levelOrig - leftSurroundMax * rmsLevelLS);
-    rmsPath.lineTo(levelOrig - leftMax * rmsLevelL);
+    rmsPath.startNewSubPath(m_levelOrig - leftMax * rmsLevelL);
+    rmsPath.lineTo(m_levelOrig - centerMax * rmsLevelC);
+    rmsPath.lineTo(m_levelOrig - rightMax * rmsLevelR);
+    rmsPath.lineTo(m_levelOrig - rightSurroundMax * rmsLevelRS);
+    rmsPath.lineTo(m_levelOrig - leftSurroundMax * rmsLevelLS);
+    rmsPath.lineTo(m_levelOrig - leftMax * rmsLevelL);
     g.fillPath(rmsPath);
-
+#if defined DEBUG && defined PAINTINGHELPER
+    g.setColour(juce::Colours::turquoise);
+    g.drawRect(rmsPath.getBounds());
+#endif
 
     // draw a simple circle surrounding
     g.setColour(Colours::white);
-    g.drawEllipse(visuArea.toFloat(), 1);
+    g.drawEllipse(m_visuArea.toFloat(), 1);
 
     // draw dashed field dimension indication lines
     float dparam[]{ 4.0f, 5.0f };
-    g.drawDashedLine(juce::Line<float>(leftMaxPoint, levelOrig), dparam, 2);
-    g.drawDashedLine(juce::Line<float>(leftSurroundMaxPoint, levelOrig), dparam, 2);
-    g.drawDashedLine(juce::Line<float>(rightMaxPoint, levelOrig), dparam, 2);
-    g.drawDashedLine(juce::Line<float>(rightSurroundMaxPoint, levelOrig), dparam, 2);
-    g.drawDashedLine(juce::Line<float>(centerMaxPoint, levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(m_leftMaxPoint, m_levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(m_leftSurroundMaxPoint, m_levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(m_rightMaxPoint, m_levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(m_rightSurroundMaxPoint, m_levelOrig), dparam, 2);
+    g.drawDashedLine(juce::Line<float>(m_centerMaxPoint, m_levelOrig), dparam, 2);
 
     // draw L C R LS RS legend
     auto textRectSize = juce::Point<float>(25.0f, 25.0f);
-    g.drawText("L", juce::Rectangle<float>(leftMaxPoint, leftMaxPoint - textRectSize),
-        Justification::centred,
-        true);
-    g.drawText("C", juce::Rectangle<float>(centerMaxPoint - 0.5f * textRectSize, centerMaxPoint + 0.5f * textRectSize),
-        Justification::centred, 
-        true);
-    g.drawText("R", juce::Rectangle<float>(rightMaxPoint, rightMaxPoint + textRectSize),
-        Justification::centred,
-        true);
-    g.drawText("LS", juce::Rectangle<float>(leftSurroundMaxPoint, leftSurroundMaxPoint - textRectSize),
-        Justification::centred,
-        true);
-    g.drawText("RS", juce::Rectangle<float>(rightSurroundMaxPoint, rightSurroundMaxPoint + textRectSize),
-        Justification::centred,
-        true);
+    auto textLRect = juce::Rectangle<float>(m_leftMaxPoint, m_leftMaxPoint - textRectSize);
+    g.drawText("L", textLRect, Justification::centred, true);
+    auto textCRect = juce::Rectangle<float>(m_centerMaxPoint - 0.5f * textRectSize, m_centerMaxPoint + 0.5f * textRectSize);
+    g.drawText("C", textCRect, Justification::centred, true);
+    auto textRRect = juce::Rectangle<float>(m_rightMaxPoint, m_rightMaxPoint + textRectSize);
+    g.drawText("R", textRRect, Justification::centred, true);
+    auto textLSRect = juce::Rectangle<float>(m_leftSurroundMaxPoint, m_leftSurroundMaxPoint - textRectSize);
+    g.drawText("LS", textLSRect, Justification::centred, true);
+    auto textRSRect = juce::Rectangle<float>(m_rightSurroundMaxPoint, m_rightSurroundMaxPoint + textRectSize);
+    g.drawText("RS", textRSRect, Justification::centred, true);
+#if defined DEBUG && defined PAINTINGHELPER
+    g.setColour(juce::Colours::lightblue);
+    g.drawRect(textLRect);
+    g.drawRect(textCRect);
+    g.drawRect(textRRect);
+    g.drawRect(textLSRect);
+    g.drawRect(textRSRect);
+#endif
 
     // draw dBFS
     g.setFont(12.0f);
@@ -237,12 +216,46 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
         rangeText = String(SurroundSoundMatrixProcessor::getGlobalMindB()) + " ... " + String(SurroundSoundMatrixProcessor::getGlobalMaxdB()) + " dBFS";
     else
         rangeText = "0 ... 1";
-    g.drawText(rangeText, Rectangle<float>(visuAreaOrigX + visuAreaWidth - 110.0f, visuAreaOrigY - visuAreaHeight - 5.0f, 110.0f, float(outerMargin)), Justification::centred, true);
+    g.drawText(rangeText, Rectangle<float>(m_visuAreaOrigX + m_visuAreaWidth - 110.0f, m_visuAreaOrigY - m_visuAreaHeight - 5.0f, 110.0f, float(m_outerMargin)), Justification::centred, true);
 
 }
 
 void TwoDFieldAudioVisualizer::resized()
 {
+    // calculate what we need for our center circle
+    auto width = getWidth();
+    auto height = getHeight();
+
+    m_visuAreaWidth = static_cast<float>(width < height ? width : height) - 2 * m_outerMargin;
+    m_visuAreaHeight = static_cast<float>(width < height ? width : height) - 2 * m_outerMargin;
+
+    m_visuAreaOrigX = float(0.5f * (width - m_visuAreaWidth));
+    m_visuAreaOrigY = height - float(0.5f * (height - m_visuAreaHeight));
+
+    m_visuArea = juce::Rectangle<float>(m_visuAreaOrigX, m_visuAreaOrigY - m_visuAreaHeight, m_visuAreaWidth, m_visuAreaHeight);
+
+    auto visuAreaHalfHeight = m_visuAreaHeight * 0.5f;
+    auto visuAreaHalfWidth = m_visuAreaWidth * 0.5f;
+
+    m_levelOrig = juce::Point<float>(m_visuAreaOrigX + 0.5f * m_visuAreaWidth, m_visuAreaOrigY - 0.5f * m_visuAreaHeight);
+    m_centerMaxPoint = juce::Point<float>(m_visuAreaOrigX + 0.5f * m_visuAreaWidth, m_visuAreaOrigY - m_visuAreaHeight);
+
+    auto leftXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto leftYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    m_leftMaxPoint = m_levelOrig + juce::Point<float>(-leftXLength, -leftYLength);
+
+    auto rightXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    auto rightYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * visuAreaHalfWidth;
+    m_rightMaxPoint = m_levelOrig + juce::Point<float>(rightXLength, -rightYLength);
+
+    auto leftSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto leftSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    m_leftSurroundMaxPoint = m_levelOrig + juce::Point<float>(-leftSurroundXLength, leftSurroundYLength);
+
+    auto rightSurroundXLength = cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    auto rightSurroundYLength = sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * visuAreaHalfWidth;
+    m_rightSurroundMaxPoint = m_levelOrig + juce::Point<float>(rightSurroundXLength, rightSurroundYLength);
+
     AbstractAudioVisualizer::resized();
 }
 
