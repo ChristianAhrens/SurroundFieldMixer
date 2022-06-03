@@ -21,6 +21,7 @@
 #include <JuceHeader.h>
 
 #include "AbstractAudioVisualizer.h"
+#include "../SurroundSoundMatrixProcessor/SurroundSoundMatrixProcessor.h"
 
 namespace SurroundSoundMatrix
 {
@@ -28,7 +29,8 @@ namespace SurroundSoundMatrix
 //==============================================================================
 /*
 */
-class MultiMeterAudioVisualizer    : public AbstractAudioVisualizer
+class MultiMeterAudioVisualizer :   public AbstractAudioVisualizer, 
+                                    public SurroundSoundMatrixProcessor::InputCommander
 {
 public:
     MultiMeterAudioVisualizer();

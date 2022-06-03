@@ -40,8 +40,10 @@ SurroundSoundMatrixEditor::SurroundSoundMatrixEditor(AudioProcessor& processor)
     auto surroundSoundMatrixProc = dynamic_cast<SurroundSoundMatrixProcessor*>(&processor);
     if (surroundSoundMatrixProc)
     {
-        surroundSoundMatrixProc->addOutputListener(m_surroundField.get());
         surroundSoundMatrixProc->addInputListener(m_meterBank.get());
+        surroundSoundMatrixProc->addInputCommander(m_meterBank.get());
+        surroundSoundMatrixProc->addOutputListener(m_surroundField.get());
+        surroundSoundMatrixProc->addOutputCommander(m_surroundField.get());
     }
 
     setSize(800, 600);

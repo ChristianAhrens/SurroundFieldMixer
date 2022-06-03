@@ -36,6 +36,17 @@ class SurroundSoundMatrixProcessor :    public AudioProcessor,
                                         public MessageListener
 {
 public:
+    class InputCommander
+    {
+
+    };
+
+    class OutputCommander
+    {
+
+    };
+
+public:
     SurroundSoundMatrixProcessor();
     ~SurroundSoundMatrixProcessor();
 
@@ -44,6 +55,12 @@ public:
     void removeInputListener(ProcessorDataAnalyzer::Listener* listener);
     void addOutputListener(ProcessorDataAnalyzer::Listener* listener);
     void removeOutputListener(ProcessorDataAnalyzer::Listener* listener);
+
+    //==============================================================================
+    void addInputCommander(InputCommander* commander);
+    void removeInputCommander(InputCommander* commander);
+    void addOutputCommander(OutputCommander* commander);
+    void removeOutputCommander(OutputCommander* comander);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
@@ -116,6 +133,10 @@ private:
     //==============================================================================
     std::unique_ptr<ProcessorDataAnalyzer>  m_inputDataAnalyzer;
     std::unique_ptr<ProcessorDataAnalyzer>  m_outputDataAnalyzer;
+
+    //==============================================================================
+    std::vector<InputCommander*>    m_inputCommanders;
+    std::vector<OutputCommander*>   m_outputCommanders;
 
     //==============================================================================
     std::unique_ptr<SurroundSoundMatrixEditor>  m_processorEditor;

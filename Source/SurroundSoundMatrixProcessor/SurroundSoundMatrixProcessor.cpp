@@ -94,6 +94,32 @@ void SurroundSoundMatrixProcessor::removeOutputListener(ProcessorDataAnalyzer::L
 		m_outputDataAnalyzer->removeListener(listener);
 }
 
+void SurroundSoundMatrixProcessor::addInputCommander(InputCommander* commander)
+{
+	if (std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander) == m_inputCommanders.end())
+		m_inputCommanders.push_back(commander);
+}
+
+void SurroundSoundMatrixProcessor::removeInputCommander(InputCommander* commander)
+{
+	auto existingInputCommander = std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander);
+	if (existingInputCommander != m_inputCommanders.end())
+		m_inputCommanders.erase(existingInputCommander);
+}
+
+void SurroundSoundMatrixProcessor::addOutputCommander(OutputCommander* commander)
+{
+	if (std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander) == m_outputCommanders.end())
+		m_outputCommanders.push_back(commander);
+}
+
+void SurroundSoundMatrixProcessor::removeOutputCommander(OutputCommander* commander)
+{
+	auto existingOutputCommander = std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander);
+	if (existingOutputCommander != m_outputCommanders.end())
+		m_outputCommanders.erase(existingOutputCommander);
+}
+
 AudioDeviceManager* SurroundSoundMatrixProcessor::getDeviceManager()
 {
 	if (m_deviceManager)
