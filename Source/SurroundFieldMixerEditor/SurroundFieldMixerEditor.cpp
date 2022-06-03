@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -16,19 +16,19 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "SurroundSoundMatrixEditor.h"
+#include "SurroundFieldMixerEditor.h"
 
 #include <JuceHeader.h>
 
-#include "../SurroundSoundMatrixEditor/MultiMeterAudioVisualizer.h"
-#include "../SurroundSoundMatrixEditor/TwoDFieldAudioVisualizer.h"
+#include "../SurroundFieldMixerEditor/MultiMeterAudioVisualizer.h"
+#include "../SurroundFieldMixerEditor/TwoDFieldAudioVisualizer.h"
 
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
 //==============================================================================
-SurroundSoundMatrixEditor::SurroundSoundMatrixEditor(AudioProcessor& processor)
+SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor& processor)
     : AudioProcessorEditor(processor)
 {
     m_meterBank = std::make_unique<MultiMeterAudioVisualizer>();
@@ -37,28 +37,28 @@ SurroundSoundMatrixEditor::SurroundSoundMatrixEditor(AudioProcessor& processor)
     m_surroundField = std::make_unique<TwoDFieldAudioVisualizer>();
     addAndMakeVisible(m_surroundField.get());
 
-    auto surroundSoundMatrixProc = dynamic_cast<SurroundSoundMatrixProcessor*>(&processor);
-    if (surroundSoundMatrixProc)
+    auto SurroundFieldMixerProc = dynamic_cast<SurroundFieldMixerProcessor*>(&processor);
+    if (SurroundFieldMixerProc)
     {
-        surroundSoundMatrixProc->addInputListener(m_meterBank.get());
-        surroundSoundMatrixProc->addInputCommander(m_meterBank.get());
-        surroundSoundMatrixProc->addOutputListener(m_surroundField.get());
-        surroundSoundMatrixProc->addOutputCommander(m_surroundField.get());
+        SurroundFieldMixerProc->addInputListener(m_meterBank.get());
+        SurroundFieldMixerProc->addInputCommander(m_meterBank.get());
+        SurroundFieldMixerProc->addOutputListener(m_surroundField.get());
+        SurroundFieldMixerProc->addOutputCommander(m_surroundField.get());
     }
 
     setSize(800, 600);
 }
 
-SurroundSoundMatrixEditor::SurroundSoundMatrixEditor(AudioProcessor* processor)
-    : SurroundSoundMatrixEditor(*processor)
+SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor* processor)
+    : SurroundFieldMixerEditor(*processor)
 {
 }
 
-SurroundSoundMatrixEditor::~SurroundSoundMatrixEditor()
+SurroundFieldMixerEditor::~SurroundFieldMixerEditor()
 {
 }
 
-void SurroundSoundMatrixEditor::paint (Graphics& g)
+void SurroundFieldMixerEditor::paint (Graphics& g)
 {
     auto bounds = getLocalBounds();
 
@@ -67,7 +67,7 @@ void SurroundSoundMatrixEditor::paint (Graphics& g)
     g.fillRect(bounds.toFloat());
 }
 
-void SurroundSoundMatrixEditor::resized()
+void SurroundFieldMixerEditor::resized()
 {
     auto bounds = getLocalBounds();
 
@@ -83,12 +83,12 @@ void SurroundSoundMatrixEditor::resized()
     m_surroundField->setBounds(surroundFieldBounds);
 }
 
-void SurroundSoundMatrixEditor::lookAndFeelChanged()
+void SurroundFieldMixerEditor::lookAndFeelChanged()
 {
     AudioProcessorEditor::lookAndFeelChanged();
 }
 
-std::unique_ptr<XmlElement> SurroundSoundMatrixEditor::createStateXml()
+std::unique_ptr<XmlElement> SurroundFieldMixerEditor::createStateXml()
 {
     //auto activeVisuTypes = getActiveVisuTypes();
     //
@@ -119,7 +119,7 @@ std::unique_ptr<XmlElement> SurroundSoundMatrixEditor::createStateXml()
     return nullptr;
 }
 
-bool SurroundSoundMatrixEditor::setStateXml(XmlElement* stateXml)
+bool SurroundFieldMixerEditor::setStateXml(XmlElement* stateXml)
 {
     //if (!stateXml || (stateXml->getTagName() != AppConfiguration::getTagName(AppConfiguration::TagID::VISU)))
     //    return false;

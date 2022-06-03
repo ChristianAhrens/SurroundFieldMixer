@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -18,7 +18,7 @@
 
 #include "TwoDFieldAudioVisualizer.h"
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
 #define PAINTINGHELPER
@@ -218,7 +218,7 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
     g.setColour(Colours::grey);
     String rangeText;
     if (getUsesValuesInDB())
-        rangeText = String(SurroundSoundMatrixProcessor::getGlobalMindB()) + " ... " + String(SurroundSoundMatrixProcessor::getGlobalMaxdB()) + " dBFS";
+        rangeText = String(SurroundFieldMixerProcessor::getGlobalMindB()) + " ... " + String(SurroundFieldMixerProcessor::getGlobalMaxdB()) + " dBFS";
     else
         rangeText = "0 ... 1";
     g.drawText(rangeText, Rectangle<float>(m_visuAreaOrigX + m_visuAreaWidth - 110.0f, m_visuAreaOrigY - m_visuAreaHeight - 5.0f, 110.0f, float(m_outerMargin)), Justification::centred, true);

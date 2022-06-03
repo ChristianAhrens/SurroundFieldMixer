@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -16,39 +16,39 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "SurroundSoundMatrix.h"
+#include "SurroundFieldMixer.h"
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
 //==============================================================================
-SurroundSoundMatrix::SurroundSoundMatrix() :
+SurroundFieldMixer::SurroundFieldMixer() :
     Component(),
     JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement()
 {
-    m_SurroundSoundMatrixProcessor = std::make_unique<SurroundSoundMatrixProcessor>();
-    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundSoundMatrixProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
+    m_SurroundFieldMixerProcessor = std::make_unique<SurroundFieldMixerProcessor>();
+    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
 }
 
-SurroundSoundMatrix::~SurroundSoundMatrix()
+SurroundFieldMixer::~SurroundFieldMixer()
 {
-    if (m_SurroundSoundMatrixProcessor)
-        m_SurroundSoundMatrixProcessor->editorBeingDeleted(m_SurroundSoundMatrixProcessor->getActiveEditor());
+    if (m_SurroundFieldMixerProcessor)
+        m_SurroundFieldMixerProcessor->editorBeingDeleted(m_SurroundFieldMixerProcessor->getActiveEditor());
 }
 
-juce::Component* SurroundSoundMatrix::getUIComponent()
+juce::Component* SurroundFieldMixer::getUIComponent()
 {
-    if (m_SurroundSoundMatrixProcessor)
+    if (m_SurroundFieldMixerProcessor)
     {
-        if (nullptr == m_SurroundSoundMatrixProcessor->getActiveEditor())
-            m_SurroundSoundMatrixProcessor->createEditorIfNeeded();
-        return m_SurroundSoundMatrixProcessor->getActiveEditor();
+        if (nullptr == m_SurroundFieldMixerProcessor->getActiveEditor())
+            m_SurroundFieldMixerProcessor->createEditorIfNeeded();
+        return m_SurroundFieldMixerProcessor->getActiveEditor();
     }
     else
         return nullptr;
 }
 
-juce::Component* SurroundSoundMatrix::getDeviceSetupComponent()
+juce::Component* SurroundFieldMixer::getDeviceSetupComponent()
 {
     if (m_audioDeviceSelectComponent)
         return m_audioDeviceSelectComponent.get();
@@ -56,13 +56,13 @@ juce::Component* SurroundSoundMatrix::getDeviceSetupComponent()
         return nullptr;
 }
 
-std::unique_ptr<XmlElement> SurroundSoundMatrix::createStateXml()
+std::unique_ptr<XmlElement> SurroundFieldMixer::createStateXml()
 {
     jassertfalse;
     return nullptr;
 }
 
-bool SurroundSoundMatrix::setStateXml(XmlElement* stateXml)
+bool SurroundFieldMixer::setStateXml(XmlElement* stateXml)
 {
     jassertfalse;
     return false;

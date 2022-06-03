@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -21,43 +21,39 @@
 #include <JuceHeader.h>
 
 #include "AppConfigurationBase.h"
-#include "AudioSelectComponent.h"
+
+#include "SurroundFieldMixerEditor/SurroundFieldMixerEditor.h"
+#include "SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
 
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
-
-class MultiMeterAudioVisualizer;
-class TwoDFieldAudioVisualizer;
-
 
 //==============================================================================
 /*
-*/
-class SurroundSoundMatrixEditor :   public AudioProcessorEditor,
-                                    public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
+ *
+ */
+class SurroundFieldMixer   :   public Component,
+                                public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
 {
 public:
-    SurroundSoundMatrixEditor(AudioProcessor& processor);
-    SurroundSoundMatrixEditor(AudioProcessor* processor);
-    ~SurroundSoundMatrixEditor();
-
-    //==============================================================================
-    void paint(Graphics&) override;
-    void resized() override;
-
+    SurroundFieldMixer();
+    ~SurroundFieldMixer() override;
+    
     //==========================================================================
-    void lookAndFeelChanged() override;
+    juce::Component* getUIComponent();
+    juce::Component* getDeviceSetupComponent();
 
     //==========================================================================
     std::unique_ptr<XmlElement> createStateXml() override;
     bool setStateXml(XmlElement* stateXml) override;
 
 private:
-    std::unique_ptr<MultiMeterAudioVisualizer>  m_meterBank;
-    std::unique_ptr<TwoDFieldAudioVisualizer>   m_surroundField;
+    std::unique_ptr<SurroundFieldMixerProcessor>   m_SurroundFieldMixerProcessor;
+    std::unique_ptr<SurroundFieldMixerEditor>      m_audioVisuComponent;
+    std::unique_ptr<AudioSelectComponent>           m_audioDeviceSelectComponent;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundSoundMatrixEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundFieldMixer)
 };
 
-}
+};

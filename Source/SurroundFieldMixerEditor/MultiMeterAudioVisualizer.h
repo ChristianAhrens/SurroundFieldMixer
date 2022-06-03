@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -21,16 +21,16 @@
 #include <JuceHeader.h>
 
 #include "AbstractAudioVisualizer.h"
-#include "../SurroundSoundMatrixProcessor/SurroundSoundMatrixProcessor.h"
+#include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
 //==============================================================================
 /*
 */
 class MultiMeterAudioVisualizer :   public AbstractAudioVisualizer, 
-                                    public SurroundSoundMatrixProcessor::InputCommander
+                                    public SurroundFieldMixerProcessor::InputCommander
 {
 public:
     MultiMeterAudioVisualizer();

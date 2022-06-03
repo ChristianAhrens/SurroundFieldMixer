@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -20,9 +20,9 @@
 
 #include <JuceHeader.h>
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
-    class SurroundSoundMatrix;
+    class SurroundFieldMixer;
 }
 
 
@@ -37,7 +37,7 @@ public:
     void resized() override;
 
 private:
-    std::unique_ptr<SurroundSoundMatrix::SurroundSoundMatrix>    m_ssm;
+    std::unique_ptr<SurroundFieldMixer::SurroundFieldMixer>    m_ssm;
 
     std::unique_ptr<TextButton> m_setupToggleButton;
 

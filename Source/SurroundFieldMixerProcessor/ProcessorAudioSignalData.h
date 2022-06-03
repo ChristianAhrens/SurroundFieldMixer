@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -15,25 +15,31 @@
  * along with this library; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
+#pragma once
+
+#include <JuceHeader.h>
 
 #include "AbstractProcessorData.h"
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
-AbstractProcessorData::AbstractProcessorData()
+class ProcessorAudioSignalData :    public AbstractProcessorData,
+                                    public AudioBuffer<float>
 {
-    m_type = Invalid;
-}
+public:
+    ProcessorAudioSignalData();
+    ~ProcessorAudioSignalData();
+    
+    void SetChannelCount(unsigned long count) override;
+    unsigned long GetChannelCount() override;
 
-AbstractProcessorData::~AbstractProcessorData()
-{
+    void SetSampleRate(unsigned long rate);
+    unsigned long GetSampleRate();
 
-}
-
-AbstractProcessorData::Type AbstractProcessorData::GetDataType()
-{
-    return m_type;
-}
+private:
+    unsigned long m_sampleRate;
+    
+};
 
 }

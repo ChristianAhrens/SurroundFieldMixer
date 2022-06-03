@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -21,17 +21,17 @@
 #include <JuceHeader.h>
 
 #include "ProcessorDataAnalyzer.h"
-#include "../SurroundSoundMatrixEditor/SurroundSoundMatrixEditor.h"
+#include "../SurroundFieldMixerEditor/SurroundFieldMixerEditor.h"
 
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
 
 //==============================================================================
 /*
 */
-class SurroundSoundMatrixProcessor :    public AudioProcessor,
+class SurroundFieldMixerProcessor :    public AudioProcessor,
 					                    public AudioIODeviceCallback,
                                         public MessageListener
 {
@@ -47,8 +47,8 @@ public:
     };
 
 public:
-    SurroundSoundMatrixProcessor();
-    ~SurroundSoundMatrixProcessor();
+    SurroundFieldMixerProcessor();
+    ~SurroundFieldMixerProcessor();
 
     //==============================================================================
     void addInputListener(ProcessorDataAnalyzer::Listener* listener);
@@ -139,9 +139,9 @@ private:
     std::vector<OutputCommander*>   m_outputCommanders;
 
     //==============================================================================
-    std::unique_ptr<SurroundSoundMatrixEditor>  m_processorEditor;
+    std::unique_ptr<SurroundFieldMixerEditor>  m_processorEditor;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundSoundMatrixProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundFieldMixerProcessor)
 };
 
-} // namespace SurroundSoundMatrix
+} // namespace SurroundFieldMixer

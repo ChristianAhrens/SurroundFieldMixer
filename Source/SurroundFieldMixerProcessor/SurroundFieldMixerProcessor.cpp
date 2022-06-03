@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -16,14 +16,14 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "SurroundSoundMatrixProcessor.h"
+#include "SurroundFieldMixerProcessor.h"
 
-namespace SurroundSoundMatrix
+namespace SurroundFieldMixer
 {
 
 
 //==============================================================================
-SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
+SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 	AudioProcessor()
 {
 	// prepare max sized processing data buffer
@@ -60,7 +60,7 @@ SurroundSoundMatrixProcessor::SurroundSoundMatrixProcessor() :
 	m_deviceManager->setAudioDeviceSetup(audioDeviceSetup, true);
 }
 
-SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
+SurroundFieldMixerProcessor::~SurroundFieldMixerProcessor()
 {
 	m_deviceManager->removeAudioCallback(this);
 
@@ -70,57 +70,57 @@ SurroundSoundMatrixProcessor::~SurroundSoundMatrixProcessor()
 	delete[] m_processorChannels;
 }
 
-void SurroundSoundMatrixProcessor::addInputListener(ProcessorDataAnalyzer::Listener* listener)
+void SurroundFieldMixerProcessor::addInputListener(ProcessorDataAnalyzer::Listener* listener)
 {
 	if (m_inputDataAnalyzer)
 		m_inputDataAnalyzer->addListener(listener);
 }
 
-void SurroundSoundMatrixProcessor::removeInputListener(ProcessorDataAnalyzer::Listener* listener)
+void SurroundFieldMixerProcessor::removeInputListener(ProcessorDataAnalyzer::Listener* listener)
 {
 	if (m_inputDataAnalyzer)
 		m_inputDataAnalyzer->removeListener(listener);
 }
 
-void SurroundSoundMatrixProcessor::addOutputListener(ProcessorDataAnalyzer::Listener* listener)
+void SurroundFieldMixerProcessor::addOutputListener(ProcessorDataAnalyzer::Listener* listener)
 {
 	if (m_outputDataAnalyzer)
 		m_outputDataAnalyzer->addListener(listener);
 }
 
-void SurroundSoundMatrixProcessor::removeOutputListener(ProcessorDataAnalyzer::Listener* listener)
+void SurroundFieldMixerProcessor::removeOutputListener(ProcessorDataAnalyzer::Listener* listener)
 {
 	if (m_outputDataAnalyzer)
 		m_outputDataAnalyzer->removeListener(listener);
 }
 
-void SurroundSoundMatrixProcessor::addInputCommander(InputCommander* commander)
+void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 {
 	if (std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander) == m_inputCommanders.end())
 		m_inputCommanders.push_back(commander);
 }
 
-void SurroundSoundMatrixProcessor::removeInputCommander(InputCommander* commander)
+void SurroundFieldMixerProcessor::removeInputCommander(InputCommander* commander)
 {
 	auto existingInputCommander = std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander);
 	if (existingInputCommander != m_inputCommanders.end())
 		m_inputCommanders.erase(existingInputCommander);
 }
 
-void SurroundSoundMatrixProcessor::addOutputCommander(OutputCommander* commander)
+void SurroundFieldMixerProcessor::addOutputCommander(OutputCommander* commander)
 {
 	if (std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander) == m_outputCommanders.end())
 		m_outputCommanders.push_back(commander);
 }
 
-void SurroundSoundMatrixProcessor::removeOutputCommander(OutputCommander* commander)
+void SurroundFieldMixerProcessor::removeOutputCommander(OutputCommander* commander)
 {
 	auto existingOutputCommander = std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander);
 	if (existingOutputCommander != m_outputCommanders.end())
 		m_outputCommanders.erase(existingOutputCommander);
 }
 
-AudioDeviceManager* SurroundSoundMatrixProcessor::getDeviceManager()
+AudioDeviceManager* SurroundFieldMixerProcessor::getDeviceManager()
 {
 	if (m_deviceManager)
 		return m_deviceManager.get();
@@ -129,12 +129,12 @@ AudioDeviceManager* SurroundSoundMatrixProcessor::getDeviceManager()
 }
 
 //==============================================================================
-const String SurroundSoundMatrixProcessor::getName() const
+const String SurroundFieldMixerProcessor::getName() const
 {
 	return m_Name;
 }
 
-void SurroundSoundMatrixProcessor::prepareToPlay(double sampleRate, int maximumExpectedSamplesPerBlock)
+void SurroundFieldMixerProcessor::prepareToPlay(double sampleRate, int maximumExpectedSamplesPerBlock)
 {
 	if (m_inputDataAnalyzer)
 		m_inputDataAnalyzer->initializeParameters(sampleRate, maximumExpectedSamplesPerBlock);
@@ -142,7 +142,7 @@ void SurroundSoundMatrixProcessor::prepareToPlay(double sampleRate, int maximumE
 		m_outputDataAnalyzer->initializeParameters(sampleRate, maximumExpectedSamplesPerBlock);
 }
 
-void SurroundSoundMatrixProcessor::releaseResources()
+void SurroundFieldMixerProcessor::releaseResources()
 {
 	if (m_inputDataAnalyzer)
 		m_inputDataAnalyzer->clearParameters();
@@ -150,7 +150,7 @@ void SurroundSoundMatrixProcessor::releaseResources()
 		m_outputDataAnalyzer->clearParameters();
 }
 
-void SurroundSoundMatrixProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
 	ignoreUnused(midiMessages);
 
@@ -169,7 +169,7 @@ void SurroundSoundMatrixProcessor::processBlock(AudioBuffer<float>& buffer, Midi
 	postMessage(new AudioOutputBufferMessage(buffer));
 }
 
-void SurroundSoundMatrixProcessor::handleMessage(const Message& message)
+void SurroundFieldMixerProcessor::handleMessage(const Message& message)
 {
 	if (auto m = dynamic_cast<const AudioBufferMessage*> (&message))
 	{
@@ -180,73 +180,73 @@ void SurroundSoundMatrixProcessor::handleMessage(const Message& message)
 	}
 }
 
-double SurroundSoundMatrixProcessor::getTailLengthSeconds() const
+double SurroundFieldMixerProcessor::getTailLengthSeconds() const
 {
 	/*dbg*/return 0.0;
 }
 
-bool SurroundSoundMatrixProcessor::acceptsMidi() const
+bool SurroundFieldMixerProcessor::acceptsMidi() const
 {
 	return false;
 }
 
-bool SurroundSoundMatrixProcessor::producesMidi() const
+bool SurroundFieldMixerProcessor::producesMidi() const
 {
 	return false;
 }
 
-AudioProcessorEditor* SurroundSoundMatrixProcessor::createEditor()
+AudioProcessorEditor* SurroundFieldMixerProcessor::createEditor()
 {
 	if (!m_processorEditor)
-		m_processorEditor = std::make_unique<SurroundSoundMatrixEditor>(this);
+		m_processorEditor = std::make_unique<SurroundFieldMixerEditor>(this);
 
 	return m_processorEditor.get();
 }
 
-bool SurroundSoundMatrixProcessor::hasEditor() const
+bool SurroundFieldMixerProcessor::hasEditor() const
 {
 	return !!m_processorEditor;
 }
 
-int SurroundSoundMatrixProcessor::getNumPrograms()
+int SurroundFieldMixerProcessor::getNumPrograms()
 {
 	/*dbg*/return 0;
 }
 
-int SurroundSoundMatrixProcessor::getCurrentProgram()
+int SurroundFieldMixerProcessor::getCurrentProgram()
 {
 	/*dbg*/return 0;
 }
 
-void SurroundSoundMatrixProcessor::setCurrentProgram(int index)
+void SurroundFieldMixerProcessor::setCurrentProgram(int index)
 {
 	/*dbg*/ignoreUnused(index);
 }
 
-const String SurroundSoundMatrixProcessor::getProgramName(int index)
+const String SurroundFieldMixerProcessor::getProgramName(int index)
 {
 	/*dbg*/ignoreUnused(index);
 	/*dbg*/return String();
 }
 
-void SurroundSoundMatrixProcessor::changeProgramName(int index, const String& newName)
+void SurroundFieldMixerProcessor::changeProgramName(int index, const String& newName)
 {
 	/*dbg*/ignoreUnused(index);
 	/*dbg*/ignoreUnused(newName);
 }
 
-void SurroundSoundMatrixProcessor::getStateInformation(juce::MemoryBlock& destData)
+void SurroundFieldMixerProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
 	/*dbg*/ignoreUnused(destData);
 }
 
-void SurroundSoundMatrixProcessor::setStateInformation(const void* data, int sizeInBytes)
+void SurroundFieldMixerProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
 	/*dbg*/ignoreUnused(data);
 	/*dbg*/ignoreUnused(sizeInBytes);
 }
 
-void SurroundSoundMatrixProcessor::audioDeviceIOCallback(const float** inputChannelData, int numInputChannels,
+void SurroundFieldMixerProcessor::audioDeviceIOCallback(const float** inputChannelData, int numInputChannels,
 	float** outputChannelData, int numOutputChannels, int numSamples)
 {
 	const ScopedLock sl(m_readLock);
@@ -277,7 +277,7 @@ void SurroundSoundMatrixProcessor::audioDeviceIOCallback(const float** inputChan
 
 }
 
-void SurroundSoundMatrixProcessor::audioDeviceAboutToStart(AudioIODevice* device)
+void SurroundFieldMixerProcessor::audioDeviceAboutToStart(AudioIODevice* device)
 {
 	if (device)
 	{
@@ -285,9 +285,9 @@ void SurroundSoundMatrixProcessor::audioDeviceAboutToStart(AudioIODevice* device
 	}
 }
 
-void SurroundSoundMatrixProcessor::audioDeviceStopped()
+void SurroundFieldMixerProcessor::audioDeviceStopped()
 {
 	releaseResources();
 }
 
-} // namespace SurroundSoundMatrix
+} // namespace SurroundFieldMixer

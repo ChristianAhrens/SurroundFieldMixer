@@ -1,6 +1,6 @@
 /* Copyright (c) 2022, Christian Ahrens
  *
- * This file is part of SpaConBridge <https://github.com/ChristianAhrens/SurroundSoundMatrix>
+ * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the terms of the GNU Lesser General Public License version 3.0 as published
@@ -18,12 +18,12 @@
 
 #include "MainComponent.h"
 
-#include "SurroundSoundMatrix.h"
+#include "SurroundFieldMixer.h"
 
 MainComponent::MainComponent()
     : juce::Component()
 {
-    m_ssm = std::make_unique<SurroundSoundMatrix::SurroundSoundMatrix>();
+    m_ssm = std::make_unique<SurroundFieldMixer::SurroundFieldMixer>();
     addAndMakeVisible(m_ssm->getUIComponent());
 
     m_setupToggleButton = std::make_unique<TextButton>("Setup");
@@ -61,9 +61,9 @@ void MainComponent::paint(Graphics &g)
 
 void MainComponent::resized()
 {
-    auto surroundSoundMatrixComponent = m_ssm->getUIComponent();
-    if (surroundSoundMatrixComponent)
-        surroundSoundMatrixComponent->setBounds(getLocalBounds());
+    auto SurroundFieldMixerComponent = m_ssm->getUIComponent();
+    if (SurroundFieldMixerComponent)
+        SurroundFieldMixerComponent->setBounds(getLocalBounds());
 
     if (m_setupToggleButton)
         m_setupToggleButton->setBounds(getLocalBounds().reduced(6).removeFromRight(50).removeFromTop(20));
