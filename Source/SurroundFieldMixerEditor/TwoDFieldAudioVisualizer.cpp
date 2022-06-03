@@ -283,6 +283,11 @@ void TwoDFieldAudioVisualizer::processChangedChannelMapping()
         m_channelRS = getChannelMapping().at(AudioVisualizerConfigBase::MappingKey::RS);
 }
 
+void TwoDFieldAudioVisualizer::setMuteCallback(const std::function<void(int, bool)>& callback)
+{
+
+}
+
 void TwoDFieldAudioVisualizer::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)

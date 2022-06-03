@@ -130,6 +130,11 @@ void MultiMeterAudioVisualizer::processChangedChannelMapping()
 
 }
 
+void MultiMeterAudioVisualizer::setMuteCallback(const std::function<void(int, bool)>& callback)
+{
+
+}
+
 void MultiMeterAudioVisualizer::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)

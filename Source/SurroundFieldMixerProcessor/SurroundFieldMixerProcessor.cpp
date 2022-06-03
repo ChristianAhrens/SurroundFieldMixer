@@ -96,12 +96,21 @@ void SurroundFieldMixerProcessor::removeOutputListener(ProcessorDataAnalyzer::Li
 
 void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 {
+	if (commander == nullptr)
+		return;
+
 	if (std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander) == m_inputCommanders.end())
+	{
 		m_inputCommanders.push_back(commander);
+		commander->setMuteCallback([=](int channel, bool state) { return toggleInputMute(channel, state); } );
+	}
 }
 
 void SurroundFieldMixerProcessor::removeInputCommander(InputCommander* commander)
 {
+	if (commander == nullptr)
+		return;
+
 	auto existingInputCommander = std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander);
 	if (existingInputCommander != m_inputCommanders.end())
 		m_inputCommanders.erase(existingInputCommander);
@@ -109,15 +118,36 @@ void SurroundFieldMixerProcessor::removeInputCommander(InputCommander* commander
 
 void SurroundFieldMixerProcessor::addOutputCommander(OutputCommander* commander)
 {
+	if (commander == nullptr)
+		return;
+
 	if (std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander) == m_outputCommanders.end())
+	{
 		m_outputCommanders.push_back(commander);
+		commander->setMuteCallback([=](int channel, bool state) { return toggleOutputMute(channel, state); });
+	}
 }
 
 void SurroundFieldMixerProcessor::removeOutputCommander(OutputCommander* commander)
 {
+	if (commander == nullptr)
+		return;
+
 	auto existingOutputCommander = std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander);
 	if (existingOutputCommander != m_outputCommanders.end())
 		m_outputCommanders.erase(existingOutputCommander);
+}
+
+void SurroundFieldMixerProcessor::toggleInputMute(int inputChannelNumber, bool muted)
+{
+	jassert(inputChannelNumber > 0);
+	ignoreUnused(muted);
+}
+
+void SurroundFieldMixerProcessor::toggleOutputMute(int outputChannelNumber, bool muted)
+{
+	jassert(outputChannelNumber > 0);
+	ignoreUnused(muted);
 }
 
 AudioDeviceManager* SurroundFieldMixerProcessor::getDeviceManager()

@@ -47,6 +47,9 @@ public:
     VisuType getType() override;
     void processChangedChannelMapping() override;
 
+    //==============================================================================
+    void setMuteCallback(const std::function<void(int, bool)>& callback) override;
+
 private:
     ProcessorLevelData  m_levelData;
     

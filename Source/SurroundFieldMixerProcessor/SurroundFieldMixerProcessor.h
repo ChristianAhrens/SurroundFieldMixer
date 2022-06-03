@@ -31,19 +31,21 @@ namespace SurroundFieldMixer
 //==============================================================================
 /*
 */
-class SurroundFieldMixerProcessor :    public AudioProcessor,
-					                    public AudioIODeviceCallback,
-                                        public MessageListener
+class SurroundFieldMixerProcessor : public AudioProcessor,
+					                public AudioIODeviceCallback,
+                                    public MessageListener
 {
 public:
     class InputCommander
     {
-
+    public:
+        virtual void setMuteCallback(const std::function<void(int, bool)>& callback) = 0;
     };
 
     class OutputCommander
     {
-
+    public:
+        virtual void setMuteCallback(const std::function<void(int, bool)>& callback) = 0;
     };
 
 public:
@@ -61,6 +63,9 @@ public:
     void removeInputCommander(InputCommander* commander);
     void addOutputCommander(OutputCommander* commander);
     void removeOutputCommander(OutputCommander* comander);
+
+    void toggleInputMute(int channelNumber, bool muted);
+    void toggleOutputMute(int channelNumber, bool muted);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
