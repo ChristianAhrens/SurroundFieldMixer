@@ -102,7 +102,8 @@ void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 	if (std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander) == m_inputCommanders.end())
 	{
 		m_inputCommanders.push_back(commander);
-		commander->setMuteCallback([=](int channel, bool state) { return toggleInputMute(channel, state); } );
+		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleInputMute(channel, state); } );
+		commander->setPositionChangeCallback([=](int channel, const std::tuple<float, float, float>& position) { return setPosition(channel, position); });
 	}
 }
 
@@ -124,7 +125,7 @@ void SurroundFieldMixerProcessor::addOutputCommander(OutputCommander* commander)
 	if (std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander) == m_outputCommanders.end())
 	{
 		m_outputCommanders.push_back(commander);
-		commander->setMuteCallback([=](int channel, bool state) { return toggleOutputMute(channel, state); });
+		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleOutputMute(channel, state); });
 	}
 }
 
@@ -148,6 +149,12 @@ void SurroundFieldMixerProcessor::toggleOutputMute(int outputChannelNumber, bool
 {
 	jassert(outputChannelNumber > 0);
 	ignoreUnused(muted);
+}
+
+void SurroundFieldMixerProcessor::setPosition(int inputChannelNumber, const std::tuple<float, float, float>& position)
+{
+	jassert(inputChannelNumber > 0);
+	ignoreUnused(position);
 }
 
 AudioDeviceManager* SurroundFieldMixerProcessor::getDeviceManager()

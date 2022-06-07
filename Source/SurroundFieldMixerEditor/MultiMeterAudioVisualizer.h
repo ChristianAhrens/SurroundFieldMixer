@@ -48,7 +48,10 @@ public:
     void processChangedChannelMapping() override;
 
     //==============================================================================
-    void setMuteCallback(const std::function<void(int, bool)>& callback) override;
+    void setMuteChangeCallback(const std::function<void(int, bool)>& callback) override;
+    void setMute(int channel, bool muteState) override;
+    void setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback) override;
+    void setPosition(int channel, std::tuple<float, float, float> position) override;
 
 private:
     ProcessorLevelData  m_levelData;

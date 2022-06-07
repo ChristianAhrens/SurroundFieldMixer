@@ -48,7 +48,9 @@ public:
     void processChangedChannelMapping() override;
 
     //==============================================================================
-    void setMuteCallback(const std::function<void(int, bool)>& callback) override;
+    void setMuteChangeCallback(const std::function<void(int, bool)>& callback) override;
+    void setMute(int channel, bool muteState) override;
+    void setOutputScheme(int dummyschemetobechanged) override;
 
 private:
     unsigned long   m_channelL{ 1 };

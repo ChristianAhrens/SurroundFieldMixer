@@ -130,7 +130,22 @@ void MultiMeterAudioVisualizer::processChangedChannelMapping()
 
 }
 
-void MultiMeterAudioVisualizer::setMuteCallback(const std::function<void(int, bool)>& callback)
+void MultiMeterAudioVisualizer::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
+{
+
+}
+
+void MultiMeterAudioVisualizer::setMute(int channel, bool muteState)
+{
+
+}
+
+void MultiMeterAudioVisualizer::setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
+{
+
+}
+
+void MultiMeterAudioVisualizer::setPosition(int channel, std::tuple<float, float, float> position)
 {
 
 }

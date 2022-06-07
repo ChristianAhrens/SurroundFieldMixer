@@ -36,16 +36,27 @@ class SurroundFieldMixerProcessor : public AudioProcessor,
                                     public MessageListener
 {
 public:
-    class InputCommander
+    class ChannelCommander
     {
     public:
-        virtual void setMuteCallback(const std::function<void(int, bool)>& callback) = 0;
+        //==============================================================================
+        virtual void setMuteChangeCallback(const std::function<void(int, bool)>& callback) = 0;
+        virtual void setMute(int channel, bool muteState) = 0;
     };
 
-    class OutputCommander
+    class InputCommander : public ChannelCommander
     {
     public:
-        virtual void setMuteCallback(const std::function<void(int, bool)>& callback) = 0;
+        //==============================================================================
+        virtual void setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback) = 0;
+        virtual void setPosition(int channel, std::tuple<float, float, float> position) = 0;
+    };
+
+    class OutputCommander : public ChannelCommander
+    {
+    public:
+        //==============================================================================
+        virtual void setOutputScheme(int dummyschemetobechanged) = 0;
     };
 
 public:
@@ -66,6 +77,8 @@ public:
 
     void toggleInputMute(int channelNumber, bool muted);
     void toggleOutputMute(int channelNumber, bool muted);
+
+    void setPosition(int channelNumber, const std::tuple<float, float, float>& position);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
