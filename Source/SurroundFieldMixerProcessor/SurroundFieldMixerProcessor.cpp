@@ -142,13 +142,15 @@ void SurroundFieldMixerProcessor::removeOutputCommander(OutputCommander* command
 void SurroundFieldMixerProcessor::toggleInputMute(int inputChannelNumber, bool muted)
 {
 	jassert(inputChannelNumber > 0);
-	ignoreUnused(muted);
+	const ScopedLock sl(m_readLock);
+	m_inputMuteStates[inputChannelNumber] = muted;
 }
 
 void SurroundFieldMixerProcessor::toggleOutputMute(int outputChannelNumber, bool muted)
 {
 	jassert(outputChannelNumber > 0);
-	ignoreUnused(muted);
+	const ScopedLock sl(m_readLock);
+	m_outputMuteStates[outputChannelNumber] = muted;
 }
 
 void SurroundFieldMixerProcessor::setPosition(int inputChannelNumber, const std::tuple<float, float, float>& position)
@@ -191,6 +193,16 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 {
 	ignoreUnused(midiMessages);
 
+	for (auto const& inputMuteStateKV : m_inputMuteStates)
+	{
+		if (inputMuteStateKV.second)
+		{
+			auto channel = inputMuteStateKV.first;
+			auto channelIdx = channel - 1;
+			buffer.clear(channelIdx, 0, buffer.getNumSamples());
+		}
+	}
+
 	postMessage(new AudioInputBufferMessage(buffer));
 
 	// process data in buffer to be what shall be used as output
@@ -202,6 +214,16 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	processedBuffer.copyFrom(3, 0, buffer.getReadPointer(0), buffer.getNumSamples());
 	processedBuffer.copyFrom(4, 0, buffer.getReadPointer(1), buffer.getNumSamples());
 	buffer.makeCopyOf(processedBuffer, true);
+
+	for (auto const& outputMuteStateKV : m_outputMuteStates)
+	{
+		if (outputMuteStateKV.second)
+		{
+			auto channel = outputMuteStateKV.first;
+			auto channelIdx = channel - 1;
+			buffer.clear(channelIdx, 0, buffer.getNumSamples());
+		}
+	}
 
 	postMessage(new AudioOutputBufferMessage(buffer));
 }

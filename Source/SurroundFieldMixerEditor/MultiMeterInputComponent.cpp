@@ -30,6 +30,27 @@ MultiMeterInputComponent::MultiMeterInputComponent()
 
 MultiMeterInputComponent::~MultiMeterInputComponent()
 {
+
+}
+
+void MultiMeterInputComponent::resized()
+{
+    if (!m_inputMutes.empty())
+    {
+        auto muteButtonBounds = getLocalBounds().reduced(20).removeFromBottom(20);
+        auto maxMuteButtonWidth = 30;
+
+        auto muteButtonWidth = muteButtonBounds.getWidth() / m_inputMutes.size();
+        muteButtonWidth = muteButtonWidth > maxMuteButtonWidth ? maxMuteButtonWidth : muteButtonWidth;
+
+        for (auto const& muteButton : m_inputMutes)
+        {
+            muteButtonBounds.removeFromLeft(10);
+            muteButton->setBounds(muteButtonBounds.removeFromLeft(muteButtonWidth));
+        }
+    }
+
+    AbstractAudioVisualizer::resized();
 }
 
 void MultiMeterInputComponent::paint(Graphics& g)
@@ -45,9 +66,9 @@ void MultiMeterInputComponent::paint(Graphics& g)
 	auto outerMargin = 20;
     auto maxMeterWidth = 30;
 	auto visuAreaWidth = width - 2 * outerMargin;
-	auto visuAreaHeight = height - 2 * outerMargin;
+	auto visuAreaHeight = height - 2 * outerMargin - 30;
 
-	Rectangle<int> visuArea(outerMargin, outerMargin, visuAreaWidth, visuAreaHeight);
+	auto visuArea = Rectangle<int>(outerMargin, outerMargin, visuAreaWidth, visuAreaHeight);
 
 	// fill our visualization area background
 	g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
@@ -107,25 +128,19 @@ void MultiMeterInputComponent::paint(Graphics& g)
         g.drawLine(Line<float>(meterLeft, visuAreaOrigY - holdMeterHeight, meterLeft + meterWidth, visuAreaOrigY - holdMeterHeight));
         // channel # label
 		g.setColour(Colours::white);
-        g.drawText(String(i), Rectangle<float>(meterLeft, visuAreaOrigY, meterWidth, float(outerMargin)), Justification::centred, true);
+        g.drawText(String(i), Rectangle<float>(meterLeft, visuAreaOrigY + 30, meterWidth, float(outerMargin)), Justification::centred, true);
 
         meterLeft += meterWidth + meterSpacing;
     }
 }
 
-void MultiMeterInputComponent::resized()
-{
-    AbstractAudioVisualizer::resized();
-}
-
-void MultiMeterInputComponent::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
-{
-
-}
-
 void MultiMeterInputComponent::setMute(int channel, bool muteState)
 {
+    if (channel > m_inputMutes.size())
+        return;
 
+    auto muteButtonIter = m_inputMutes.begin() + channel;
+    muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
 void MultiMeterInputComponent::setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
@@ -165,13 +180,31 @@ void MultiMeterInputComponent::processChanges()
         {
             auto missingCnt = m_levelData.GetChannelCount() - m_inputMutes.size();
             for (; missingCnt > 0; missingCnt--)
-                m_inputMutes.push_back(std::make_unique<TextButton>("Mute"));
+            {
+                m_inputMutes.push_back(std::make_unique<TextButton>("M"));
+                auto muteButton = m_inputMutes.back().get();
+                muteButton->setColour(TextButton::ColourIds::buttonOnColourId, juce::Colours::red);
+                muteButton->setClickingTogglesState(true);
+                muteButton->onClick = [muteButton, this] {
+                    auto foundMuteButtonIter = std::find_if(m_inputMutes.begin(), m_inputMutes.end(), [muteButton](std::unique_ptr<TextButton>& b) { return b.get() == muteButton; });
+                    if (foundMuteButtonIter == m_inputMutes.end())
+                        return;
+                    int channelIdx = foundMuteButtonIter - m_inputMutes.begin();
+                    int channel = channelIdx + 1;
+                    auto muteState = muteButton->getToggleState();
+                    muteChange(channel, muteState);
+                };
+                addAndMakeVisible(*m_inputMutes.back());
+            }
         }
         else if (m_inputMutes.size() > m_levelData.GetChannelCount())
         {
             auto overheadCnt = m_inputMutes.size() - m_levelData.GetChannelCount();
             for (; overheadCnt; overheadCnt--)
+            {
+                removeChildComponent(m_inputMutes.back().get());
                 m_inputMutes.erase(m_inputMutes.end());
+            }
         }
 
         resized();

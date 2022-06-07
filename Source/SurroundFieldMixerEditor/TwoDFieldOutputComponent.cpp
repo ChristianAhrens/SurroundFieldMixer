@@ -255,11 +255,6 @@ void TwoDFieldOutputComponent::resized()
     AbstractAudioVisualizer::resized();
 }
 
-void TwoDFieldOutputComponent::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
-{
-
-}
-
 void TwoDFieldOutputComponent::setMute(int channel, bool muteState)
 {
 

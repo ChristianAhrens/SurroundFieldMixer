@@ -29,7 +29,7 @@ namespace SurroundFieldMixer
 //==============================================================================
 /*
 */
-class MultiMeterInputComponent :   public AbstractAudioVisualizer, 
+class MultiMeterInputComponent :    public AbstractAudioVisualizer, 
                                     public SurroundFieldMixerProcessor::InputCommander
 {
 public:
@@ -47,7 +47,6 @@ public:
     virtual void processChanges() override;
 
     //==============================================================================
-    void setMuteChangeCallback(const std::function<void(int, bool)>& callback) override;
     void setMute(int channel, bool muteState) override;
     void setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback) override;
     void setPosition(int channel, std::tuple<float, float, float> position) override;

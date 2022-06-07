@@ -44,7 +44,6 @@ public:
     void processingDataChanged(AbstractProcessorData *data) override;
 
     //==============================================================================
-    void setMuteChangeCallback(const std::function<void(int, bool)>& callback) override;
     void setMute(int channel, bool muteState) override;
     void setOutputScheme(int dummyschemetobechanged) override;
 

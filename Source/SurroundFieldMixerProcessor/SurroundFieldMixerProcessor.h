@@ -40,8 +40,21 @@ public:
     {
     public:
         //==============================================================================
-        virtual void setMuteChangeCallback(const std::function<void(int, bool)>& callback) = 0;
+        void setMuteChangeCallback(const std::function<void(int, bool)>& callback)
+        {
+            m_muteChangeCallback = callback;
+        }
         virtual void setMute(int channel, bool muteState) = 0;
+
+    protected:
+        void muteChange(int channel, bool muteState)
+        {
+            if (m_muteChangeCallback)
+                m_muteChangeCallback(channel, muteState);
+        }
+
+    private:
+        std::function<void(int, bool)> m_muteChangeCallback{ nullptr };
     };
 
     class InputCommander : public ChannelCommander
@@ -155,6 +168,10 @@ private:
     //==============================================================================
     std::vector<InputCommander*>    m_inputCommanders;
     std::vector<OutputCommander*>   m_outputCommanders;
+
+    //==============================================================================
+    std::map<int, bool> m_inputMuteStates;
+    std::map<int, bool> m_outputMuteStates;
 
     //==============================================================================
     std::unique_ptr<SurroundFieldMixerEditor>  m_processorEditor;
