@@ -289,6 +289,7 @@ void SurroundFieldMixerProcessor::audioDeviceIOCallback(const float** inputChann
 	const ScopedLock sl(m_readLock);
 
 	auto maxActiveChannels = std::max(numInputChannels, numOutputChannels);
+	auto minActiveChannels = std::min(numInputChannels, numOutputChannels);
 
 	// copy incoming data to processing data buffer
 	for (auto i = 0; i < numInputChannels && i < maxActiveChannels; i++)
@@ -305,9 +306,10 @@ void SurroundFieldMixerProcessor::audioDeviceIOCallback(const float** inputChann
 	auto processedChannelCount = audioBufferToProcess.getNumChannels();
 	auto processedSampleCount = audioBufferToProcess.getNumSamples();
 	auto processedData = audioBufferToProcess.getArrayOfReadPointers();
-	jassert(processedChannelCount >= numOutputChannels);
+	//jassert(processedChannelCount >= numOutputChannels);
 	jassert(processedSampleCount == numSamples);
-	for (auto i = 0; i < numOutputChannels && i < maxActiveChannels; i++)
+	//for (auto i = 0; i < numOutputChannels && i < maxActiveChannels; i++)
+	for (auto i = 0; i < minActiveChannels; i++)
 	{
 		memcpy(outputChannelData[i], processedData[i], (size_t)processedSampleCount * sizeof(float));
 	}
