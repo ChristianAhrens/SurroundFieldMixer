@@ -16,25 +16,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "MultiMeterAudioVisualizer.h"
+#include "MultiMeterInputComponent.h"
 
 namespace SurroundFieldMixer
 {
 
 //==============================================================================
-MultiMeterAudioVisualizer::MultiMeterAudioVisualizer()
+MultiMeterInputComponent::MultiMeterInputComponent()
     : AbstractAudioVisualizer()
 {
-    showConfigButton(true);
-    setConfigFeatures(AudioVisualizerConfigBase::ConfigFeatures::UseValuesInDBToogle);
     setUsesValuesInDB(true);
 }
 
-MultiMeterAudioVisualizer::~MultiMeterAudioVisualizer()
+MultiMeterInputComponent::~MultiMeterInputComponent()
 {
 }
 
-void MultiMeterAudioVisualizer::paint(Graphics& g)
+void MultiMeterInputComponent::paint(Graphics& g)
 {
     AbstractAudioVisualizer::paint(g);
 
@@ -115,42 +113,32 @@ void MultiMeterAudioVisualizer::paint(Graphics& g)
     }
 }
 
-void MultiMeterAudioVisualizer::resized()
+void MultiMeterInputComponent::resized()
 {
     AbstractAudioVisualizer::resized();
 }
 
-AbstractAudioVisualizer::VisuType MultiMeterAudioVisualizer::getType()
-{
-    return AbstractAudioVisualizer::VisuType::MultiMeter;
-}
-
-void MultiMeterAudioVisualizer::processChangedChannelMapping()
+void MultiMeterInputComponent::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
 {
 
 }
 
-void MultiMeterAudioVisualizer::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
+void MultiMeterInputComponent::setMute(int channel, bool muteState)
 {
 
 }
 
-void MultiMeterAudioVisualizer::setMute(int channel, bool muteState)
+void MultiMeterInputComponent::setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
 {
 
 }
 
-void MultiMeterAudioVisualizer::setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
+void MultiMeterInputComponent::setPosition(int channel, std::tuple<float, float, float> position)
 {
 
 }
 
-void MultiMeterAudioVisualizer::setPosition(int channel, std::tuple<float, float, float> position)
-{
-
-}
-
-void MultiMeterAudioVisualizer::processingDataChanged(AbstractProcessorData *data)
+void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)
         return;
@@ -167,6 +155,29 @@ void MultiMeterAudioVisualizer::processingDataChanged(AbstractProcessorData *dat
         default:
             break;
     }
+}
+
+void MultiMeterInputComponent::processChanges()
+{
+    if (m_inputMutes.size() != m_levelData.GetChannelCount())
+    {
+        if (m_inputMutes.size() < m_levelData.GetChannelCount())
+        {
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputMutes.size();
+            for (; missingCnt > 0; missingCnt--)
+                m_inputMutes.push_back(std::make_unique<TextButton>("Mute"));
+        }
+        else if (m_inputMutes.size() > m_levelData.GetChannelCount())
+        {
+            auto overheadCnt = m_inputMutes.size() - m_levelData.GetChannelCount();
+            for (; overheadCnt; overheadCnt--)
+                m_inputMutes.erase(m_inputMutes.end());
+        }
+
+        resized();
+    }
+
+    AbstractAudioVisualizer::processChanges();
 }
 
 }

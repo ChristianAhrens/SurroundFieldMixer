@@ -29,12 +29,12 @@ namespace SurroundFieldMixer
 //==============================================================================
 /*
 */
-class MultiMeterAudioVisualizer :   public AbstractAudioVisualizer, 
+class MultiMeterInputComponent :   public AbstractAudioVisualizer, 
                                     public SurroundFieldMixerProcessor::InputCommander
 {
 public:
-    MultiMeterAudioVisualizer();
-    ~MultiMeterAudioVisualizer();
+    MultiMeterInputComponent();
+    ~MultiMeterInputComponent();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -42,10 +42,9 @@ public:
     
     //==============================================================================
     void processingDataChanged(AbstractProcessorData *data) override;
-    
+
     //==============================================================================
-    VisuType getType() override;
-    void processChangedChannelMapping() override;
+    virtual void processChanges() override;
 
     //==============================================================================
     void setMuteChangeCallback(const std::function<void(int, bool)>& callback) override;
@@ -54,9 +53,10 @@ public:
     void setPosition(int channel, std::tuple<float, float, float> position) override;
 
 private:
-    ProcessorLevelData  m_levelData;
+    ProcessorLevelData                          m_levelData;
+    std::vector<std::unique_ptr<TextButton>>    m_inputMutes;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiMeterAudioVisualizer)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiMeterInputComponent)
 };
 
 }

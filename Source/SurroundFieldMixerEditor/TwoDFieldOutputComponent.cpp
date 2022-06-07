@@ -16,7 +16,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "TwoDFieldAudioVisualizer.h"
+#include "TwoDFieldOutputComponent.h"
 
 namespace SurroundFieldMixer
 {
@@ -24,26 +24,17 @@ namespace SurroundFieldMixer
 #define PAINTINGHELPER
 
 //==============================================================================
-TwoDFieldAudioVisualizer::TwoDFieldAudioVisualizer()
+TwoDFieldOutputComponent::TwoDFieldOutputComponent()
     : AbstractAudioVisualizer()
 {
-    showConfigButton(true);
-    setConfigFeatures(AudioVisualizerConfigBase::ConfigFeatures::ChannelMapping | AudioVisualizerConfigBase::ConfigFeatures::UseValuesInDBToogle);
-    setChannelMapping({
-        {AudioVisualizerConfigBase::MappingKey::L, m_channelL},
-        {AudioVisualizerConfigBase::MappingKey::C, m_channelC},
-        {AudioVisualizerConfigBase::MappingKey::R, m_channelR},
-        {AudioVisualizerConfigBase::MappingKey::LS, m_channelLS},
-        {AudioVisualizerConfigBase::MappingKey::RS, m_channelRS},
-        });
     setUsesValuesInDB(true);
 }
 
-TwoDFieldAudioVisualizer::~TwoDFieldAudioVisualizer()
+TwoDFieldOutputComponent::~TwoDFieldOutputComponent()
 {
 }
 
-void TwoDFieldAudioVisualizer::paint (Graphics& g)
+void TwoDFieldOutputComponent::paint (Graphics& g)
 {
     AbstractAudioVisualizer::paint(g);
 
@@ -225,7 +216,7 @@ void TwoDFieldAudioVisualizer::paint (Graphics& g)
 
 }
 
-void TwoDFieldAudioVisualizer::resized()
+void TwoDFieldOutputComponent::resized()
 {
     // calculate what we need for our center circle
     auto width = getWidth();
@@ -264,41 +255,22 @@ void TwoDFieldAudioVisualizer::resized()
     AbstractAudioVisualizer::resized();
 }
 
-AbstractAudioVisualizer::VisuType TwoDFieldAudioVisualizer::getType()
-{
-    return AbstractAudioVisualizer::VisuType::TwoDField;
-}
-
-void TwoDFieldAudioVisualizer::processChangedChannelMapping()
-{
-    if(getChannelMapping().count(AudioVisualizerConfigBase::MappingKey::L))
-        m_channelL = getChannelMapping().at(AudioVisualizerConfigBase::MappingKey::L);
-    if(getChannelMapping().count(AudioVisualizerConfigBase::MappingKey::C))
-        m_channelC = getChannelMapping().at(AudioVisualizerConfigBase::MappingKey::C);
-    if(getChannelMapping().count(AudioVisualizerConfigBase::MappingKey::R))
-        m_channelR = getChannelMapping().at(AudioVisualizerConfigBase::MappingKey::R);
-    if(getChannelMapping().count(AudioVisualizerConfigBase::MappingKey::LS))
-        m_channelLS = getChannelMapping().at(AudioVisualizerConfigBase::MappingKey::LS);
-    if(getChannelMapping().count(AudioVisualizerConfigBase::MappingKey::RS))
-        m_channelRS = getChannelMapping().at(AudioVisualizerConfigBase::MappingKey::RS);
-}
-
-void TwoDFieldAudioVisualizer::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
+void TwoDFieldOutputComponent::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
 {
 
 }
 
-void TwoDFieldAudioVisualizer::setMute(int channel, bool muteState)
+void TwoDFieldOutputComponent::setMute(int channel, bool muteState)
 {
 
 }
 
-void TwoDFieldAudioVisualizer::setOutputScheme(int dummyschemetobechanged)
+void TwoDFieldOutputComponent::setOutputScheme(int dummyschemetobechanged)
 {
 
 }
 
-void TwoDFieldAudioVisualizer::processingDataChanged(AbstractProcessorData *data)
+void TwoDFieldOutputComponent::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)
         return;

@@ -27,8 +27,8 @@
 namespace SurroundFieldMixer
 {
 
-class MultiMeterAudioVisualizer;
-class TwoDFieldAudioVisualizer;
+class MultiMeterInputComponent;
+class TwoDFieldOutputComponent;
 
 
 //==============================================================================
@@ -54,8 +54,8 @@ public:
     bool setStateXml(XmlElement* stateXml) override;
 
 private:
-    std::unique_ptr<MultiMeterAudioVisualizer>  m_meterBank;
-    std::unique_ptr<TwoDFieldAudioVisualizer>   m_surroundField;
+    std::unique_ptr<MultiMeterInputComponent>  m_meterBank;
+    std::unique_ptr<TwoDFieldOutputComponent>   m_surroundField;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundFieldMixerEditor)
 };

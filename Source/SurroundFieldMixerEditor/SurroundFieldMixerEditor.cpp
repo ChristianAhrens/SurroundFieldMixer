@@ -20,8 +20,8 @@
 
 #include <JuceHeader.h>
 
-#include "../SurroundFieldMixerEditor/MultiMeterAudioVisualizer.h"
-#include "../SurroundFieldMixerEditor/TwoDFieldAudioVisualizer.h"
+#include "../SurroundFieldMixerEditor/MultiMeterInputComponent.h"
+#include "../SurroundFieldMixerEditor/TwoDFieldOutputComponent.h"
 
 
 namespace SurroundFieldMixer
@@ -31,10 +31,10 @@ namespace SurroundFieldMixer
 SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor& processor)
     : AudioProcessorEditor(processor)
 {
-    m_meterBank = std::make_unique<MultiMeterAudioVisualizer>();
+    m_meterBank = std::make_unique<MultiMeterInputComponent>();
     addAndMakeVisible(m_meterBank.get());
 
-    m_surroundField = std::make_unique<TwoDFieldAudioVisualizer>();
+    m_surroundField = std::make_unique<TwoDFieldOutputComponent>();
     addAndMakeVisible(m_surroundField.get());
 
     auto SurroundFieldMixerProc = dynamic_cast<SurroundFieldMixerProcessor*>(&processor);
@@ -46,7 +46,7 @@ SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor& processor)
         SurroundFieldMixerProc->addOutputCommander(m_surroundField.get());
     }
 
-    setSize(800, 600);
+    setSize(800, 700);
 }
 
 SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor* processor)
@@ -71,7 +71,7 @@ void SurroundFieldMixerEditor::resized()
 {
     auto bounds = getLocalBounds();
 
-    auto meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.25f));
+    auto meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.3f));
     meterBankBounds.reduce(5, 0);
     meterBankBounds.removeFromTop(5);
     meterBankBounds.removeFromBottom(5);

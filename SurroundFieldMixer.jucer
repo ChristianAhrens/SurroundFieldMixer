@@ -37,8 +37,8 @@
               file="Resources/Images/SurroundFieldMixer.png"/>
         <FILE id="aVYyvS" name="SurroundFieldMixer.xcf" compile="0" resource="1"
               file="Resources/Images/SurroundFieldMixer.xcf"/>
-        <FILE id="gU6pke" name="SurroundFieldMixerCanvas.png" compile="0"
-              resource="1" file="Resources/Images/SurroundFieldMixerCanvas.png"/>
+        <FILE id="gU6pke" name="SurroundFieldMixerCanvas.png" compile="0" resource="1"
+              file="Resources/Images/SurroundFieldMixerCanvas.png"/>
         <FILE id="vsLK2o" name="SurroundFieldMixerRect.png" compile="0" resource="1"
               file="Resources/Images/SurroundFieldMixerRect.png"/>
       </GROUP>
@@ -79,18 +79,18 @@
               file="Source/SurroundFieldMixerEditor/AudioSelectComponent.cpp"/>
         <FILE id="EJ7QTb" name="AudioSelectComponent.h" compile="0" resource="0"
               file="Source/SurroundFieldMixerEditor/AudioSelectComponent.h"/>
-        <FILE id="E2lQVU" name="MultiMeterAudioVisualizer.cpp" compile="1"
-              resource="0" file="Source/SurroundFieldMixerEditor/MultiMeterAudioVisualizer.cpp"/>
-        <FILE id="RI7BTa" name="MultiMeterAudioVisualizer.h" compile="0" resource="0"
-              file="Source/SurroundFieldMixerEditor/MultiMeterAudioVisualizer.h"/>
-        <FILE id="bAQKqK" name="SurroundFieldMixerEditor.cpp" compile="1"
-              resource="0" file="Source/SurroundFieldMixerEditor/SurroundFieldMixerEditor.cpp"/>
+        <FILE id="E2lQVU" name="MultiMeterInputComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/MultiMeterInputComponent.cpp"/>
+        <FILE id="RI7BTa" name="MultiMeterInputComponent.h" compile="0" resource="0"
+              file="Source/SurroundFieldMixerEditor/MultiMeterInputComponent.h"/>
+        <FILE id="bAQKqK" name="SurroundFieldMixerEditor.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/SurroundFieldMixerEditor.cpp"/>
         <FILE id="P93YUo" name="SurroundFieldMixerEditor.h" compile="0" resource="0"
               file="Source/SurroundFieldMixerEditor/SurroundFieldMixerEditor.h"/>
-        <FILE id="yUf9Ve" name="TwoDFieldAudioVisualizer.cpp" compile="1" resource="0"
-              file="Source/SurroundFieldMixerEditor/TwoDFieldAudioVisualizer.cpp"/>
-        <FILE id="oYDM1s" name="TwoDFieldAudioVisualizer.h" compile="0" resource="0"
-              file="Source/SurroundFieldMixerEditor/TwoDFieldAudioVisualizer.h"/>
+        <FILE id="yUf9Ve" name="TwoDFieldOutputComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/TwoDFieldOutputComponent.cpp"/>
+        <FILE id="oYDM1s" name="TwoDFieldOutputComponent.h" compile="0" resource="0"
+              file="Source/SurroundFieldMixerEditor/TwoDFieldOutputComponent.h"/>
       </GROUP>
       <FILE id="wRpAWq" name="SurroundFieldMixer.cpp" compile="1" resource="0"
             file="Source/SurroundFieldMixer.cpp"/>

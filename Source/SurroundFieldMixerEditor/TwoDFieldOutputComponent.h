@@ -29,12 +29,12 @@ namespace SurroundFieldMixer
 //==============================================================================
 /*
 */
-class TwoDFieldAudioVisualizer  :   public AbstractAudioVisualizer,
+class TwoDFieldOutputComponent  :   public AbstractAudioVisualizer,
                                     public SurroundFieldMixerProcessor::OutputCommander
 {
 public:
-    TwoDFieldAudioVisualizer();
-    ~TwoDFieldAudioVisualizer();
+    TwoDFieldOutputComponent();
+    ~TwoDFieldOutputComponent();
     
     //==============================================================================
     void paint (Graphics&) override;
@@ -42,10 +42,6 @@ public:
     
     //==============================================================================
     void processingDataChanged(AbstractProcessorData *data) override;
-    
-    //==============================================================================
-    VisuType getType() override;
-    void processChangedChannelMapping() override;
 
     //==============================================================================
     void setMuteChangeCallback(const std::function<void(int, bool)>& callback) override;
@@ -74,7 +70,7 @@ private:
 
     ProcessorLevelData  m_levelData;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TwoDFieldAudioVisualizer)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TwoDFieldOutputComponent)
 };
 
 }
