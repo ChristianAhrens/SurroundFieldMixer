@@ -28,6 +28,14 @@ class PositionEditorComponent :
     public Component,
     private MessageListener
 {
+public:
+    class PositioningPopupCallback : public juce::ModalComponentManager::Callback
+    {
+        void modalStateFinished(int returnValue) override
+        {
+            ignoreUnused(returnValue);
+        }
+    };
 
 public:
     PositionEditorComponent();
@@ -36,6 +44,9 @@ public:
     //==============================================================================
     void paint(Graphics&) override;
     void resized() override;
+
+    //==============================================================================
+    void mouseUp(const MouseEvent& event) override;
     
     //==============================================================================
     void handleMessage(const Message& msg) override;
@@ -51,11 +62,7 @@ public:
     const std::tuple<float, float, float>& getCurrentPosition();
     
 private:
-    //void triggerPositioningPopup();
-    //void updatePopupMenu();
-    //void handlePopupResult();
-    //
-    //PopupMenu                       m_popup;
+    void triggerPositioningPopup(const juce::Point<int>& popupStartPosition);
     
     std::tuple<float, float, float>     m_currentPosition;
 

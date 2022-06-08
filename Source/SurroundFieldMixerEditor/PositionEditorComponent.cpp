@@ -68,6 +68,16 @@ void PositionEditorComponent::resized()
     Component::resized();
 }
 
+void PositionEditorComponent::mouseUp(const MouseEvent& event)
+{
+    auto mouseUpPosition = event.getMouseDownPosition() + event.getOffsetFromDragStart();
+    auto mouseUpWithinComponent = getLocalBounds().contains(mouseUpPosition);
+    if (mouseUpWithinComponent)
+        triggerPositioningPopup(mouseUpPosition);
+
+    Component::mouseUp(event);
+}
+
 void PositionEditorComponent::handleMessage(const Message& msg)
 {
     //if (auto* callbackMessage = dynamic_cast<const CallbackMidiMessage*> (&msg))
@@ -163,12 +173,25 @@ void PositionEditorComponent::lookAndFeelChanged()
 //{
 //    
 //}
-//
-//void PositionEditorComponent::triggerPositioningPopup()
-//{
-//
-//}
-//
+
+void PositionEditorComponent::triggerPositioningPopup(const juce::Point<int>& popupStartPosition)
+{
+    if (auto* window = new Component("Test"))//createWindow(options, &(callback->managerOfChosenCommand)))
+    {
+        auto callback = std::make_unique<PositioningPopupCallback>();
+
+        window->setVisible(true);
+        window->enterModalState(false, nullptr, true);
+        ModalComponentManager::getInstance()->attachCallback(window, callback.release());
+
+        window->setTopLeftPosition(popupStartPosition);
+        window->setSize(50, 50);
+        window->toFront(false);  // need to do this after making it modal, or it could
+                                  // be stuck behind other comps that are already modal..
+
+    }
+}
+
 //void PositionEditorComponent::handlePopupResult(int resultingAssiIdx)
 //{
 //    
