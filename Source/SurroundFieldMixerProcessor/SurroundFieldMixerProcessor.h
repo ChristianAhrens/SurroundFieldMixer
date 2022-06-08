@@ -61,8 +61,21 @@ public:
     {
     public:
         //==============================================================================
-        virtual void setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback) = 0;
+        void setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
+        {
+            m_positionChangeCallback = callback;
+        }
         virtual void setPosition(int channel, std::tuple<float, float, float> position) = 0;
+
+    protected:
+        void positionChange(int channel, const std::tuple<float, float, float>& position)
+        {
+            if (m_positionChangeCallback)
+                m_positionChangeCallback(channel, position);
+        }
+
+    private:
+        std::function<void(int, std::tuple<float, float, float>)> m_positionChangeCallback{ nullptr };
     };
 
     class OutputCommander : public ChannelCommander

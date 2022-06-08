@@ -20,45 +20,46 @@
 
 #include <JuceHeader.h>
 
-#include "AbstractAudioVisualizer.h"
-
-#include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
-
-#include "PositionEditorComponent.h"
 
 namespace SurroundFieldMixer
 {
 
-//==============================================================================
-/*
-*/
-class MultiMeterInputComponent :    public AbstractAudioVisualizer, 
-                                    public SurroundFieldMixerProcessor::InputCommander
+class PositionEditorComponent :
+    public Component,
+    private MessageListener
 {
-public:
-    MultiMeterInputComponent();
-    ~MultiMeterInputComponent();
 
+public:
+    PositionEditorComponent();
+    ~PositionEditorComponent();
+	
     //==============================================================================
-    void paint (Graphics&) override;
+    void paint(Graphics&) override;
     void resized() override;
     
     //==============================================================================
-    void processingDataChanged(AbstractProcessorData *data) override;
+    void handleMessage(const Message& msg) override;
 
     //==============================================================================
-    virtual void processChanges() override;
+    void lookAndFeelChanged() override;
 
     //==============================================================================
-    void setMute(int channel, bool muteState) override;
-    void setPosition(int channel, std::tuple<float, float, float> position) override;
-
-private:
-    ProcessorLevelData                                      m_levelData;
-    std::vector<std::unique_ptr<TextButton>>                m_inputMutes;
-    std::vector<std::unique_ptr<PositionEditorComponent>>   m_inputPositions;
+    std::function<void(Component*, std::tuple<float, float, float>)> onPositionSet;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiMeterInputComponent)
+    //==============================================================================
+    void setCurrentPosition(const std::tuple<float, float, float>& currentPosition);
+    const std::tuple<float, float, float>& getCurrentPosition();
+    
+private:
+    //void triggerPositioningPopup();
+    //void updatePopupMenu();
+    //void handlePopupResult();
+    //
+    //PopupMenu                       m_popup;
+    
+    std::tuple<float, float, float>     m_currentPosition;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PositionEditorComponent)
 };
 
-}
+};

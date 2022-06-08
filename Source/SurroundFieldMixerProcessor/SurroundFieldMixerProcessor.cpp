@@ -209,9 +209,9 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	AudioBuffer<float> processedBuffer;
 	processedBuffer.setSize(5, buffer.getNumSamples(), false, false, true);
 	processedBuffer.copyFrom(0, 0, buffer.getReadPointer(0), buffer.getNumSamples());
-	processedBuffer.copyFrom(1, 0, buffer.getReadPointer(1), buffer.getNumSamples());
-	processedBuffer.copyFrom(2, 0, buffer.getReadPointer(0), buffer.getNumSamples());
-	processedBuffer.copyFrom(3, 0, buffer.getReadPointer(0), buffer.getNumSamples());
+	processedBuffer.copyFrom(1, 0, buffer.getReadPointer(0), buffer.getNumSamples());
+	processedBuffer.copyFrom(2, 0, buffer.getReadPointer(1), buffer.getNumSamples());
+	processedBuffer.copyFrom(3, 0, buffer.getReadPointer(1), buffer.getNumSamples());
 	processedBuffer.copyFrom(4, 0, buffer.getReadPointer(1), buffer.getNumSamples());
 	buffer.makeCopyOf(processedBuffer, true);
 

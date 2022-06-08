@@ -83,6 +83,10 @@
               file="Source/SurroundFieldMixerEditor/MultiMeterInputComponent.cpp"/>
         <FILE id="RI7BTa" name="MultiMeterInputComponent.h" compile="0" resource="0"
               file="Source/SurroundFieldMixerEditor/MultiMeterInputComponent.h"/>
+        <FILE id="YorTha" name="PositionEditorComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/PositionEditorComponent.cpp"/>
+        <FILE id="OIO2EI" name="PositionEditorComponent.h" compile="0" resource="0"
+              file="Source/SurroundFieldMixerEditor/PositionEditorComponent.h"/>
         <FILE id="bAQKqK" name="SurroundFieldMixerEditor.cpp" compile="1" resource="0"
               file="Source/SurroundFieldMixerEditor/SurroundFieldMixerEditor.cpp"/>
         <FILE id="P93YUo" name="SurroundFieldMixerEditor.h" compile="0" resource="0"

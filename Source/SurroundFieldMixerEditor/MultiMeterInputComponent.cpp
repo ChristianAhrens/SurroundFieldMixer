@@ -35,18 +35,32 @@ MultiMeterInputComponent::~MultiMeterInputComponent()
 
 void MultiMeterInputComponent::resized()
 {
-    if (!m_inputMutes.empty())
+    if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputPositions.size())
     {
-        auto muteButtonBounds = getLocalBounds().reduced(20).removeFromBottom(20);
-        auto maxMuteButtonWidth = 30;
+        auto controlElementsBounds = getLocalBounds().reduced(20).removeFromBottom(45);
+        auto maxcontrolElementWidth = 30;
 
-        auto muteButtonWidth = muteButtonBounds.getWidth() / m_inputMutes.size();
-        muteButtonWidth = muteButtonWidth > maxMuteButtonWidth ? maxMuteButtonWidth : muteButtonWidth;
+        auto controlElementWidth = controlElementsBounds.getWidth() / m_inputMutes.size();
+        controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
 
-        for (auto const& muteButton : m_inputMutes)
+        auto positionComponentBounds = controlElementsBounds.removeFromTop(20);
+        for (auto i = 0; i < m_inputPositions.size(); i++)
         {
+            auto const& positionComponent = m_inputPositions.at(i);
+
+            positionComponentBounds.removeFromLeft(10);
+            positionComponent->setBounds(positionComponentBounds.removeFromLeft(controlElementWidth));
+        }
+
+        controlElementsBounds.removeFromTop(5);
+
+        auto muteButtonBounds = controlElementsBounds.removeFromTop(20);
+        for (auto i = 0; i < m_inputMutes.size(); i++)
+        {
+            auto const& muteButton = m_inputMutes.at(i);
+
             muteButtonBounds.removeFromLeft(10);
-            muteButton->setBounds(muteButtonBounds.removeFromLeft(muteButtonWidth));
+            muteButton->setBounds(muteButtonBounds.removeFromLeft(controlElementWidth));
         }
     }
 
@@ -60,13 +74,15 @@ void MultiMeterInputComponent::paint(Graphics& g)
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
+    auto controlElementsGap = 50;
+
 	// calculate what we need for our center circle
 	auto width = getWidth();
 	auto height = getHeight();
 	auto outerMargin = 20;
     auto maxMeterWidth = 30;
 	auto visuAreaWidth = width - 2 * outerMargin;
-	auto visuAreaHeight = height - 2 * outerMargin - 30;
+	auto visuAreaHeight = height - 2 * outerMargin - controlElementsGap;
 
 	auto visuArea = Rectangle<int>(outerMargin, outerMargin, visuAreaWidth, visuAreaHeight);
 
@@ -128,7 +144,7 @@ void MultiMeterInputComponent::paint(Graphics& g)
         g.drawLine(Line<float>(meterLeft, visuAreaOrigY - holdMeterHeight, meterLeft + meterWidth, visuAreaOrigY - holdMeterHeight));
         // channel # label
 		g.setColour(Colours::white);
-        g.drawText(String(i), Rectangle<float>(meterLeft, visuAreaOrigY + 30, meterWidth, float(outerMargin)), Justification::centred, true);
+        g.drawText(String(i), Rectangle<float>(meterLeft, visuAreaOrigY + controlElementsGap, meterWidth, float(outerMargin)), Justification::centred, true);
 
         meterLeft += meterWidth + meterSpacing;
     }
@@ -143,14 +159,13 @@ void MultiMeterInputComponent::setMute(int channel, bool muteState)
     muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
-void MultiMeterInputComponent::setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
-{
-
-}
-
 void MultiMeterInputComponent::setPosition(int channel, std::tuple<float, float, float> position)
 {
+    if (channel > m_inputPositions.size())
+        return;
 
+    auto positionComponentIter = m_inputPositions.begin() + channel;
+    positionComponentIter->get()->setCurrentPosition(position);
 }
 
 void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data)
@@ -204,6 +219,43 @@ void MultiMeterInputComponent::processChanges()
             {
                 removeChildComponent(m_inputMutes.back().get());
                 m_inputMutes.erase(m_inputMutes.end());
+            }
+        }
+
+        resized();
+    }
+
+    if (m_inputPositions.size() != m_levelData.GetChannelCount())
+    {
+        if (m_inputPositions.size() < m_levelData.GetChannelCount())
+        {
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputPositions.size();
+            for (; missingCnt > 0; missingCnt--)
+            {
+                m_inputPositions.push_back(std::make_unique<PositionEditorComponent>());
+                auto positionComponent = m_inputPositions.back().get();
+                positionComponent->setCurrentPosition(std::tuple<float, float, float>(0.5f, 0.5f, 0.5f));
+                //muteButton->setColour(TextButton::ColourIds::buttonOnColourId, juce::Colours::red);
+                //muteButton->setClickingTogglesState(true);
+                //muteButton->onClick = [muteButton, this] {
+                //    auto foundMuteButtonIter = std::find_if(m_inputPositions.begin(), m_inputPositions.end(), [muteButton](std::unique_ptr<TextButton>& b) { return b.get() == muteButton; });
+                //    if (foundMuteButtonIter == m_inputPositions.end())
+                //        return;
+                //    int channelIdx = foundMuteButtonIter - m_inputPositions.begin();
+                //    int channel = channelIdx + 1;
+                //    auto muteState = muteButton->getToggleState();
+                //    muteChange(channel, muteState);
+                //};
+                addAndMakeVisible(*m_inputPositions.back());
+            }
+        }
+        else if (m_inputPositions.size() > m_levelData.GetChannelCount())
+        {
+            auto overheadCnt = m_inputPositions.size() - m_levelData.GetChannelCount();
+            for (; overheadCnt; overheadCnt--)
+            {
+                removeChildComponent(m_inputPositions.back().get());
+                m_inputPositions.erase(m_inputPositions.end());
             }
         }
 
