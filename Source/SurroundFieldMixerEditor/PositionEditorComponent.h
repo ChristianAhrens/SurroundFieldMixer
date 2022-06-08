@@ -24,9 +24,24 @@
 namespace SurroundFieldMixer
 {
 
-class PositionEditorComponent :
-    public Component,
-    private MessageListener
+
+class PositionEditorPopupComponent : public Component
+{
+public:
+    PositionEditorPopupComponent();
+    ~PositionEditorPopupComponent();
+
+    //==============================================================================
+    void paint(Graphics&) override;
+    void resized() override;
+
+    //==============================================================================
+    std::function<std::tuple<float, float, float>(void)> getCurrentPositionCallback;
+    std::function<void(std::tuple<float, float, float>)> setCurrentPositionCallback;
+};
+
+
+class PositionEditorComponent : public Component, private MessageListener
 {
 public:
     class PositioningPopupCallback : public juce::ModalComponentManager::Callback
@@ -63,8 +78,10 @@ public:
     
 private:
     void triggerPositioningPopup(const juce::Point<int>& popupStartPosition);
+
+    std::unique_ptr<PositionEditorPopupComponent>   m_positioningPopup;
     
-    std::tuple<float, float, float>     m_currentPosition;
+    std::tuple<float, float, float>                 m_currentPosition;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PositionEditorComponent)
 };

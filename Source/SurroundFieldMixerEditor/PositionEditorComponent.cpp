@@ -22,6 +22,58 @@
 namespace SurroundFieldMixer
 {
 
+
+//==============================================================================
+PositionEditorPopupComponent::PositionEditorPopupComponent()
+{
+    lookAndFeelChanged();
+
+    setSize(50, 50);
+}
+
+PositionEditorPopupComponent::~PositionEditorPopupComponent()
+{
+
+}
+
+void PositionEditorPopupComponent::paint(Graphics& g)
+{
+    // (Our component is opaque, so we must completely fill the background with a solid colour)
+    g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
+
+    auto bounds = getLocalBounds();
+
+    // draw 1px border
+    g.setColour(getLookAndFeel().findColour(TextButton::buttonColourId));
+    g.drawRect(bounds);
+
+    auto positioningNormalArea = bounds.reduced(10);
+
+    g.setColour(getLookAndFeel().findColour(TextButton::buttonColourId).darker());
+    g.drawRect(positioningNormalArea);
+
+    if (getCurrentPositionCallback)
+    {
+        auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * juce::Point<float>(std::get<0>(getCurrentPositionCallback()), std::get<1>(getCurrentPositionCallback())));
+        auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), positioningNormalArea.getY()), juce::Point<float>(relPos.getX(), positioningNormalArea.getBottom()));
+        g.drawLine(verticalPosLine, 1.0f);
+        auto horizontalPosLine = juce::Line<float>(juce::Point<float>(positioningNormalArea.getX(), relPos.getY()), juce::Point<float>(positioningNormalArea.getRight(), relPos.getY()));
+        g.drawLine(horizontalPosLine, 1.0f);
+
+        g.setColour(Colours::forestgreen);
+        g.fillEllipse(juce::Rectangle<float>(relPos - juce::Point<float>(5.0f, 5.0f), relPos + juce::Point<float>(5.0f, 5.0f)));
+    }
+
+    Component::paint(g);
+}
+
+void PositionEditorPopupComponent::resized()
+{
+    auto bounds = getLocalBounds();
+
+    Component::resized();
+}
+
 //==============================================================================
 PositionEditorComponent::PositionEditorComponent()
 {
@@ -169,33 +221,28 @@ void PositionEditorComponent::lookAndFeelChanged()
     Component::lookAndFeelChanged();
 }
 
-//void PositionEditorComponent::updatePopupMenu()
-//{
-//    
-//}
-
 void PositionEditorComponent::triggerPositioningPopup(const juce::Point<int>& popupStartPosition)
 {
-    if (auto* window = new Component("Test"))//createWindow(options, &(callback->managerOfChosenCommand)))
+    if (!m_positioningPopup)
+        m_positioningPopup = std::make_unique<PositionEditorPopupComponent>();
+
+    if (m_positioningPopup)
     {
         auto callback = std::make_unique<PositioningPopupCallback>();
 
-        window->setVisible(true);
-        window->enterModalState(false, nullptr, true);
-        ModalComponentManager::getInstance()->attachCallback(window, callback.release());
+        m_positioningPopup->getCurrentPositionCallback = [this]() { return getCurrentPosition(); };
+        m_positioningPopup->setCurrentPositionCallback = [this](const std::tuple<float, float, float>& position) { setCurrentPosition(position); };
 
-        window->setTopLeftPosition(popupStartPosition);
-        window->setSize(50, 50);
-        window->toFront(false);  // need to do this after making it modal, or it could
+        m_positioningPopup->setVisible(true);
+        m_positioningPopup->enterModalState(false, nullptr, true);
+        ModalComponentManager::getInstance()->attachCallback(m_positioningPopup.get(), callback.release());
+
+        m_positioningPopup->setTopLeftPosition(popupStartPosition);
+        m_positioningPopup->toFront(false);  // need to do this after making it modal, or it could
                                   // be stuck behind other comps that are already modal..
 
     }
 }
-
-//void PositionEditorComponent::handlePopupResult(int resultingAssiIdx)
-//{
-//    
-//}
 
 void PositionEditorComponent::setCurrentPosition(const std::tuple<float, float, float>& currentPosition)
 {
