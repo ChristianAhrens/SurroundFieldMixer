@@ -215,6 +215,9 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 {
 	ignoreUnused(midiMessages);
 
+	// the lock is currently gloablly taken in audioDeviceIOCallback which is calling this method
+	//const ScopedLock sl(m_readLock);
+
 	for (auto const& inputMuteStateKV : m_inputMuteStates)
 	{
 		if (inputMuteStateKV.second)
@@ -228,13 +231,18 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	postMessage(new AudioInputBufferMessage(buffer));
 
 	// process data in buffer to be what shall be used as output
+	auto inputChannels = buffer.getNumChannels();
+	auto outputChannels = 5;
 	AudioBuffer<float> processedBuffer;
-	processedBuffer.setSize(5, buffer.getNumSamples(), false, false, true);
-	processedBuffer.copyFrom(0, 0, buffer.getReadPointer(0), buffer.getNumSamples());
-	processedBuffer.copyFrom(1, 0, buffer.getReadPointer(0), buffer.getNumSamples());
-	processedBuffer.copyFrom(2, 0, buffer.getReadPointer(1), buffer.getNumSamples());
-	processedBuffer.copyFrom(3, 0, buffer.getReadPointer(1), buffer.getNumSamples());
-	processedBuffer.copyFrom(4, 0, buffer.getReadPointer(1), buffer.getNumSamples());
+	processedBuffer.setSize(outputChannels, buffer.getNumSamples(), false, true, true);
+	for (auto inputIdx = 0; inputIdx < inputChannels; inputIdx++)
+	{
+		for (auto outputIdx = 0; outputIdx < outputChannels; outputIdx++)
+		{
+			auto gain = getInputToOutputGain(inputIdx + 1, outputIdx + 1);
+			processedBuffer.addFrom(outputIdx, 0, buffer.getReadPointer(inputIdx), buffer.getNumSamples(), gain);
+		}
+	}
 	buffer.makeCopyOf(processedBuffer, true);
 
 	for (auto const& outputMuteStateKV : m_outputMuteStates)
@@ -248,6 +256,48 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	}
 
 	postMessage(new AudioOutputBufferMessage(buffer));
+}
+
+float SurroundFieldMixerProcessor::getInputToOutputGain(int input, int output)
+{
+	auto inputPos = getInputPosition(input);
+	auto outputPos = getOutputPosition(output);
+
+	return 1.0f - inputPos.getDistanceFrom(outputPos);
+}
+
+const juce::Point<float> SurroundFieldMixerProcessor::getInputPosition(int channelNumber)
+{
+	return juce::Point<float>(std::get<0>(getInputPositionValue(channelNumber)), std::get<1>(getInputPositionValue(channelNumber)));
+}
+
+const juce::Point<float> SurroundFieldMixerProcessor::getOutputPosition(int channelNumber)
+{
+	auto origX = 0.5f;
+	auto origY = 0.5f;
+	auto centerPosition = juce::Point<float>(origX + 0.5f, origY - 0.5f);
+
+	switch (channelNumber)
+	{
+	case 0: // L
+		return juce::Point<float>(0.0f, 1.0f);
+		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f), -(sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f));
+	case 1: // C
+		return juce::Point<float>(0.5f, 1.0f);
+		//return juce::Point<float>(origX + 0.5f, origY - 1.0f);
+	case 2: // R
+		return juce::Point<float>(1.0f, 1.0f);
+		//return centerPosition + juce::Point<float>(cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f, -(sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f));
+	case 3: // LS
+		return juce::Point<float>(0.0f, 0.0f);
+		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f), sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
+	case 4: // RS
+		return juce::Point<float>(1.0f, 0.0f);
+		//return centerPosition + juce::Point<float>(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f, sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
+	case 5: // LFE
+	default:
+		return juce::Point<float>(0.5f, 0.5f);
+	}
 }
 
 void SurroundFieldMixerProcessor::handleMessage(const Message& message)
@@ -333,7 +383,6 @@ void SurroundFieldMixerProcessor::audioDeviceIOCallback(const float** inputChann
 	const ScopedLock sl(m_readLock);
 
 	auto maxActiveChannels = std::max(numInputChannels, numOutputChannels);
-	auto minActiveChannels = std::min(numInputChannels, numOutputChannels);
 
 	// copy incoming data to processing data buffer
 	for (auto i = 0; i < numInputChannels && i < maxActiveChannels; i++)
@@ -350,10 +399,8 @@ void SurroundFieldMixerProcessor::audioDeviceIOCallback(const float** inputChann
 	auto processedChannelCount = audioBufferToProcess.getNumChannels();
 	auto processedSampleCount = audioBufferToProcess.getNumSamples();
 	auto processedData = audioBufferToProcess.getArrayOfReadPointers();
-	//jassert(processedChannelCount >= numOutputChannels);
 	jassert(processedSampleCount == numSamples);
-	//for (auto i = 0; i < numOutputChannels && i < maxActiveChannels; i++)
-	for (auto i = 0; i < minActiveChannels; i++)
+	for (auto i = 0; i < numOutputChannels && i < processedChannelCount; i++)
 	{
 		memcpy(outputChannelData[i], processedData[i], (size_t)processedSampleCount * sizeof(float));
 	}

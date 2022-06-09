@@ -144,6 +144,9 @@ public:
     void audioDeviceStopped() override;
 
     //==============================================================================
+    float getInputToOutputGain(int input, int output);
+
+    //==============================================================================
     void handleMessage(const Message& message) override;
 
     //==============================================================================
@@ -167,6 +170,10 @@ public:
     static constexpr int s_maxNumSamples = 1024;
 
 private:
+    const juce::Point<float> getInputPosition(int channelNumber);
+    const juce::Point<float> getOutputPosition(int channelNumber);
+
+    //==============================================================================
     String                      m_Name;
 
     //==============================================================================
