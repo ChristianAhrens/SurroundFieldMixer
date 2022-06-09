@@ -37,13 +37,13 @@ void MultiMeterInputComponent::resized()
 {
     if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputPositions.size())
     {
-        auto controlElementsBounds = getLocalBounds().reduced(20).removeFromBottom(45);
+        auto controlElementsBounds = getLocalBounds().reduced(20).removeFromBottom(55);
         auto maxcontrolElementWidth = 30;
 
-        auto controlElementWidth = controlElementsBounds.getWidth() / m_inputMutes.size();
+        auto controlElementWidth = controlElementsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
         controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
 
-        auto positionComponentBounds = controlElementsBounds.removeFromTop(20);
+        auto positionComponentBounds = controlElementsBounds.removeFromTop(30);
         for (auto i = 0; i < m_inputPositions.size(); i++)
         {
             auto const& positionComponent = m_inputPositions.at(i);
@@ -74,7 +74,7 @@ void MultiMeterInputComponent::paint(Graphics& g)
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    auto controlElementsGap = 50;
+    auto controlElementsGap = 60;
 
 	// calculate what we need for our center circle
 	auto width = getWidth();
@@ -204,8 +204,8 @@ void MultiMeterInputComponent::processChanges()
                     auto foundMuteButtonIter = std::find_if(m_inputMutes.begin(), m_inputMutes.end(), [muteButton](std::unique_ptr<TextButton>& b) { return b.get() == muteButton; });
                     if (foundMuteButtonIter == m_inputMutes.end())
                         return;
-                    int channelIdx = foundMuteButtonIter - m_inputMutes.begin();
-                    int channel = channelIdx + 1;
+                    auto channelIdx = foundMuteButtonIter - m_inputMutes.begin();
+                    auto channel = static_cast<int>(channelIdx + 1);
                     auto muteState = muteButton->getToggleState();
                     muteChange(channel, muteState);
                 };
@@ -235,17 +235,14 @@ void MultiMeterInputComponent::processChanges()
                 m_inputPositions.push_back(std::make_unique<PositionEditorComponent>());
                 auto positionComponent = m_inputPositions.back().get();
                 positionComponent->setCurrentPosition(std::tuple<float, float, float>(0.5f, 0.5f, 0.5f));
-                //muteButton->setColour(TextButton::ColourIds::buttonOnColourId, juce::Colours::red);
-                //muteButton->setClickingTogglesState(true);
-                //muteButton->onClick = [muteButton, this] {
-                //    auto foundMuteButtonIter = std::find_if(m_inputPositions.begin(), m_inputPositions.end(), [muteButton](std::unique_ptr<TextButton>& b) { return b.get() == muteButton; });
-                //    if (foundMuteButtonIter == m_inputPositions.end())
-                //        return;
-                //    int channelIdx = foundMuteButtonIter - m_inputPositions.begin();
-                //    int channel = channelIdx + 1;
-                //    auto muteState = muteButton->getToggleState();
-                //    muteChange(channel, muteState);
-                //};
+                positionComponent->setPositionCallback = [positionComponent, this] (juce::Component*, const std::tuple<float, float, float>& position) {
+                    auto foundPositionComponentIter = std::find_if(m_inputPositions.begin(), m_inputPositions.end(), [positionComponent](std::unique_ptr<PositionEditorComponent>& b) { return b.get() == positionComponent; });
+                    if (foundPositionComponentIter == m_inputPositions.end())
+                        return;
+                    auto channelIdx = foundPositionComponentIter - m_inputPositions.begin();
+                    auto channel = static_cast<int>(channelIdx + 1);
+                    positionChange(channel, position);
+                };
                 addAndMakeVisible(*m_inputPositions.back());
             }
         }

@@ -101,10 +101,13 @@ public:
     void addOutputCommander(OutputCommander* commander);
     void removeOutputCommander(OutputCommander* comander);
 
-    void toggleInputMute(int channelNumber, bool muted);
-    void toggleOutputMute(int channelNumber, bool muted);
+    bool getInputMuteState(int channelNumber);
+    void toggleInputMuteState(int channelNumber, bool muted);
+    bool getOutputMuteState(int channelNumber);
+    void toggleOutputMuteState(int channelNumber, bool muted);
 
-    void setPosition(int channelNumber, const std::tuple<float, float, float>& position);
+    const std::tuple<float, float, float>& getInputPositionValue(int channelNumber);
+    void setInputPositionValue(int channelNumber, const std::tuple<float, float, float>& position);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
@@ -185,6 +188,9 @@ private:
     //==============================================================================
     std::map<int, bool> m_inputMuteStates;
     std::map<int, bool> m_outputMuteStates;
+
+    //==============================================================================
+    std::map<int, std::tuple<float, float, float>>  m_inputPositionValues;
 
     //==============================================================================
     std::unique_ptr<SurroundFieldMixerEditor>  m_processorEditor;

@@ -36,22 +36,20 @@ public:
     void resized() override;
 
     //==============================================================================
+    void mouseUp(const MouseEvent& event) override;
+    void mouseDrag(const MouseEvent& event) override;
+
+    //==============================================================================
     std::function<std::tuple<float, float, float>(void)> getCurrentPositionCallback;
     std::function<void(std::tuple<float, float, float>)> setCurrentPositionCallback;
+
+private:
+    void updatePosition(const juce::Point<int>& mousePosition);
 };
 
 
 class PositionEditorComponent : public Component, private MessageListener
 {
-public:
-    class PositioningPopupCallback : public juce::ModalComponentManager::Callback
-    {
-        void modalStateFinished(int returnValue) override
-        {
-            ignoreUnused(returnValue);
-        }
-    };
-
 public:
     PositionEditorComponent();
     ~PositionEditorComponent();
@@ -61,6 +59,7 @@ public:
     void resized() override;
 
     //==============================================================================
+    void mouseDown(const MouseEvent& event) override;
     void mouseUp(const MouseEvent& event) override;
     
     //==============================================================================
@@ -70,11 +69,14 @@ public:
     void lookAndFeelChanged() override;
 
     //==============================================================================
-    std::function<void(Component*, std::tuple<float, float, float>)> onPositionSet;
+    std::function<void(Component*, const std::tuple<float, float, float>&)> setPositionCallback;
     
     //==============================================================================
     void setCurrentPosition(const std::tuple<float, float, float>& currentPosition);
     const std::tuple<float, float, float>& getCurrentPosition();
+
+    //==============================================================================
+    void closePositioningPopup();
     
 private:
     void triggerPositioningPopup(const juce::Point<int>& popupStartPosition);

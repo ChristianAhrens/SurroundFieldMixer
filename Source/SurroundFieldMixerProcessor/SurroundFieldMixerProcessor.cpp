@@ -102,8 +102,8 @@ void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 	if (std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander) == m_inputCommanders.end())
 	{
 		m_inputCommanders.push_back(commander);
-		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleInputMute(channel, state); } );
-		commander->setPositionChangeCallback([=](int channel, const std::tuple<float, float, float>& position) { return setPosition(channel, position); });
+		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleInputMuteState(channel, state); } );
+		commander->setPositionChangeCallback([=](int channel, const std::tuple<float, float, float>& position) { return setInputPositionValue(channel, position); });
 	}
 }
 
@@ -125,7 +125,7 @@ void SurroundFieldMixerProcessor::addOutputCommander(OutputCommander* commander)
 	if (std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander) == m_outputCommanders.end())
 	{
 		m_outputCommanders.push_back(commander);
-		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleOutputMute(channel, state); });
+		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleOutputMuteState(channel, state); });
 	}
 }
 
@@ -139,24 +139,46 @@ void SurroundFieldMixerProcessor::removeOutputCommander(OutputCommander* command
 		m_outputCommanders.erase(existingOutputCommander);
 }
 
-void SurroundFieldMixerProcessor::toggleInputMute(int inputChannelNumber, bool muted)
+bool SurroundFieldMixerProcessor::getInputMuteState(int inputChannelNumber)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	return m_inputMuteStates[inputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::toggleInputMuteState(int inputChannelNumber, bool muted)
 {
 	jassert(inputChannelNumber > 0);
 	const ScopedLock sl(m_readLock);
 	m_inputMuteStates[inputChannelNumber] = muted;
 }
 
-void SurroundFieldMixerProcessor::toggleOutputMute(int outputChannelNumber, bool muted)
+bool SurroundFieldMixerProcessor::getOutputMuteState(int outputChannelNumber)
+{
+	jassert(outputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	return m_outputMuteStates[outputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::toggleOutputMuteState(int outputChannelNumber, bool muted)
 {
 	jassert(outputChannelNumber > 0);
 	const ScopedLock sl(m_readLock);
 	m_outputMuteStates[outputChannelNumber] = muted;
 }
 
-void SurroundFieldMixerProcessor::setPosition(int inputChannelNumber, const std::tuple<float, float, float>& position)
+const std::tuple<float, float, float>& SurroundFieldMixerProcessor::getInputPositionValue(int inputChannelNumber)
 {
 	jassert(inputChannelNumber > 0);
-	ignoreUnused(position);
+	const ScopedLock sl(m_readLock);
+	return m_inputPositionValues[inputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::setInputPositionValue(int inputChannelNumber, const std::tuple<float, float, float>& position)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	m_inputPositionValues[inputChannelNumber] = position;
 }
 
 AudioDeviceManager* SurroundFieldMixerProcessor::getDeviceManager()

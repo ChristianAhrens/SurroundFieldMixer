@@ -28,7 +28,7 @@ PositionEditorPopupComponent::PositionEditorPopupComponent()
 {
     lookAndFeelChanged();
 
-    setSize(50, 50);
+    setSize(100, 100);
 }
 
 PositionEditorPopupComponent::~PositionEditorPopupComponent()
@@ -74,10 +74,37 @@ void PositionEditorPopupComponent::resized()
     Component::resized();
 }
 
+void PositionEditorPopupComponent::mouseUp(const MouseEvent& event)
+{
+    updatePosition(event.getPosition());
+}
+
+void PositionEditorPopupComponent::mouseDrag(const MouseEvent& event)
+{
+    updatePosition(event.getPosition());
+}
+
+void PositionEditorPopupComponent::updatePosition(const juce::Point<int>& mousePosition)
+{
+    if (setCurrentPositionCallback)
+    {
+        auto positioningNormalArea = getLocalBounds().reduced(10);
+
+        auto mousePos = (mousePosition - positioningNormalArea.getTopLeft()).toFloat();
+
+        auto relPosX = mousePos.getX() / static_cast<float>(positioningNormalArea.getWidth());
+        auto relPosY = mousePos.getY() / static_cast<float>(positioningNormalArea.getHeight());
+
+        setCurrentPositionCallback(std::tuple<float, float, float>(relPosX, relPosY, 0.0f));
+    }
+}
+
 //==============================================================================
 PositionEditorComponent::PositionEditorComponent()
 {
     lookAndFeelChanged();
+
+    Desktop::getInstance().addGlobalMouseListener(this);
 }
 
 PositionEditorComponent::~PositionEditorComponent()
@@ -118,6 +145,18 @@ void PositionEditorComponent::resized()
 	auto bounds = getLocalBounds();
 
     Component::resized();
+}
+
+void PositionEditorComponent::mouseDown(const MouseEvent& event)
+{
+    if (m_positioningPopup)
+    {
+        auto mouseDownOutsideOfPopupComponent = !m_positioningPopup->getLocalBounds().contains(event.getMouseDownPosition());
+        if (mouseDownOutsideOfPopupComponent)
+            closePositioningPopup();
+    }
+
+    Component::mouseDown(event);
 }
 
 void PositionEditorComponent::mouseUp(const MouseEvent& event)
@@ -223,30 +262,50 @@ void PositionEditorComponent::lookAndFeelChanged()
 
 void PositionEditorComponent::triggerPositioningPopup(const juce::Point<int>& popupStartPosition)
 {
+    if (isCurrentlyBlockedByAnotherModalComponent())
+        return;
+
     if (!m_positioningPopup)
+    {
         m_positioningPopup = std::make_unique<PositionEditorPopupComponent>();
+        getParentComponent()->getParentComponent()->addChildComponent(m_positioningPopup.get());
+    }
 
     if (m_positioningPopup)
     {
-        auto callback = std::make_unique<PositioningPopupCallback>();
-
         m_positioningPopup->getCurrentPositionCallback = [this]() { return getCurrentPosition(); };
         m_positioningPopup->setCurrentPositionCallback = [this](const std::tuple<float, float, float>& position) { setCurrentPosition(position); };
 
         m_positioningPopup->setVisible(true);
-        m_positioningPopup->enterModalState(false, nullptr, true);
-        ModalComponentManager::getInstance()->attachCallback(m_positioningPopup.get(), callback.release());
+        m_positioningPopup->enterModalState(true, nullptr, true);
 
-        m_positioningPopup->setTopLeftPosition(popupStartPosition);
+        auto popupPositionInParent = getParentComponent()->getPosition() + getPosition() + popupStartPosition + juce::Point<int>(0, -m_positioningPopup->getHeight());
+        
+        m_positioningPopup->setTopLeftPosition(popupPositionInParent);
+
         m_positioningPopup->toFront(false);  // need to do this after making it modal, or it could
                                   // be stuck behind other comps that are already modal..
 
     }
 }
 
+void PositionEditorComponent::closePositioningPopup()
+{
+    if (m_positioningPopup)
+    {
+        m_positioningPopup->exitModalState(0);
+        m_positioningPopup->setVisible(false);
+        getParentComponent()->getParentComponent()->removeChildComponent(m_positioningPopup.get());
+        m_positioningPopup.reset();
+    }
+}
+
 void PositionEditorComponent::setCurrentPosition(const std::tuple<float, float, float>& currentPosition)
 {
     m_currentPosition = currentPosition;
+
+    if (setPositionCallback)
+        setPositionCallback(this, currentPosition);
 }
 
 const std::tuple<float, float, float>& PositionEditorComponent::getCurrentPosition()
