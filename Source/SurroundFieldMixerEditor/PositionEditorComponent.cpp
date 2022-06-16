@@ -306,15 +306,21 @@ void PositionEditorComponent::closePositioningPopup()
 
 void PositionEditorComponent::setCurrentPosition(const std::tuple<float, float, float>& currentPosition)
 {
-    m_currentPosition = currentPosition;
+    m_currentPosition.swap(std::tuple<float, float, float>(
+        std::get<0>(currentPosition), 
+        -1.0f * (std::get<1>(currentPosition) - 1.0f), 
+        std::get<2>(currentPosition)));
 
     if (setPositionCallback)
-        setPositionCallback(this, currentPosition);
+        setPositionCallback(this, m_currentPosition);
 }
 
 const std::tuple<float, float, float>& PositionEditorComponent::getCurrentPosition()
 {
-    return m_currentPosition;
+    return std::tuple<float, float, float>(
+        std::get<0>(m_currentPosition),
+        -1.0f * (std::get<1>(m_currentPosition) - 1.0f),
+        std::get<2>(m_currentPosition));
 }
 
 }

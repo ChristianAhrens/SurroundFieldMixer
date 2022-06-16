@@ -263,6 +263,9 @@ float SurroundFieldMixerProcessor::getInputToOutputGain(int input, int output)
 	auto inputPos = getInputPosition(input);
 	auto outputPos = getOutputPosition(output);
 
+	if (input == 1)
+		DBG(String(__FUNCTION__) << " i:o " << input << ":" << output << "(inputPos:" << inputPos.toString() << ", outputPos:" << outputPos.toString() << " resulting in dist " << inputPos.getDistanceFrom(outputPos));
+
 	return 1.0f - inputPos.getDistanceFrom(outputPos);
 }
 
@@ -277,24 +280,26 @@ const juce::Point<float> SurroundFieldMixerProcessor::getOutputPosition(int chan
 	auto origY = 0.5f;
 	auto centerPosition = juce::Point<float>(origX + 0.5f, origY - 0.5f);
 
+	jassert(channelNumber > 0);
+
 	switch (channelNumber)
 	{
-	case 0: // L
+	case 1: // L
 		return juce::Point<float>(0.0f, 1.0f);
 		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f), -(sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f));
-	case 1: // C
+	case 2: // C
 		return juce::Point<float>(0.5f, 1.0f);
 		//return juce::Point<float>(origX + 0.5f, origY - 1.0f);
-	case 2: // R
+	case 3: // R
 		return juce::Point<float>(1.0f, 1.0f);
 		//return centerPosition + juce::Point<float>(cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f, -(sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f));
-	case 3: // LS
-		return juce::Point<float>(0.0f, 0.0f);
-		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f), sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
 	case 4: // RS
 		return juce::Point<float>(1.0f, 0.0f);
 		//return centerPosition + juce::Point<float>(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f, sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
-	case 5: // LFE
+	case 5: // LS
+		return juce::Point<float>(0.0f, 0.0f);
+		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f), sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
+	case 6: // LFE
 	default:
 		return juce::Point<float>(0.5f, 0.5f);
 	}
