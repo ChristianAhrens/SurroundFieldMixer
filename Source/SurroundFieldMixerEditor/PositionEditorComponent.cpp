@@ -161,10 +161,14 @@ void PositionEditorComponent::mouseDown(const MouseEvent& event)
 
 void PositionEditorComponent::mouseUp(const MouseEvent& event)
 {
-    auto mouseUpPosition = event.getMouseDownPosition() + event.getOffsetFromDragStart();
-    auto mouseUpWithinComponent = getLocalBounds().contains(mouseUpPosition);
+    auto relEventInParent = event.getEventRelativeTo(getParentComponent());
+    auto relMouseUpPosition = relEventInParent.getMouseDownPosition() + relEventInParent.getOffsetFromDragStart();
+    auto mouseUpWithinComponent = getBounds().contains(relMouseUpPosition);
     if (mouseUpWithinComponent)
-        triggerPositioningPopup(mouseUpPosition);
+    {
+        auto localMouseUpPosition = event.getMouseDownPosition() + event.getOffsetFromDragStart();
+        triggerPositioningPopup(localMouseUpPosition);
+    }
 
     Component::mouseUp(event);
 }
