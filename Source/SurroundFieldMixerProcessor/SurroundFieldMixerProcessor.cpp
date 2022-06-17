@@ -103,7 +103,7 @@ void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 	{
 		m_inputCommanders.push_back(commander);
 		commander->setMuteChangeCallback([=](int channel, bool state) { return toggleInputMuteState(channel, state); } );
-		commander->setPositionChangeCallback([=](int channel, const std::tuple<float, float, float>& position) { return setInputPositionValue(channel, position); });
+		commander->setPositionChangeCallback([=](int channel, const juce::Point<float>& position) { return setInputPositionValue(channel, position); });
 	}
 }
 
@@ -167,14 +167,14 @@ void SurroundFieldMixerProcessor::toggleOutputMuteState(int outputChannelNumber,
 	m_outputMuteStates[outputChannelNumber] = muted;
 }
 
-const std::tuple<float, float, float>& SurroundFieldMixerProcessor::getInputPositionValue(int inputChannelNumber)
+const juce::Point<float>& SurroundFieldMixerProcessor::getInputPositionValue(int inputChannelNumber)
 {
 	jassert(inputChannelNumber > 0);
 	const ScopedLock sl(m_readLock);
 	return m_inputPositionValues[inputChannelNumber];
 }
 
-void SurroundFieldMixerProcessor::setInputPositionValue(int inputChannelNumber, const std::tuple<float, float, float>& position)
+void SurroundFieldMixerProcessor::setInputPositionValue(int inputChannelNumber, const juce::Point<float>& position)
 {
 	jassert(inputChannelNumber > 0);
 	const ScopedLock sl(m_readLock);
@@ -263,15 +263,15 @@ float SurroundFieldMixerProcessor::getInputToOutputGain(int input, int output)
 	auto inputPos = getInputPosition(input);
 	auto outputPos = getOutputPosition(output);
 
-	if (input == 1)
-		DBG(String(__FUNCTION__) << " i:o " << input << ":" << output << "(inputPos:" << inputPos.toString() << ", outputPos:" << outputPos.toString() << " resulting in dist " << inputPos.getDistanceFrom(outputPos));
+	//if (input == 1)
+	//	DBG(String(__FUNCTION__) << " i:o " << input << ":" << output << "(inputPos:" << inputPos.toString() << ", outputPos:" << outputPos.toString() << " resulting in dist " << inputPos.getDistanceFrom(outputPos));
 
 	return 1.0f - inputPos.getDistanceFrom(outputPos);
 }
 
 const juce::Point<float> SurroundFieldMixerProcessor::getInputPosition(int channelNumber)
 {
-	return juce::Point<float>(std::get<0>(getInputPositionValue(channelNumber)), std::get<1>(getInputPositionValue(channelNumber)));
+	return getInputPositionValue(channelNumber);
 }
 
 const juce::Point<float> SurroundFieldMixerProcessor::getOutputPosition(int channelNumber)

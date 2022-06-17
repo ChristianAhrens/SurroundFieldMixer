@@ -54,7 +54,7 @@ void PositionEditorPopupComponent::paint(Graphics& g)
 
     if (getCurrentPositionCallback)
     {
-        auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * juce::Point<float>(std::get<0>(getCurrentPositionCallback()), std::get<1>(getCurrentPositionCallback())));
+        auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * getCurrentPositionCallback());
         auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), positioningNormalArea.getY()), juce::Point<float>(relPos.getX(), positioningNormalArea.getBottom()));
         g.drawLine(verticalPosLine, 1.0f);
         auto horizontalPosLine = juce::Line<float>(juce::Point<float>(positioningNormalArea.getX(), relPos.getY()), juce::Point<float>(positioningNormalArea.getRight(), relPos.getY()));
@@ -95,7 +95,7 @@ void PositionEditorPopupComponent::updatePosition(const juce::Point<int>& mouseP
         auto relPosX = mousePos.getX() / static_cast<float>(positioningNormalArea.getWidth());
         auto relPosY = mousePos.getY() / static_cast<float>(positioningNormalArea.getHeight());
 
-        setCurrentPositionCallback(std::tuple<float, float, float>(relPosX, relPosY, 0.0f));
+        setCurrentPositionCallback(juce::Point<float>(relPosX, relPosY));
     }
 }
 
@@ -128,7 +128,7 @@ void PositionEditorComponent::paint(Graphics& g)
     g.setColour(getLookAndFeel().findColour(TextButton::buttonColourId).darker());
     g.drawRect(positioningNormalArea);
     
-    auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * juce::Point<float>(std::get<0>(getCurrentPosition()), std::get<1>(getCurrentPosition())));
+    auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * getCurrentPosition());
     auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), positioningNormalArea.getY()), juce::Point<float>(relPos.getX(), positioningNormalArea.getBottom()));
     g.drawLine(verticalPosLine, 1.0f);
     auto horizontalPosLine = juce::Line<float>(juce::Point<float>(positioningNormalArea.getX(), relPos.getY()), juce::Point<float>(positioningNormalArea.getRight(), relPos.getY()));
@@ -278,7 +278,7 @@ void PositionEditorComponent::triggerPositioningPopup(const juce::Point<int>& po
     if (m_positioningPopup)
     {
         m_positioningPopup->getCurrentPositionCallback = [this]() { return getCurrentPosition(); };
-        m_positioningPopup->setCurrentPositionCallback = [this](const std::tuple<float, float, float>& position) { setCurrentPosition(position); };
+        m_positioningPopup->setCurrentPositionCallback = [this](const juce::Point<float>& position) { setCurrentPosition(position); };
 
         m_positioningPopup->setVisible(true);
         m_positioningPopup->enterModalState(true, nullptr, true);
@@ -304,23 +304,21 @@ void PositionEditorComponent::closePositioningPopup()
     }
 }
 
-void PositionEditorComponent::setCurrentPosition(const std::tuple<float, float, float>& currentPosition)
+void PositionEditorComponent::setCurrentPosition(const juce::Point<float>& currentPosition)
 {
-    m_currentPosition.swap(std::tuple<float, float, float>(
-        std::get<0>(currentPosition), 
-        -1.0f * (std::get<1>(currentPosition) - 1.0f), 
-        std::get<2>(currentPosition)));
+    m_currentPosition = juce::Point<float>(
+        currentPosition.getX(),
+        -1.0f * currentPosition.getY() - 1.0f);
 
     if (setPositionCallback)
         setPositionCallback(this, m_currentPosition);
 }
 
-const std::tuple<float, float, float>& PositionEditorComponent::getCurrentPosition()
+const juce::Point<float>& PositionEditorComponent::getCurrentPosition()
 {
-    return std::tuple<float, float, float>(
-        std::get<0>(m_currentPosition),
-        -1.0f * (std::get<1>(m_currentPosition) - 1.0f),
-        std::get<2>(m_currentPosition));
+    return juce::Point<float>(
+        m_currentPosition.getX(),
+        -1.0f * m_currentPosition.getY() - 1.0f);
 }
 
 }

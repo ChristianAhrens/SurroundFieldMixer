@@ -61,21 +61,21 @@ public:
     {
     public:
         //==============================================================================
-        void setPositionChangeCallback(const std::function<void(int, std::tuple<float, float, float>)>& callback)
+        void setPositionChangeCallback(const std::function<void(int, juce::Point<float>)>& callback)
         {
             m_positionChangeCallback = callback;
         }
-        virtual void setPosition(int channel, std::tuple<float, float, float> position) = 0;
+        virtual void setPosition(int channel, juce::Point<float> position) = 0;
 
     protected:
-        void positionChange(int channel, const std::tuple<float, float, float>& position)
+        void positionChange(int channel, const juce::Point<float>& position)
         {
             if (m_positionChangeCallback)
                 m_positionChangeCallback(channel, position);
         }
 
     private:
-        std::function<void(int, std::tuple<float, float, float>)> m_positionChangeCallback{ nullptr };
+        std::function<void(int, juce::Point<float>)> m_positionChangeCallback{ nullptr };
     };
 
     class OutputCommander : public ChannelCommander
@@ -106,8 +106,8 @@ public:
     bool getOutputMuteState(int channelNumber);
     void toggleOutputMuteState(int channelNumber, bool muted);
 
-    const std::tuple<float, float, float>& getInputPositionValue(int channelNumber);
-    void setInputPositionValue(int channelNumber, const std::tuple<float, float, float>& position);
+    const juce::Point<float>& getInputPositionValue(int channelNumber);
+    void setInputPositionValue(int channelNumber, const juce::Point<float>& position);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
@@ -197,7 +197,7 @@ private:
     std::map<int, bool> m_outputMuteStates;
 
     //==============================================================================
-    std::map<int, std::tuple<float, float, float>>  m_inputPositionValues;
+    std::map<int, juce::Point<float>>  m_inputPositionValues;
 
     //==============================================================================
     std::unique_ptr<SurroundFieldMixerEditor>  m_processorEditor;

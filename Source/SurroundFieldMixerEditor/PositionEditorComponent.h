@@ -40,8 +40,8 @@ public:
     void mouseDrag(const MouseEvent& event) override;
 
     //==============================================================================
-    std::function<std::tuple<float, float, float>(void)> getCurrentPositionCallback;
-    std::function<void(std::tuple<float, float, float>)> setCurrentPositionCallback;
+    std::function<juce::Point<float>(void)> getCurrentPositionCallback;
+    std::function<void(juce::Point<float>)> setCurrentPositionCallback;
 
 private:
     void updatePosition(const juce::Point<int>& mousePosition);
@@ -69,11 +69,11 @@ public:
     void lookAndFeelChanged() override;
 
     //==============================================================================
-    std::function<void(Component*, const std::tuple<float, float, float>&)> setPositionCallback;
+    std::function<void(Component*, const juce::Point<float>&)> setPositionCallback;
     
     //==============================================================================
-    void setCurrentPosition(const std::tuple<float, float, float>& currentPosition);
-    const std::tuple<float, float, float>& getCurrentPosition();
+    void setCurrentPosition(const juce::Point<float>& currentPosition);
+    const juce::Point<float>& getCurrentPosition();
 
     //==============================================================================
     void closePositioningPopup();
@@ -83,7 +83,7 @@ private:
 
     std::unique_ptr<PositionEditorPopupComponent>   m_positioningPopup;
     
-    std::tuple<float, float, float>                 m_currentPosition;
+    juce::Point<float>                 m_currentPosition;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PositionEditorComponent)
 };

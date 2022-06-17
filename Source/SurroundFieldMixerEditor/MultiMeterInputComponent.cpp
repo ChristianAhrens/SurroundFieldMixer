@@ -159,7 +159,7 @@ void MultiMeterInputComponent::setMute(int channel, bool muteState)
     muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
-void MultiMeterInputComponent::setPosition(int channel, std::tuple<float, float, float> position)
+void MultiMeterInputComponent::setPosition(int channel, juce::Point<float> position)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -234,8 +234,8 @@ void MultiMeterInputComponent::processChanges()
             {
                 m_inputPositions.push_back(std::make_unique<PositionEditorComponent>());
                 auto positionComponent = m_inputPositions.back().get();
-                positionComponent->setCurrentPosition(std::tuple<float, float, float>(0.5f, 0.5f, 0.5f));
-                positionComponent->setPositionCallback = [positionComponent, this] (juce::Component*, const std::tuple<float, float, float>& position) {
+                positionComponent->setCurrentPosition(juce::Point<float>(0.5f, 0.5f));
+                positionComponent->setPositionCallback = [positionComponent, this] (juce::Component*, const juce::Point<float>& position) {
                     auto foundPositionComponentIter = std::find_if(m_inputPositions.begin(), m_inputPositions.end(), [positionComponent](std::unique_ptr<PositionEditorComponent>& b) { return b.get() == positionComponent; });
                     if (foundPositionComponentIter == m_inputPositions.end())
                         return;

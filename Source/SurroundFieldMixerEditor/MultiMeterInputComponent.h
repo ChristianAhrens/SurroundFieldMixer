@@ -51,7 +51,7 @@ public:
 
     //==============================================================================
     void setMute(int channel, bool muteState) override;
-    void setPosition(int channel, std::tuple<float, float, float> position) override;
+    void setPosition(int channel, juce::Point<float> position) override;
 
 private:
     ProcessorLevelData                                      m_levelData;
