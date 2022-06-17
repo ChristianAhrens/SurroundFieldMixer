@@ -182,10 +182,18 @@ public:
     static constexpr int s_maxNumSamples = 1024;
 
     static constexpr juce::Point<float> s_defaultPos = juce::Point<float>(0.5f, 0.5f);
+    juce::Point<float> m_leftPos;
+    juce::Point<float> m_rightPos;
+    juce::Point<float> m_centerPos;
+    juce::Point<float> m_leftSurroundPos;
+    juce::Point<float> m_rightSurroundPos;
 
 private:
     const juce::Point<float> getInputPosition(int channelNumber);
     const juce::Point<float> getOutputPosition(int channelNumber);
+
+    //==============================================================================
+    const juce::Point<float> getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType channelIdent);
 
     //==============================================================================
     String                      m_Name;

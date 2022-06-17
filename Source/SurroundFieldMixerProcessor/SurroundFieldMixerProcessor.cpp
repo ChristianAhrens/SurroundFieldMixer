@@ -58,6 +58,16 @@ SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 		audioDeviceSetup.bufferSize = 512; // temp. workaround for iOS where buffersizes <512 lead to no sample data being delivered?
 #endif
 	m_deviceManager->setAudioDeviceSetup(audioDeviceSetup, true);
+
+
+	auto orig = s_defaultPos;
+	auto a = 0.5f * sinf(juce::MathConstants<float>::pi / 6); // pi * (30/180)
+	auto b = 0.5f * sinf(juce::MathConstants<float>::pi / 3); // pi * (60/180)
+	m_leftPos = orig + juce::Point<float>(-a, b);
+	m_rightPos = orig + juce::Point<float>(a, b);
+	m_centerPos = orig + juce::Point<float>(0.f, 0.5f);
+	m_leftSurroundPos = orig + juce::Point<float>(-b, -a);
+	m_rightSurroundPos = orig + juce::Point<float>(b, -a);
 }
 
 SurroundFieldMixerProcessor::~SurroundFieldMixerProcessor()
@@ -264,7 +274,10 @@ float SurroundFieldMixerProcessor::getInputToOutputGain(int input, int output)
 	auto outputPos = getOutputPosition(output);
 
 	//if (input == 1)
-	//	DBG(String(__FUNCTION__) << " i:o " << input << ":" << output << "(inputPos:" << inputPos.toString() << ", outputPos:" << outputPos.toString() << " resulting in dist " << inputPos.getDistanceFrom(outputPos));
+	//{
+	//	DBG(String(__FUNCTION__) << " i:o=" << input << ":" << output << "(inputPos:" << inputPos.toString() << "; outputPos:" << outputPos.toString() << ")");
+	//	DBG(String(__FUNCTION__) << " i:o=" << input << ":" << output << " resulting in dist " << inputPos.getDistanceFrom(outputPos));
+	//}
 
 	return 1.0f - inputPos.getDistanceFrom(outputPos);
 }
@@ -276,28 +289,114 @@ const juce::Point<float> SurroundFieldMixerProcessor::getInputPosition(int chann
 
 const juce::Point<float> SurroundFieldMixerProcessor::getOutputPosition(int channelNumber)
 {
-	auto centerPosition = s_defaultPos + juce::Point<float>(0.5f, - 0.5f);
-
 	jassert(channelNumber > 0);
-
 	switch (channelNumber)
 	{
 	case 1: // L
-		return juce::Point<float>(0.0f, 1.0f);
-		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f), -(sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f));
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::left);
 	case 2: // C
-		return juce::Point<float>(0.5f, 1.0f);
-		//return juce::Point<float>(origX + 0.5f, origY - 1.0f);
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::centre);
 	case 3: // R
-		return juce::Point<float>(1.0f, 1.0f);
-		//return centerPosition + juce::Point<float>(cosf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f, -(sinf(juce::MathConstants<float>::pi / 180.0f * 60.0f) * 0.5f));
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::right);
 	case 4: // RS
-		return juce::Point<float>(1.0f, 0.0f);
-		//return centerPosition + juce::Point<float>(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f, sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::rightSurround);
 	case 5: // LS
-		return juce::Point<float>(0.0f, 0.0f);
-		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f), sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::leftSurround);
 	case 6: // LFE
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::LFE);
+	default:
+		return getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType::unknown);
+	}
+}
+
+const juce::Point<float> SurroundFieldMixerProcessor::getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType channelIdent)
+{
+	switch (channelIdent)
+	{
+	case juce::AudioChannelSet::ChannelType::left:
+		//return juce::Point<float>(0.0f, 1.0f);
+		return m_leftPos;
+	case juce::AudioChannelSet::ChannelType::right:
+		//return juce::Point<float>(1.0f, 1.0f);
+		return m_rightPos;
+	case juce::AudioChannelSet::ChannelType::centre:
+		//return juce::Point<float>(0.5f, 1.0f);
+		return m_centerPos;
+	case juce::AudioChannelSet::ChannelType::LFE:
+		return s_defaultPos;
+	case juce::AudioChannelSet::ChannelType::leftSurround:
+		//return juce::Point<float>(0.0f, 0.0f);
+		return m_leftSurroundPos;
+	case juce::AudioChannelSet::ChannelType::rightSurround:
+		//return juce::Point<float>(1.0f, 0.0f);
+		return m_rightSurroundPos;
+	case juce::AudioChannelSet::ChannelType::leftCentre:
+	case juce::AudioChannelSet::ChannelType::rightCentre:
+	case juce::AudioChannelSet::ChannelType::centreSurround:
+	case juce::AudioChannelSet::ChannelType::leftSurroundSide:
+	case juce::AudioChannelSet::ChannelType::rightSurroundSide:
+	case juce::AudioChannelSet::ChannelType::topMiddle:
+	case juce::AudioChannelSet::ChannelType::topFrontLeft:
+	case juce::AudioChannelSet::ChannelType::topFrontCentre:
+	case juce::AudioChannelSet::ChannelType::topFrontRight:
+	case juce::AudioChannelSet::ChannelType::topRearLeft:
+	case juce::AudioChannelSet::ChannelType::topRearCentre:
+	case juce::AudioChannelSet::ChannelType::topRearRight:
+	case juce::AudioChannelSet::ChannelType::LFE2:
+	case juce::AudioChannelSet::ChannelType::leftSurroundRear:
+	case juce::AudioChannelSet::ChannelType::rightSurroundRear:
+	case juce::AudioChannelSet::ChannelType::wideLeft:
+	case juce::AudioChannelSet::ChannelType::wideRight:
+	case juce::AudioChannelSet::ChannelType::topSideLeft:
+	case juce::AudioChannelSet::ChannelType::topSideRight:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN0:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN1: 
+	case juce::AudioChannelSet::ChannelType::ambisonicACN2:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN3: 
+	case juce::AudioChannelSet::ChannelType::ambisonicACN4:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN5:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN6: 
+	case juce::AudioChannelSet::ChannelType::ambisonicACN7: 
+	case juce::AudioChannelSet::ChannelType::ambisonicACN8:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN9:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN10:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN11:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN12:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN13:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN14:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN15:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN16:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN17:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN18:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN19:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN20:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN21:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN22:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN23:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN24:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN25:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN26:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN27:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN28:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN29:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN30:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN31:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN32:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN33:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN34:
+	case juce::AudioChannelSet::ChannelType::ambisonicACN35:
+	case juce::AudioChannelSet::ChannelType::bottomFrontLeft:
+	case juce::AudioChannelSet::ChannelType::bottomFrontCentre:
+	case juce::AudioChannelSet::ChannelType::bottomFrontRight:
+	case juce::AudioChannelSet::ChannelType::proximityLeft:
+	case juce::AudioChannelSet::ChannelType::proximityRight:
+	case juce::AudioChannelSet::ChannelType::bottomSideLeft:
+	case juce::AudioChannelSet::ChannelType::bottomSideRight:
+	case juce::AudioChannelSet::ChannelType::bottomRearLeft:
+	case juce::AudioChannelSet::ChannelType::bottomRearCentre:
+	case juce::AudioChannelSet::ChannelType::bottomRearRight:
+	case juce::AudioChannelSet::ChannelType::discreteChannel0:
+	case juce::AudioChannelSet::ChannelType::unknown:
 	default:
 		return s_defaultPos;
 	}

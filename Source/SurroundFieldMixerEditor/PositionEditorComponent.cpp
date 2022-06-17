@@ -51,6 +51,7 @@ void PositionEditorPopupComponent::paint(Graphics& g)
 
     g.setColour(getLookAndFeel().findColour(TextButton::buttonColourId).darker());
     g.drawRect(positioningNormalArea);
+    g.drawEllipse(positioningNormalArea.toFloat(), 1.0f);
 
     if (getCurrentPositionCallback)
     {
