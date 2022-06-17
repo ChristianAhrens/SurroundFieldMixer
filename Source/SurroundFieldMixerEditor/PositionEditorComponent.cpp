@@ -308,7 +308,7 @@ void PositionEditorComponent::setCurrentPosition(const juce::Point<float>& curre
 {
     m_currentPosition = juce::Point<float>(
         currentPosition.getX(),
-        -1.0f * currentPosition.getY() - 1.0f);
+        -1.0f * (currentPosition.getY() - 1.0f));
 
     if (setPositionCallback)
         setPositionCallback(this, m_currentPosition);
@@ -318,7 +318,7 @@ const juce::Point<float> PositionEditorComponent::getCurrentPosition()
 {
     return juce::Point<float>(
         m_currentPosition.getX(),
-        -1.0f * m_currentPosition.getY() - 1.0f);
+        -1.0f * (m_currentPosition.getY() - 1.0f));
 }
 
 }
