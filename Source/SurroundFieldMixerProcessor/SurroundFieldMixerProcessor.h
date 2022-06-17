@@ -181,6 +181,8 @@ public:
     static constexpr int s_maxChannelCount = 64;
     static constexpr int s_maxNumSamples = 1024;
 
+    static constexpr juce::Point<float> s_defaultPos = juce::Point<float>(0.5f, 0.5f);
+
 private:
     const juce::Point<float> getInputPosition(int channelNumber);
     const juce::Point<float> getOutputPosition(int channelNumber);

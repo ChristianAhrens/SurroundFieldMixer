@@ -276,9 +276,7 @@ const juce::Point<float> SurroundFieldMixerProcessor::getInputPosition(int chann
 
 const juce::Point<float> SurroundFieldMixerProcessor::getOutputPosition(int channelNumber)
 {
-	auto origX = 0.5f;
-	auto origY = 0.5f;
-	auto centerPosition = juce::Point<float>(origX + 0.5f, origY - 0.5f);
+	auto centerPosition = s_defaultPos + juce::Point<float>(0.5f, - 0.5f);
 
 	jassert(channelNumber > 0);
 
@@ -301,7 +299,7 @@ const juce::Point<float> SurroundFieldMixerProcessor::getOutputPosition(int chan
 		//return centerPosition + juce::Point<float>(-(cosf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f), sinf(juce::MathConstants<float>::pi / 180.0f * 20.0f) * 0.5f);
 	case 6: // LFE
 	default:
-		return juce::Point<float>(0.5f, 0.5f);
+		return s_defaultPos;
 	}
 }
 
@@ -417,6 +415,12 @@ void SurroundFieldMixerProcessor::audioDeviceAboutToStart(AudioIODevice* device)
 	if (device)
 	{
 		prepareToPlay(device->getCurrentSampleRate(), device->getCurrentBufferSizeSamples());
+
+		auto inputChannels = device->getActiveInputChannels().toInteger();
+		for (auto i = 1; i <= inputChannels; i++)
+			setInputPositionValue(i, s_defaultPos);
+
+		//auto outputChannels = device->getActiveOutputChannels();
 	}
 }
 
