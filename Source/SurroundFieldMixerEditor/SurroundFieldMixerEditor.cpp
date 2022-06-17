@@ -119,7 +119,7 @@ std::unique_ptr<XmlElement> SurroundFieldMixerEditor::createStateXml()
     return nullptr;
 }
 
-bool SurroundFieldMixerEditor::setStateXml(XmlElement* stateXml)
+bool SurroundFieldMixerEditor::setStateXml(XmlElement* /*stateXml*/)
 {
     //if (!stateXml || (stateXml->getTagName() != AppConfiguration::getTagName(AppConfiguration::TagID::VISU)))
     //    return false;

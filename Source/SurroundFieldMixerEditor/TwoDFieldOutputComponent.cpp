@@ -255,12 +255,12 @@ void TwoDFieldOutputComponent::resized()
     AbstractAudioVisualizer::resized();
 }
 
-void TwoDFieldOutputComponent::setMute(int channel, bool muteState)
+void TwoDFieldOutputComponent::setMute(int /*channel*/, bool /*muteState*/)
 {
 
 }
 
-void TwoDFieldOutputComponent::setOutputScheme(int dummyschemetobechanged)
+void TwoDFieldOutputComponent::setOutputScheme(int /*dummyschemetobechanged*/)
 {
 
 }

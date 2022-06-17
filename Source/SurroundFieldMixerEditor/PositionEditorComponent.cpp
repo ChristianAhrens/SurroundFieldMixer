@@ -54,10 +54,11 @@ void PositionEditorPopupComponent::paint(Graphics& g)
 
     if (getCurrentPositionCallback)
     {
-        auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * getCurrentPositionCallback());
-        auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), positioningNormalArea.getY()), juce::Point<float>(relPos.getX(), positioningNormalArea.getBottom()));
+        auto pnaf = positioningNormalArea.toFloat();
+        auto relPos = pnaf.getTopLeft() + (juce::Point<float>(pnaf.getWidth(), pnaf.getHeight()) * getCurrentPositionCallback());
+        auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), pnaf.getY()), juce::Point<float>(relPos.getX(), pnaf.getBottom()));
         g.drawLine(verticalPosLine, 1.0f);
-        auto horizontalPosLine = juce::Line<float>(juce::Point<float>(positioningNormalArea.getX(), relPos.getY()), juce::Point<float>(positioningNormalArea.getRight(), relPos.getY()));
+        auto horizontalPosLine = juce::Line<float>(juce::Point<float>(pnaf.getX(), relPos.getY()), juce::Point<float>(pnaf.getRight(), relPos.getY()));
         g.drawLine(horizontalPosLine, 1.0f);
 
         g.setColour(Colours::forestgreen);
@@ -69,8 +70,6 @@ void PositionEditorPopupComponent::paint(Graphics& g)
 
 void PositionEditorPopupComponent::resized()
 {
-    auto bounds = getLocalBounds();
-
     Component::resized();
 }
 
@@ -127,11 +126,12 @@ void PositionEditorComponent::paint(Graphics& g)
 
     g.setColour(getLookAndFeel().findColour(TextButton::buttonColourId).darker());
     g.drawRect(positioningNormalArea);
-    
-    auto relPos = positioningNormalArea.getTopLeft().toFloat() + (juce::Point<float>(positioningNormalArea.getWidth(), positioningNormalArea.getHeight()) * getCurrentPosition());
-    auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), positioningNormalArea.getY()), juce::Point<float>(relPos.getX(), positioningNormalArea.getBottom()));
+
+    auto pnaf = positioningNormalArea.toFloat();
+    auto relPos = pnaf.getTopLeft() + (juce::Point<float>(pnaf.getWidth(), pnaf.getHeight()) * getCurrentPosition());
+    auto verticalPosLine = juce::Line<float>(juce::Point<float>(relPos.getX(), pnaf.getY()), juce::Point<float>(relPos.getX(), pnaf.getBottom()));
     g.drawLine(verticalPosLine, 1.0f);
-    auto horizontalPosLine = juce::Line<float>(juce::Point<float>(positioningNormalArea.getX(), relPos.getY()), juce::Point<float>(positioningNormalArea.getRight(), relPos.getY()));
+    auto horizontalPosLine = juce::Line<float>(juce::Point<float>(pnaf.getX(), relPos.getY()), juce::Point<float>(pnaf.getRight(), relPos.getY()));
     g.drawLine(horizontalPosLine, 1.0f);
 
     g.setColour(Colours::forestgreen);
@@ -173,7 +173,7 @@ void PositionEditorComponent::mouseUp(const MouseEvent& event)
     Component::mouseUp(event);
 }
 
-void PositionEditorComponent::handleMessage(const Message& msg)
+void PositionEditorComponent::handleMessage(const Message& /*msg*/)
 {
     //if (auto* callbackMessage = dynamic_cast<const CallbackMidiMessage*> (&msg))
     //{
@@ -314,7 +314,7 @@ void PositionEditorComponent::setCurrentPosition(const juce::Point<float>& curre
         setPositionCallback(this, m_currentPosition);
 }
 
-const juce::Point<float>& PositionEditorComponent::getCurrentPosition()
+const juce::Point<float> PositionEditorComponent::getCurrentPosition()
 {
     return juce::Point<float>(
         m_currentPosition.getX(),

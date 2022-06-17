@@ -39,6 +39,10 @@ public:
     class ChannelCommander
     {
     public:
+        virtual ~ChannelCommander()
+        {
+        };
+
         //==============================================================================
         void setMuteChangeCallback(const std::function<void(int, bool)>& callback)
         {
@@ -60,6 +64,10 @@ public:
     class InputCommander : public ChannelCommander
     {
     public:
+        virtual ~InputCommander() override
+        {
+        };
+
         //==============================================================================
         void setPositionChangeCallback(const std::function<void(int, juce::Point<float>)>& callback)
         {
@@ -81,6 +89,10 @@ public:
     class OutputCommander : public ChannelCommander
     {
     public:
+        virtual ~OutputCommander() override
+        {
+        };
+
         //==============================================================================
         virtual void setOutputScheme(int dummyschemetobechanged) = 0;
     };

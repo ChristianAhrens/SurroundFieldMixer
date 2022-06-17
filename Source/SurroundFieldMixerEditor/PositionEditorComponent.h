@@ -73,7 +73,7 @@ public:
     
     //==============================================================================
     void setCurrentPosition(const juce::Point<float>& currentPosition);
-    const juce::Point<float>& getCurrentPosition();
+    const juce::Point<float> getCurrentPosition();
 
     //==============================================================================
     void closePositioningPopup();
