@@ -314,21 +314,16 @@ const juce::Point<float> SurroundFieldMixerProcessor::getNormalizedDefaultPositi
 	switch (channelIdent)
 	{
 	case juce::AudioChannelSet::ChannelType::left:
-		//return juce::Point<float>(0.0f, 1.0f);
 		return m_leftPos;
 	case juce::AudioChannelSet::ChannelType::right:
-		//return juce::Point<float>(1.0f, 1.0f);
 		return m_rightPos;
 	case juce::AudioChannelSet::ChannelType::centre:
-		//return juce::Point<float>(0.5f, 1.0f);
 		return m_centerPos;
 	case juce::AudioChannelSet::ChannelType::LFE:
 		return s_defaultPos;
 	case juce::AudioChannelSet::ChannelType::leftSurround:
-		//return juce::Point<float>(0.0f, 0.0f);
 		return m_leftSurroundPos;
 	case juce::AudioChannelSet::ChannelType::rightSurround:
-		//return juce::Point<float>(1.0f, 0.0f);
 		return m_rightSurroundPos;
 	case juce::AudioChannelSet::ChannelType::leftCentre:
 	case juce::AudioChannelSet::ChannelType::rightCentre:

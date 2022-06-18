@@ -21,6 +21,10 @@
 namespace SurroundFieldMixer
 {
 
+#define USE_LEVEL_PROCESSING
+//#define USE_BUFFER_PROCESSING
+//#define USE_SPECTRUM_PROCESSING
+
 //==============================================================================
 AudioBufferMessage::AudioBufferMessage(AudioBuffer<float>& buffer)
 {
@@ -105,15 +109,20 @@ void ProcessorDataAnalyzer::analyzeData(const AudioBuffer<float>& buffer)
 	{
 		for (int i = 0; i < numChannels; ++i)
 		{
+#ifdef USE_BUFFER_PROCESSING
 			// generate signal buffer data
 			m_centiSecondBuffer.copyFrom(i, writePos, buffer.getReadPointer(i) + readPos, m_missingSamplesForCentiSecond);
+#endif
 
+#ifdef USE_LEVEL_PROCESSING
 			// generate level data
 			auto peak = m_centiSecondBuffer.getMagnitude(i, 0, m_samplesPerCentiSecond);
 			auto rms = m_centiSecondBuffer.getRMSLevel(i, 0, m_samplesPerCentiSecond);
 			auto hold = std::max(peak, m_level.GetLevel(i + 1).hold);
 			m_level.SetLevel(i + 1, ProcessorLevelData::LevelVal(peak, rms, hold, static_cast<float>(getGlobalMindB())));
+#endif
 
+#ifdef USE_SPECTRUM_PROCESSING
 			// generate spectrum data
 			{
 				int unprocessedSamples = 0;
@@ -175,11 +184,18 @@ void ProcessorDataAnalyzer::analyzeData(const AudioBuffer<float>& buffer)
 					m_FFTdataPos += unprocessedSamples;
 				}
 			}
+#endif
 		}
 
+#ifdef USE_LEVEL_PROCESSING
 		BroadcastData(&m_level);
+#endif
+#ifdef USE_BUFFER_PROCESSING
 		BroadcastData(&m_centiSecondBuffer);
+#endif
+#ifdef USE_SPECTRUM_PROCESSING
 		BroadcastData(&m_spectrum);
+#endif
 
 		readPos += m_missingSamplesForCentiSecond;
 		availableSamples -= m_missingSamplesForCentiSecond;

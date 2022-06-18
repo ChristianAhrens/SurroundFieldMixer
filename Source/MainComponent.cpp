@@ -47,7 +47,7 @@ MainComponent::MainComponent()
     };
     addAndMakeVisible(m_setupToggleButton.get());
 
-    setSize(800, 600);
+    setSize(300, 500);
 }
 
 MainComponent::~MainComponent()
