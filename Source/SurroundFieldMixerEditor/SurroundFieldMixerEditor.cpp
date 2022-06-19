@@ -70,16 +70,35 @@ void SurroundFieldMixerEditor::paint (Graphics& g)
 void SurroundFieldMixerEditor::resized()
 {
     auto bounds = getLocalBounds();
-
-    auto meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.3f));
-    meterBankBounds.reduce(5, 0);
-    meterBankBounds.removeFromTop(5);
-    meterBankBounds.removeFromBottom(5);
-    m_meterBank->setBounds(meterBankBounds);
-
+    auto meterBankBounds = bounds;
     auto surroundFieldBounds = bounds;
-    surroundFieldBounds.reduce(5, 0);
-    surroundFieldBounds.removeFromTop(5);
+
+    // horizontal layout
+    if (bounds.getWidth() > bounds.getHeight())
+    {
+        meterBankBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.3f));
+        meterBankBounds.reduce(0, 5);
+        meterBankBounds.removeFromRight(5);
+        meterBankBounds.removeFromLeft(5);
+
+        surroundFieldBounds = bounds;
+        surroundFieldBounds.reduce(0, 5);
+        surroundFieldBounds.removeFromRight(5);
+    }
+    // vertical layout
+    else
+    {
+        meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.3f));
+        meterBankBounds.reduce(5, 0);
+        meterBankBounds.removeFromTop(5);
+        meterBankBounds.removeFromBottom(5);
+
+        surroundFieldBounds = bounds;
+        surroundFieldBounds.reduce(5, 0);
+        surroundFieldBounds.removeFromTop(5);
+    }
+
+    m_meterBank->setBounds(meterBankBounds);
     m_surroundField->setBounds(surroundFieldBounds);
 }
 
