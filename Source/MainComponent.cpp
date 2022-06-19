@@ -20,6 +20,8 @@
 
 #include "SurroundFieldMixer.h"
 
+#include <iOS_utils.h>
+
 MainComponent::MainComponent()
     : juce::Component()
 {
@@ -61,15 +63,22 @@ void MainComponent::paint(Graphics &g)
 
 void MainComponent::resized()
 {
+    auto safety = JUCEAppBasics::iOS_utils::getDeviceSafetyMargins();
+    auto safeBounds = getLocalBounds();
+    safeBounds.removeFromTop(safety._top);
+    safeBounds.removeFromBottom(safety._bottom);
+    safeBounds.removeFromLeft(safety._left);
+    safeBounds.removeFromRight(safety._right);
+
     auto SurroundFieldMixerComponent = m_ssm->getUIComponent();
     if (SurroundFieldMixerComponent)
-        SurroundFieldMixerComponent->setBounds(getLocalBounds());
+        SurroundFieldMixerComponent->setBounds(safeBounds);
 
     if (m_setupToggleButton)
-        m_setupToggleButton->setBounds(getLocalBounds().reduced(6).removeFromRight(50).removeFromTop(20));
+        m_setupToggleButton->setBounds(safeBounds.reduced(6).removeFromRight(50).removeFromTop(20));
 
     auto setupComponent = m_ssm->getDeviceSetupComponent();
     if (setupComponent && setupComponent->isVisible())
-        setupComponent->setBounds(getLocalBounds().reduced(15));
+        setupComponent->setBounds(safeBounds.reduced(15));
 }
 
