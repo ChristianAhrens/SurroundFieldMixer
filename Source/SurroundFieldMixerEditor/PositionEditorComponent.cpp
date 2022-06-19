@@ -143,8 +143,6 @@ void PositionEditorComponent::paint(Graphics& g)
 
 void PositionEditorComponent::resized()
 {
-	auto bounds = getLocalBounds();
-
     Component::resized();
 }
 

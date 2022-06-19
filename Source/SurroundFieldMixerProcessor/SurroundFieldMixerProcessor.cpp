@@ -60,7 +60,7 @@ SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 	m_deviceManager->setAudioDeviceSetup(audioDeviceSetup, true);
 
 
-	auto orig = s_defaultPos;
+	auto orig = s_defaultPos();
 	auto a = 0.5f * sinf(juce::MathConstants<float>::pi / 6); // pi * (30/180)
 	auto b = 0.5f * sinf(juce::MathConstants<float>::pi / 3); // pi * (60/180)
 	m_leftPos = orig + juce::Point<float>(-a, b);
@@ -320,7 +320,7 @@ const juce::Point<float> SurroundFieldMixerProcessor::getNormalizedDefaultPositi
 	case juce::AudioChannelSet::ChannelType::centre:
 		return m_centerPos;
 	case juce::AudioChannelSet::ChannelType::LFE:
-		return s_defaultPos;
+		return s_defaultPos();
 	case juce::AudioChannelSet::ChannelType::leftSurround:
 		return m_leftSurroundPos;
 	case juce::AudioChannelSet::ChannelType::rightSurround:
@@ -393,7 +393,7 @@ const juce::Point<float> SurroundFieldMixerProcessor::getNormalizedDefaultPositi
 	case juce::AudioChannelSet::ChannelType::discreteChannel0:
 	case juce::AudioChannelSet::ChannelType::unknown:
 	default:
-		return s_defaultPos;
+		return s_defaultPos();
 	}
 }
 
@@ -512,7 +512,7 @@ void SurroundFieldMixerProcessor::audioDeviceAboutToStart(AudioIODevice* device)
 
 		auto inputChannels = device->getActiveInputChannels().toInteger();
 		for (auto i = 1; i <= inputChannels; i++)
-			setInputPositionValue(i, s_defaultPos);
+			setInputPositionValue(i, s_defaultPos());
 
 		//auto outputChannels = device->getActiveOutputChannels();
 	}
