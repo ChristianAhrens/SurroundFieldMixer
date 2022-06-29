@@ -58,7 +58,7 @@ void ProcessorSpectrumData::SetChannelCount(unsigned long count)
 
 unsigned long ProcessorSpectrumData::GetChannelCount()
 {
-    return m_spectrumsMap.size();
+    return static_cast<unsigned long>(m_spectrumsMap.size());
 }
 
 }
