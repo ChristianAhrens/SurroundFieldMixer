@@ -28,6 +28,9 @@ SurroundFieldMixer::SurroundFieldMixer() :
 {
     m_SurroundFieldMixerProcessor = std::make_unique<SurroundFieldMixerProcessor>();
     m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
+    m_SurroundFieldMixerRemote = std::make_unique<SurroundFieldMixerRemoteWrapper>();
+
+    m_SurroundFieldMixerRemote->AddListener(this);
 }
 
 SurroundFieldMixer::~SurroundFieldMixer()
@@ -66,6 +69,16 @@ bool SurroundFieldMixer::setStateXml(XmlElement* stateXml)
 {
     jassertfalse;
     return false;
+}
+
+void SurroundFieldMixer::HandleMessageData(NodeId nodeId, ProtocolId senderProtocolId, RemoteObjectIdentifier Id, const RemoteObjectMessageData& msgData)
+{
+    ignoreUnused(nodeId);
+    ignoreUnused(senderProtocolId);
+    ignoreUnused(Id);
+    ignoreUnused(msgData);
+
+    return;
 }
 
 }

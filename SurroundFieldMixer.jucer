@@ -3,7 +3,8 @@
 <JUCERPROJECT id="InQ33m" name="SurroundFieldMixer" projectType="guiapp" defines="JUCE_USE_LAME_AUDIO_FORMAT=1,&#10;JUCE_USE_MP3AUDIOFORMAT=1,"
               bundleIdentifier="com.ChristianAhrens.SurroundFieldMixer" version="0.1.0"
               companyName="Christian Ahrens" companyCopyright="2022" companyEmail="christianahrens@me.com"
-              jucerFormatVersion="1" headerPath="../../submodules/JUCE-AppBasics/Source/">
+              jucerFormatVersion="1" headerPath="../../submodules/RemoteProtocolBridgeCore/Source/&#10;../../submodules/JUCE-AppBasics/Source/"
+              companyWebsite="https://github.com/ChristianAhrens/SurroundFieldMixer">
   <MAINGROUP id="cIkH3v" name="SurroundFieldMixer">
     <GROUP id="{2F00D803-4C7B-B972-8DBF-6BAEC9E73388}" name="submodules">
       <GROUP id="{841D0E45-8D36-8B0B-5504-370165681A4C}" name="RemoteProtocolBridgeCore">
@@ -238,6 +239,12 @@
       </GROUP>
     </GROUP>
     <GROUP id="{0480E33C-041F-2346-F9AA-44BBEAD80CFE}" name="Source">
+      <GROUP id="{7B5E9D26-7C00-BD4A-AD93-0A7DFE4BB26E}" name="SurroundFieldMixerRemote">
+        <FILE id="UQJxvL" name="SurroundFieldMixerRemoteWrapper.cpp" compile="1"
+              resource="0" file="Source/SurroundFieldMixerRemote/SurroundFieldMixerRemoteWrapper.cpp"/>
+        <FILE id="TDI3gc" name="SurroundFieldMixerRemoteWrapper.h" compile="0"
+              resource="0" file="Source/SurroundFieldMixerRemote/SurroundFieldMixerRemoteWrapper.h"/>
+      </GROUP>
       <GROUP id="{F4572078-D4AC-0012-4EA9-0F40E9C23763}" name="SurroundFieldMixerProcessor">
         <FILE id="qIcbbS" name="AbstractProcessorData.cpp" compile="1" resource="0"
               file="Source/SurroundFieldMixerProcessor/AbstractProcessorData.cpp"/>

@@ -24,6 +24,7 @@
 
 #include "SurroundFieldMixerEditor/SurroundFieldMixerEditor.h"
 #include "SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
+#include "SurroundFieldMixerRemote/SurroundFieldMixerRemoteWrapper.h"
 
 
 namespace SurroundFieldMixer
@@ -33,8 +34,9 @@ namespace SurroundFieldMixer
 /*
  *
  */
-class SurroundFieldMixer   :   public Component,
-                                public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
+class SurroundFieldMixer   :    public Component,
+                                public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement,
+                                public SurroundFieldMixerRemoteWrapper::Listener
 {
 public:
     SurroundFieldMixer();
@@ -48,10 +50,16 @@ public:
     std::unique_ptr<XmlElement> createStateXml() override;
     bool setStateXml(XmlElement* stateXml) override;
 
+    //==========================================================================
+    void HandleMessageData(NodeId nodeId, ProtocolId senderProtocolId, RemoteObjectIdentifier Id, const RemoteObjectMessageData& msgData) override;
+
 private:
-    std::unique_ptr<SurroundFieldMixerProcessor>   m_SurroundFieldMixerProcessor;
-    std::unique_ptr<SurroundFieldMixerEditor>      m_audioVisuComponent;
-    std::unique_ptr<AudioSelectComponent>           m_audioDeviceSelectComponent;
+    std::unique_ptr<SurroundFieldMixerProcessor>        m_SurroundFieldMixerProcessor;
+
+    std::unique_ptr<SurroundFieldMixerRemoteWrapper>    m_SurroundFieldMixerRemote;
+
+    std::unique_ptr<SurroundFieldMixerEditor>           m_audioVisuComponent;
+    std::unique_ptr<AudioSelectComponent>               m_audioDeviceSelectComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundFieldMixer)
 };
