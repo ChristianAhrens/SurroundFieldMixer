@@ -71,14 +71,35 @@ bool SurroundFieldMixer::setStateXml(XmlElement* stateXml)
     return false;
 }
 
-void SurroundFieldMixer::HandleMessageData(NodeId nodeId, ProtocolId senderProtocolId, RemoteObjectIdentifier Id, const RemoteObjectMessageData& msgData)
+void SurroundFieldMixer::OnRemoteMuteChange(unsigned int channel, int muteVal)
 {
-    ignoreUnused(nodeId);
-    ignoreUnused(senderProtocolId);
-    ignoreUnused(Id);
-    ignoreUnused(msgData);
 
-    return;
 }
+
+void SurroundFieldMixer::OnRemoteXPosChange(unsigned int channel, float xPosVal)
+{
+
+}
+
+void SurroundFieldMixer::OnRemoteYPosChange(unsigned int channel, float yPosVal)
+{
+
+}
+
+void SurroundFieldMixer::OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal)
+{
+
+}
+
+void SurroundFieldMixer::OnRemoteSpreadChange(unsigned int channel, float spreadVal)
+{
+
+}
+
+void SurroundFieldMixer::OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal)
+{
+
+}
+
 
 }

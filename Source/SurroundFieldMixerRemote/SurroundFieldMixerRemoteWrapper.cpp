@@ -31,6 +31,8 @@ SurroundFieldMixerRemoteWrapper::SurroundFieldMixerRemoteWrapper()
 	SetupBridgingNode();
     
     m_processingNode.AddListener(this);
+
+	startTimer(1500);
 }
 
 /**
@@ -39,6 +41,7 @@ SurroundFieldMixerRemoteWrapper::SurroundFieldMixerRemoteWrapper()
 SurroundFieldMixerRemoteWrapper::~SurroundFieldMixerRemoteWrapper()
 {
 	m_listeners.clear();
+	stopTimer();
 }
 
 /**
@@ -49,6 +52,52 @@ void SurroundFieldMixerRemoteWrapper::AddListener(SurroundFieldMixerRemoteWrappe
 {
 	if (listener)
 		m_listeners.push_back(listener);
+}
+
+void SurroundFieldMixerRemoteWrapper::timerCallback()
+{
+	if (m_processingNode.IsRunning())
+		return;
+
+	auto nodeXmlElement = m_bridgingXml.getChildByName(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::NODE));
+	if (nodeXmlElement)
+		m_processingNode.setStateXml(nodeXmlElement);
+
+	m_processingNode.Start();
+}
+
+void SurroundFieldMixerRemoteWrapper::setMute(int channel, bool muteState)
+{
+	int muteValue = muteState ? 1 : 0;
+
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 0;
+	msgData._valCount = 1;
+	msgData._valType = ROVT_INT;
+	msgData._payloadSize = sizeof(int);
+	msgData._payloadOwned = false;
+	msgData._payload = &muteValue;
+
+	SendMessage(ROI_MatrixInput_Mute, msgData);
+}
+
+void SurroundFieldMixerRemoteWrapper::setPosition(int channel, juce::Point<float> position)
+{
+	float positionValues[2];
+	positionValues[0] = position.getX();
+	positionValues[1] = position.getY();
+
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 1; // mapping 1 while developing
+	msgData._valCount = 2;
+	msgData._valType = ROVT_FLOAT;
+	msgData._payloadSize = 2 * sizeof(float);
+	msgData._payloadOwned = false;
+	msgData._payload = &positionValues;
+
+	SendMessage(ROI_CoordinateMapping_SourcePosition_XY, msgData);
 }
 
 /**
@@ -72,8 +121,94 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
     if (!callbackMessage)
         return;
     
-	for (auto l : m_listeners)
-        l->HandleMessageData(callbackMessage->_protocolMessage._nodeId, callbackMessage->_protocolMessage._senderProtocolId, callbackMessage->_protocolMessage._Id, callbackMessage->_protocolMessage._msgData);
+	auto& remoteObjectId = callbackMessage->_protocolMessage._Id;
+	auto& messageDataValType = callbackMessage->_protocolMessage._msgData._valType;
+	auto& messageDataValCount = callbackMessage->_protocolMessage._msgData._valCount;
+	auto& messageDataPayload = callbackMessage->_protocolMessage._msgData._payload;
+	auto& channel = callbackMessage->_protocolMessage._msgData._addrVal._first;
+	//auto& record = callbackMessage->_protocolMessage._msgData._addrVal._second;
+
+	switch (remoteObjectId)
+	{
+	case RemoteObjectIdentifier::ROI_MatrixInput_Mute:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_INT;
+			auto valCountMatch = 1 == messageDataValCount;
+			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && muteValPtr)
+			{
+				for (auto l : m_listeners)
+					l->OnRemoteMuteChange(channel, *muteValPtr);
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_X:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+			auto valCountMatch = 1 == messageDataValCount;
+			auto xPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && xPosValPtr)
+			{
+				for (auto l : m_listeners)
+					l->OnRemoteXPosChange(channel, *xPosValPtr);
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_Y:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+			auto valCountMatch = 1 == messageDataValCount;
+			auto yPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && yPosValPtr)
+			{
+				for (auto l : m_listeners)
+					l->OnRemoteYPosChange(channel, *yPosValPtr);
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_XY:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+			auto valCountMatch = 2 == messageDataValCount;
+			auto xyPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && xyPosValPtr)
+			{
+				for (auto l : m_listeners)
+					l->OnRemoteXYPosChange(channel, xyPosValPtr[0], xyPosValPtr[1]);
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_Positioning_SourceSpread:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+			auto valCountMatch = 1 == messageDataValCount;
+			auto spreadValPtr = reinterpret_cast<const float*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && spreadValPtr)
+			{
+				for (auto l : m_listeners)
+					l->OnRemoteSpreadChange(channel, *spreadValPtr);
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_MatrixInput_ReverbSendGain:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+			auto valCountMatch = 1 == messageDataValCount;
+			auto reverbSendGainValPtr = reinterpret_cast<const float*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && reverbSendGainValPtr)
+			{
+				for (auto l : m_listeners)
+					l->OnRemoteReverbSendGainChange(channel, *reverbSendGainValPtr);
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_HeartbeatPing:
+	case RemoteObjectIdentifier::ROI_HeartbeatPong:
+		OnRemoteHeartbeatReceived();
+		break;
+	default:
+		break;
+	}
 }
 
 /**
@@ -124,7 +259,7 @@ void SurroundFieldMixerRemoteWrapper::SetupBridgingNode()
 
 		auto simRefreshIntervalXmlElement = objectHandlingXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::REFRESHINTERVAL));
 		if (simRefreshIntervalXmlElement)
-			simRefreshIntervalXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::INTERVAL), 200);
+			simRefreshIntervalXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::INTERVAL), 0);
 	}
 
 	// DS100 protocol - RoleA
@@ -152,6 +287,14 @@ void SurroundFieldMixerRemoteWrapper::SetupBridgingNode()
 	m_processingNode.setStateXml(nodeXmlElement.get());
 
 	m_bridgingXml.addChildElement(nodeXmlElement.release());
+}
+
+/**
+ * To be called when a heartbeat is received from the remote connection and in consequence update internal connection state.
+ */
+void SurroundFieldMixerRemoteWrapper::OnRemoteHeartbeatReceived()
+{
+
 }
 
 }

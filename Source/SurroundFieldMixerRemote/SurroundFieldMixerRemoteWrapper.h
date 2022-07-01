@@ -36,7 +36,8 @@ static constexpr int DEFAULT_PROCNODE_ID = 1;
 static constexpr int DS100_1_PROCESSINGPROTOCOL_ID = 2;
 
 class SurroundFieldMixerRemoteWrapper :
-	public ProcessingEngineNode::NodeListener
+	public ProcessingEngineNode::NodeListener,
+	public juce::Timer
 {
 public:
 	/**
@@ -48,31 +49,39 @@ public:
 		Listener() {};
 		virtual ~Listener() {};
 
-		/**
-		 * Method to be overloaded by ancestors to act as an interface
-		 * for handling of received message data
-		 */
-		virtual void HandleMessageData(NodeId nodeId, ProtocolId senderProtocolId, RemoteObjectIdentifier Id, const RemoteObjectMessageData& msgData) = 0;
+		virtual void OnRemoteMuteChange(unsigned int channel, int muteVal) = 0;
+		virtual void OnRemoteXPosChange(unsigned int channel, float xPosVal) = 0;
+		virtual void OnRemoteYPosChange(unsigned int channel, float yPosVal) = 0;
+		virtual void OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal) = 0;
+		virtual void OnRemoteSpreadChange(unsigned int channel, float spreadVal) = 0;
+		virtual void OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal) = 0;
 	};
-
 public:
 	SurroundFieldMixerRemoteWrapper();
 	~SurroundFieldMixerRemoteWrapper();
 
 	//==========================================================================
 	void AddListener(SurroundFieldMixerRemoteWrapper::Listener* listener);
-
-	//==========================================================================
-	void HandleNodeData(const ProcessingEngineNode::NodeCallbackMessage* callbackMessage) override;
-	bool SendMessage(RemoteObjectIdentifier Id, RemoteObjectMessageData& msgData);
+	void setMute(int channel, bool muteState);
+	void setPosition(int channel, juce::Point<float> position);
 
 	//==========================================================================
 	void Disconnect();
 	void Reconnect();
 
+	//==========================================================================
+	void timerCallback() override;
+
 private:
 	//==========================================================================
+	void HandleNodeData(const ProcessingEngineNode::NodeCallbackMessage* callbackMessage) override;
+	bool SendMessage(RemoteObjectIdentifier Id, RemoteObjectMessageData& msgData);
+
+	//==========================================================================
 	void SetupBridgingNode();
+
+	//==========================================================================
+	void OnRemoteHeartbeatReceived();
 
 	ProcessingEngineNode							m_processingNode;	/**< The node that encapsulates the protocols that are used to send, receive and bridge data. */
 	XmlElement										m_bridgingXml;		/**< The current xml config for bridging (contains node xml). */

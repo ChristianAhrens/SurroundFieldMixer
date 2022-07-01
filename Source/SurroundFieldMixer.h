@@ -51,7 +51,12 @@ public:
     bool setStateXml(XmlElement* stateXml) override;
 
     //==========================================================================
-    void HandleMessageData(NodeId nodeId, ProtocolId senderProtocolId, RemoteObjectIdentifier Id, const RemoteObjectMessageData& msgData) override;
+    void OnRemoteMuteChange(unsigned int channel, int muteVal) override;
+    void OnRemoteXPosChange(unsigned int channel, float xPosVal) override;
+    void OnRemoteYPosChange(unsigned int channel, float yPosVal) override;
+    void OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal) override;
+    void OnRemoteSpreadChange(unsigned int channel, float spreadVal) override;
+    void OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal) override;
 
 private:
     std::unique_ptr<SurroundFieldMixerProcessor>        m_SurroundFieldMixerProcessor;
