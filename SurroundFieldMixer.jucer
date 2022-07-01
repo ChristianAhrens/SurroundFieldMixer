@@ -215,6 +215,10 @@
           <FILE id="AE0daJ" name="Image_utils.h" compile="0" resource="0" file="submodules/JUCE-AppBasics/Source/Image_utils.h"/>
           <FILE id="zOwPAT" name="iOS_utils.cpp" compile="1" resource="0" file="submodules/JUCE-AppBasics/Source/iOS_utils.cpp"/>
           <FILE id="f8dk8I" name="iOS_utils.h" compile="0" resource="0" file="submodules/JUCE-AppBasics/Source/iOS_utils.h"/>
+          <FILE id="JVFaCX" name="MidiCommandRangeAssignment.cpp" compile="1"
+                resource="0" file="submodules/JUCE-AppBasics/Source/MidiCommandRangeAssignment.cpp"/>
+          <FILE id="ysP3OK" name="MidiCommandRangeAssignment.h" compile="0" resource="0"
+                file="submodules/JUCE-AppBasics/Source/MidiCommandRangeAssignment.h"/>
           <FILE id="kkYqkY" name="SplitButtonComponent.cpp" compile="1" resource="0"
                 file="submodules/JUCE-AppBasics/Source/SplitButtonComponent.cpp"/>
           <FILE id="KqBeZL" name="SplitButtonComponent.h" compile="0" resource="0"
@@ -331,6 +335,7 @@
         <MODULEPATH id="juce_gui_extra" path="submodules/JUCE/modules"/>
         <MODULEPATH id="juce_opengl" path="submodules/JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="submodules/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" smallIcon="gU6pke" iosBackgroundAudio="1"
@@ -356,6 +361,7 @@
         <MODULEPATH id="juce_gui_extra" path="submodules/JUCE/modules"/>
         <MODULEPATH id="juce_opengl" path="submodules/JUCE/modules"/>
         <MODULEPATH id="juce_dsp" path="submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="submodules/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <VS2022 targetFolder="Builds/VisualStudio2022" smallIcon="bKmtj9" bigIcon="bKmtj9">
@@ -378,6 +384,7 @@
         <MODULEPATH id="juce_gui_basics" path="submodules/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="submodules/JUCE/modules"/>
         <MODULEPATH id="juce_opengl" path="submodules/JUCE/modules"/>
+        <MODULEPATH id="juce_osc" path="submodules/JUCE/modules"/>
       </MODULEPATHS>
     </VS2022>
   </EXPORTFORMATS>
@@ -396,6 +403,7 @@
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_gui_extra" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_opengl" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <LIVE_SETTINGS>
     <OSX/>

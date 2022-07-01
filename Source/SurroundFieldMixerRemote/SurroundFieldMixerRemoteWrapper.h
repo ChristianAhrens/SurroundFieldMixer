@@ -19,7 +19,6 @@
 #pragma once
 
 #include <ProcessingEngine/ProcessingEngineNode.h>
-#include <ProcessingEngine/ObjectDataHandling/DS100_DeviceSimulation/DS100_DeviceSimulation.h>
 
 #include <JuceHeader.h>
 
