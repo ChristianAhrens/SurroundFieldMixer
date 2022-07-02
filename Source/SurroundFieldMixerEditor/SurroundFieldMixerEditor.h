@@ -34,7 +34,7 @@ class TwoDFieldOutputComponent;
 //==============================================================================
 /*
 */
-class SurroundFieldMixerEditor :   public AudioProcessorEditor,
+class SurroundFieldMixerEditor :    public AudioProcessorEditor,
                                     public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
 {
 public:

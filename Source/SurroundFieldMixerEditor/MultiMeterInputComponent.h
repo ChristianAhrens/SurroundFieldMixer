@@ -50,8 +50,10 @@ public:
     virtual void processChanges() override;
 
     //==============================================================================
-    void setMute(int channel, bool muteState) override;
-    void setPosition(int channel, juce::Point<float> position) override;
+    void setInputMute(unsigned int channel, bool muteState) override;
+    void setPosition(unsigned int channel, juce::Point<float> position) override;
+    void setSpreadFactor(unsigned int channel, float spreadFactor) override;
+    void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
 
 private:
     ProcessorLevelData                                      m_levelData;

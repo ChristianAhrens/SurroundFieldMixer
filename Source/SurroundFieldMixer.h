@@ -35,8 +35,7 @@ namespace SurroundFieldMixer
  *
  */
 class SurroundFieldMixer   :    public Component,
-                                public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement,
-                                public SurroundFieldMixerRemoteWrapper::Listener
+                                public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
 {
 public:
     SurroundFieldMixer();
@@ -49,14 +48,6 @@ public:
     //==========================================================================
     std::unique_ptr<XmlElement> createStateXml() override;
     bool setStateXml(XmlElement* stateXml) override;
-
-    //==========================================================================
-    void OnRemoteMuteChange(unsigned int channel, int muteVal) override;
-    void OnRemoteXPosChange(unsigned int channel, float xPosVal) override;
-    void OnRemoteYPosChange(unsigned int channel, float yPosVal) override;
-    void OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal) override;
-    void OnRemoteSpreadFactorChange(unsigned int channel, float spreadFactorVal) override;
-    void OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal) override;
 
 private:
     std::unique_ptr<SurroundFieldMixerProcessor>        m_SurroundFieldMixerProcessor;

@@ -42,15 +42,9 @@ public:
         ChannelCommander();
         virtual ~ChannelCommander();
 
-        void setMuteChangeCallback(const std::function<void(ChannelCommander* sender, int, bool)>& callback);
-
-        virtual void setMute(int channel, bool muteState) = 0;
-
     protected:
-        void muteChange(int channel, bool muteState);
 
     private:
-        std::function<void(ChannelCommander* sender, int, bool)> m_muteChangeCallback{ nullptr };
     };
 
     class InputCommander : public ChannelCommander
@@ -59,15 +53,27 @@ public:
         InputCommander();
         virtual ~InputCommander() override;
 
+        void setInputMuteChangeCallback(const std::function<void(InputCommander* sender, int, bool)>& callback);
         void setPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback);
+        void setSpreadFactorChangeCallback(const std::function<void(InputCommander* sender, int, float spreadFactor)>& callback);
+        void setReverbSendGainChangeCallback(const std::function<void(InputCommander* sender, int, float reverbSendGain)>& callback);
 
-        virtual void setPosition(int channel, juce::Point<float> position) = 0;
+        virtual void setInputMute(unsigned int channel, bool muteState) = 0;
+        virtual void setPosition(unsigned int channel, juce::Point<float> position) = 0;
+        virtual void setSpreadFactor(unsigned int channel, float spreadFactor) = 0;
+        virtual void setReverbSendGain(unsigned int channel, float reverbSendGain) = 0;
 
     protected:
+        void inputMuteChange(int channel, bool muteState);
         void positionChange(int channel, const juce::Point<float>& position);
+        void spreadFactorChange(int channel, const float spreadFactor);
+        void reverbSendGainChange(int channel, const float reverbSendGain);
 
     private:
-        std::function<void(InputCommander* sender, int, juce::Point<float>)> m_positionChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, bool)>                  m_inputMuteChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, juce::Point<float>)>    m_positionChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, float spreadFactor)>    m_spreadFactorChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, float reverbSendGain)>  m_reverbSendGainChangeCallback{ nullptr };
     };
 
     class OutputCommander : public ChannelCommander
@@ -76,7 +82,19 @@ public:
         OutputCommander();
         virtual ~OutputCommander() override;
 
-        virtual void setOutputScheme(int dummyschemetobechanged) = 0;
+        void setOutputMuteChangeCallback(const std::function<void(OutputCommander* sender, int, bool)>& callback);
+        void setOutputSchemeChangeCallback(const std::function<void(OutputCommander* sender, unsigned int)>& callback);
+
+        virtual void setOutputMute(unsigned int channel, bool muteState) = 0;
+        virtual void setOutputScheme(unsigned int outputScheme) = 0;
+
+    protected:
+        void outputMuteChange(int channel, bool muteState);
+        void outputSchemeChange(unsigned int outputScheme);
+
+    private:
+        std::function<void(OutputCommander* sender, int, bool)>     m_outputMuteChangeCallback{ nullptr };
+        std::function<void(OutputCommander* sender, unsigned int)>  m_outputSchemeChangeCallback{ nullptr };
     };
 
 public:

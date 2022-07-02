@@ -40,18 +40,7 @@ SurroundFieldMixerRemoteWrapper::SurroundFieldMixerRemoteWrapper()
  */
 SurroundFieldMixerRemoteWrapper::~SurroundFieldMixerRemoteWrapper()
 {
-	m_listeners.clear();
 	stopTimer();
-}
-
-/**
- * Method to register a listener object to be called when the node has received the respective data via a node protocol.
- * @param listener	The listener object to add to the internal list of listeners
- */
-void SurroundFieldMixerRemoteWrapper::AddListener(SurroundFieldMixerRemoteWrapper::Listener* listener)
-{
-	if (listener)
-		m_listeners.push_back(listener);
 }
 
 void SurroundFieldMixerRemoteWrapper::timerCallback()
@@ -66,7 +55,7 @@ void SurroundFieldMixerRemoteWrapper::timerCallback()
 	m_processingNode.Start();
 }
 
-void SurroundFieldMixerRemoteWrapper::setMute(unsigned int channel, bool muteState)
+void SurroundFieldMixerRemoteWrapper::setInputMute(unsigned int channel, bool muteState)
 {
 	int muteValue = muteState ? 1 : 0;
 
@@ -128,6 +117,27 @@ void SurroundFieldMixerRemoteWrapper::setReverbSendGain(unsigned int channel, fl
 	SendMessage(ROI_MatrixInput_ReverbSendGain, msgData);
 }
 
+void SurroundFieldMixerRemoteWrapper::setOutputMute(unsigned int channel, bool muteState)
+{
+	int muteValue = muteState ? 1 : 0;
+
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 0;
+	msgData._valCount = 1;
+	msgData._valType = ROVT_INT;
+	msgData._payloadSize = sizeof(int);
+	msgData._payloadOwned = false;
+	msgData._payload = &muteValue;
+
+	SendMessage(ROI_MatrixOutput_Mute, msgData);
+}
+
+void SurroundFieldMixerRemoteWrapper::setOutputScheme(unsigned int /*outputScheme*/)
+{
+	/*t.b.d*/
+}
+
 /**
  * Send a Message out via the active bridging node.
  * @param Id	The id of the remote object to be sent.
@@ -164,10 +174,7 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && muteValPtr)
-			{
-				for (auto l : m_listeners)
-					l->OnRemoteMuteChange(channel, *muteValPtr);
-			}
+				inputMuteChange(channel, *muteValPtr);
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_X:
@@ -176,10 +183,7 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto xPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && xPosValPtr)
-			{
-				for (auto l : m_listeners)
-					l->OnRemoteXPosChange(channel, *xPosValPtr);
-			}
+				positionChange(channel, juce::Point<float>(*xPosValPtr, 0.0f));	// TODO
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_Y:
@@ -188,10 +192,7 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto yPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && yPosValPtr)
-			{
-				for (auto l : m_listeners)
-					l->OnRemoteYPosChange(channel, *yPosValPtr);
-			}
+				positionChange(channel, juce::Point<float>(0.0f, *yPosValPtr));	// TODO
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_XY:
@@ -200,10 +201,7 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 2 == messageDataValCount;
 			auto xyPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && xyPosValPtr)
-			{
-				for (auto l : m_listeners)
-					l->OnRemoteXYPosChange(channel, xyPosValPtr[0], xyPosValPtr[1]);
-			}
+				positionChange(channel, juce::Point<float>(xyPosValPtr[0], xyPosValPtr[1]));
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_Positioning_SourceSpread:
@@ -212,10 +210,7 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto spreadFactorValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && spreadFactorValPtr)
-			{
-				for (auto l : m_listeners)
-					l->OnRemoteSpreadFactorChange(channel, *spreadFactorValPtr);
-			}
+				spreadFactorChange(channel, *spreadFactorValPtr);
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_MatrixInput_ReverbSendGain:
@@ -224,10 +219,16 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto reverbSendGainValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && reverbSendGainValPtr)
-			{
-				for (auto l : m_listeners)
-					l->OnRemoteReverbSendGainChange(channel, *reverbSendGainValPtr);
-			}
+				reverbSendGainChange(channel, *reverbSendGainValPtr);
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_MatrixOutput_Mute:
+		{
+			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_INT;
+			auto valCountMatch = 1 == messageDataValCount;
+			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && muteValPtr)
+				outputMuteChange(channel, *muteValPtr);
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_HeartbeatPing:

@@ -20,6 +20,8 @@
 
 #include <ProcessingEngine/ProcessingEngineNode.h>
 
+#include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
+
 #include <JuceHeader.h>
 
 namespace SurroundFieldMixer
@@ -35,39 +37,24 @@ static constexpr int RX_PORT_DS100_HOST = 50011;		//< UDP port to which the DS10
 static constexpr int DEFAULT_PROCNODE_ID = 1;
 static constexpr int DS100_1_PROCESSINGPROTOCOL_ID = 2;
 
-class SurroundFieldMixerRemoteWrapper :
-	public ProcessingEngineNode::NodeListener,
-	public juce::Timer
+class SurroundFieldMixerRemoteWrapper :	public ProcessingEngineNode::NodeListener,
+										public SurroundFieldMixerProcessor::InputCommander,
+										public SurroundFieldMixerProcessor::OutputCommander,
+										public juce::Timer
 {
-public:
-	/**
-	 * Abstract embedded interface class for message data handling
-	 */
-	class Listener
-	{
-	public:
-		Listener() {};
-		virtual ~Listener() {};
-
-		virtual void OnRemoteMuteChange(unsigned int channel, int muteVal) = 0;
-		virtual void OnRemoteXPosChange(unsigned int channel, float xPosVal) = 0;
-		virtual void OnRemoteYPosChange(unsigned int channel, float yPosVal) = 0;
-		virtual void OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal) = 0;
-		virtual void OnRemoteSpreadFactorChange(unsigned int channel, float spreadFactorVal) = 0;
-		virtual void OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal) = 0;
-	};
 public:
 	SurroundFieldMixerRemoteWrapper();
 	~SurroundFieldMixerRemoteWrapper();
-
-	//==========================================================================
-	void AddListener(SurroundFieldMixerRemoteWrapper::Listener* listener);
 	
 	//==========================================================================
-	void setMute(unsigned int channel, bool muteState);
-	void setPosition(unsigned int channel, juce::Point<float> position);
-	void setSpreadFactor(unsigned int channel, float spreadFactor);
-	void setReverbSendGain(unsigned int channel, float reverbSendGain);
+	void setInputMute(unsigned int channel, bool muteState) override;
+	void setPosition(unsigned int channel, juce::Point<float> position) override;
+	void setSpreadFactor(unsigned int channel, float spreadFactor) override;
+	void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
+
+	//==========================================================================
+	void setOutputMute(unsigned int channel, bool muteState) override;
+	void setOutputScheme(unsigned int outputScheme) override;
 
 	//==========================================================================
 	void Disconnect();
@@ -89,8 +76,6 @@ private:
 
 	ProcessingEngineNode							m_processingNode;	/**< The node that encapsulates the protocols that are used to send, receive and bridge data. */
 	XmlElement										m_bridgingXml;		/**< The current xml config for bridging (contains node xml). */
-
-	std::vector<SurroundFieldMixerRemoteWrapper::Listener*>	m_listeners;		/**< The listner objects, for message data handling callback. */
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundFieldMixerRemoteWrapper)
 };

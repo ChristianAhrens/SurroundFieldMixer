@@ -27,10 +27,12 @@ SurroundFieldMixer::SurroundFieldMixer() :
     JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement()
 {
     m_SurroundFieldMixerProcessor = std::make_unique<SurroundFieldMixerProcessor>();
-    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
     m_SurroundFieldMixerRemote = std::make_unique<SurroundFieldMixerRemoteWrapper>();
 
-    m_SurroundFieldMixerRemote->AddListener(this);
+    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
+
+    m_SurroundFieldMixerProcessor->addInputCommander(m_SurroundFieldMixerRemote.get());
+    m_SurroundFieldMixerProcessor->addOutputCommander(m_SurroundFieldMixerRemote.get());
 }
 
 SurroundFieldMixer::~SurroundFieldMixer()
@@ -69,36 +71,6 @@ bool SurroundFieldMixer::setStateXml(XmlElement* stateXml)
 {
     jassertfalse;
     return false;
-}
-
-void SurroundFieldMixer::OnRemoteMuteChange(unsigned int channel, int muteVal)
-{
-
-}
-
-void SurroundFieldMixer::OnRemoteXPosChange(unsigned int channel, float xPosVal)
-{
-
-}
-
-void SurroundFieldMixer::OnRemoteYPosChange(unsigned int channel, float yPosVal)
-{
-
-}
-
-void SurroundFieldMixer::OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal)
-{
-
-}
-
-void SurroundFieldMixer::OnRemoteSpreadFactorChange(unsigned int channel, float spreadFactorVal)
-{
-
-}
-
-void SurroundFieldMixer::OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal)
-{
-
 }
 
 
