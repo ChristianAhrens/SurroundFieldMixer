@@ -42,7 +42,7 @@ public:
         ChannelCommander();
         virtual ~ChannelCommander();
 
-        void setMuteChangeCallback(const std::function<void(int, bool)>& callback);
+        void setMuteChangeCallback(const std::function<void(ChannelCommander* sender, int, bool)>& callback);
 
         virtual void setMute(int channel, bool muteState) = 0;
 
@@ -50,7 +50,7 @@ public:
         void muteChange(int channel, bool muteState);
 
     private:
-        std::function<void(int, bool)> m_muteChangeCallback{ nullptr };
+        std::function<void(ChannelCommander* sender, int, bool)> m_muteChangeCallback{ nullptr };
     };
 
     class InputCommander : public ChannelCommander
@@ -59,7 +59,7 @@ public:
         InputCommander();
         virtual ~InputCommander() override;
 
-        void setPositionChangeCallback(const std::function<void(int, juce::Point<float>)>& callback);
+        void setPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback);
 
         virtual void setPosition(int channel, juce::Point<float> position) = 0;
 
@@ -67,7 +67,7 @@ public:
         void positionChange(int channel, const juce::Point<float>& position);
 
     private:
-        std::function<void(int, juce::Point<float>)> m_positionChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, juce::Point<float>)> m_positionChangeCallback{ nullptr };
     };
 
     class OutputCommander : public ChannelCommander
@@ -96,12 +96,12 @@ public:
     void removeOutputCommander(OutputCommander* comander);
 
     bool getInputMuteState(int channelNumber);
-    void toggleInputMuteState(int channelNumber, bool muted);
+    void setInputMuteState(ChannelCommander* sender, int channelNumber, bool muted);
     bool getOutputMuteState(int channelNumber);
-    void toggleOutputMuteState(int channelNumber, bool muted);
+    void setOutputMuteState(ChannelCommander* sender, int channelNumber, bool muted);
 
     const juce::Point<float>& getInputPositionValue(int channelNumber);
-    void setInputPositionValue(int channelNumber, const juce::Point<float>& position);
+    void setInputPositionValue(InputCommander* sender, int channelNumber, const juce::Point<float>& position);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
