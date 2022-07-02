@@ -22,6 +22,55 @@ namespace SurroundFieldMixer
 {
 
 
+SurroundFieldMixerProcessor::ChannelCommander::ChannelCommander()
+{
+}
+
+SurroundFieldMixerProcessor::ChannelCommander::~ChannelCommander()
+{
+}
+
+void SurroundFieldMixerProcessor::ChannelCommander::setMuteChangeCallback(const std::function<void(int, bool)>& callback)
+{
+	m_muteChangeCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::ChannelCommander::muteChange(int channel, bool muteState)
+{
+	if (m_muteChangeCallback)
+		m_muteChangeCallback(channel, muteState);
+}
+
+SurroundFieldMixerProcessor::InputCommander::InputCommander()
+{
+
+}
+
+SurroundFieldMixerProcessor::InputCommander::~InputCommander()
+{
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setPositionChangeCallback(const std::function<void(int, juce::Point<float>)>& callback)
+{
+	m_positionChangeCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::positionChange(int channel, const juce::Point<float>& position)
+{
+	if (m_positionChangeCallback)
+		m_positionChangeCallback(channel, position);
+}
+
+SurroundFieldMixerProcessor::OutputCommander::OutputCommander()
+{
+
+}
+
+SurroundFieldMixerProcessor::OutputCommander::~OutputCommander()
+{
+}
+
+
 //==============================================================================
 SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 	AudioProcessor()

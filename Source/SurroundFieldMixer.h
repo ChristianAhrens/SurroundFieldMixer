@@ -55,7 +55,7 @@ public:
     void OnRemoteXPosChange(unsigned int channel, float xPosVal) override;
     void OnRemoteYPosChange(unsigned int channel, float yPosVal) override;
     void OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal) override;
-    void OnRemoteSpreadChange(unsigned int channel, float spreadVal) override;
+    void OnRemoteSpreadFactorChange(unsigned int channel, float spreadFactorVal) override;
     void OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal) override;
 
 private:

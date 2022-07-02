@@ -91,7 +91,7 @@ void SurroundFieldMixer::OnRemoteXYPosChange(unsigned int channel, float xPosVal
 
 }
 
-void SurroundFieldMixer::OnRemoteSpreadChange(unsigned int channel, float spreadVal)
+void SurroundFieldMixer::OnRemoteSpreadFactorChange(unsigned int channel, float spreadFactorVal)
 {
 
 }

@@ -39,23 +39,15 @@ public:
     class ChannelCommander
     {
     public:
-        virtual ~ChannelCommander()
-        {
-        };
+        ChannelCommander();
+        virtual ~ChannelCommander();
 
-        //==============================================================================
-        void setMuteChangeCallback(const std::function<void(int, bool)>& callback)
-        {
-            m_muteChangeCallback = callback;
-        }
+        void setMuteChangeCallback(const std::function<void(int, bool)>& callback);
+
         virtual void setMute(int channel, bool muteState) = 0;
 
     protected:
-        void muteChange(int channel, bool muteState)
-        {
-            if (m_muteChangeCallback)
-                m_muteChangeCallback(channel, muteState);
-        }
+        void muteChange(int channel, bool muteState);
 
     private:
         std::function<void(int, bool)> m_muteChangeCallback{ nullptr };
@@ -64,23 +56,15 @@ public:
     class InputCommander : public ChannelCommander
     {
     public:
-        virtual ~InputCommander() override
-        {
-        };
+        InputCommander();
+        virtual ~InputCommander() override;
 
-        //==============================================================================
-        void setPositionChangeCallback(const std::function<void(int, juce::Point<float>)>& callback)
-        {
-            m_positionChangeCallback = callback;
-        }
+        void setPositionChangeCallback(const std::function<void(int, juce::Point<float>)>& callback);
+
         virtual void setPosition(int channel, juce::Point<float> position) = 0;
 
     protected:
-        void positionChange(int channel, const juce::Point<float>& position)
-        {
-            if (m_positionChangeCallback)
-                m_positionChangeCallback(channel, position);
-        }
+        void positionChange(int channel, const juce::Point<float>& position);
 
     private:
         std::function<void(int, juce::Point<float>)> m_positionChangeCallback{ nullptr };
@@ -89,11 +73,9 @@ public:
     class OutputCommander : public ChannelCommander
     {
     public:
-        virtual ~OutputCommander() override
-        {
-        };
+        OutputCommander();
+        virtual ~OutputCommander() override;
 
-        //==============================================================================
         virtual void setOutputScheme(int dummyschemetobechanged) = 0;
     };
 

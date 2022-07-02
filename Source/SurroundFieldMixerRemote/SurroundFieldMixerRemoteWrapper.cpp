@@ -66,7 +66,7 @@ void SurroundFieldMixerRemoteWrapper::timerCallback()
 	m_processingNode.Start();
 }
 
-void SurroundFieldMixerRemoteWrapper::setMute(int channel, bool muteState)
+void SurroundFieldMixerRemoteWrapper::setMute(unsigned int channel, bool muteState)
 {
 	int muteValue = muteState ? 1 : 0;
 
@@ -82,7 +82,7 @@ void SurroundFieldMixerRemoteWrapper::setMute(int channel, bool muteState)
 	SendMessage(ROI_MatrixInput_Mute, msgData);
 }
 
-void SurroundFieldMixerRemoteWrapper::setPosition(int channel, juce::Point<float> position)
+void SurroundFieldMixerRemoteWrapper::setPosition(unsigned int channel, juce::Point<float> position)
 {
 	float positionValues[2];
 	positionValues[0] = position.getX();
@@ -98,6 +98,34 @@ void SurroundFieldMixerRemoteWrapper::setPosition(int channel, juce::Point<float
 	msgData._payload = &positionValues;
 
 	SendMessage(ROI_CoordinateMapping_SourcePosition_XY, msgData);
+}
+
+void SurroundFieldMixerRemoteWrapper::setSpreadFactor(unsigned int channel, float spreadFactor)
+{
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 0;
+	msgData._valCount = 1;
+	msgData._valType = ROVT_FLOAT;
+	msgData._payloadSize = sizeof(float);
+	msgData._payloadOwned = false;
+	msgData._payload = &spreadFactor;
+
+	SendMessage(ROI_Positioning_SourceSpread, msgData);
+}
+
+void SurroundFieldMixerRemoteWrapper::setReverbSendGain(unsigned int channel, float reverbSendGain)
+{
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 0;
+	msgData._valCount = 1;
+	msgData._valType = ROVT_FLOAT;
+	msgData._payloadSize = sizeof(float);
+	msgData._payloadOwned = false;
+	msgData._payload = &reverbSendGain;
+
+	SendMessage(ROI_MatrixInput_ReverbSendGain, msgData);
 }
 
 /**
@@ -182,11 +210,11 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 		{
 			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
 			auto valCountMatch = 1 == messageDataValCount;
-			auto spreadValPtr = reinterpret_cast<const float*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && spreadValPtr)
+			auto spreadFactorValPtr = reinterpret_cast<const float*>(messageDataPayload);
+			if (valTypeMatch && valCountMatch && spreadFactorValPtr)
 			{
 				for (auto l : m_listeners)
-					l->OnRemoteSpreadChange(channel, *spreadValPtr);
+					l->OnRemoteSpreadFactorChange(channel, *spreadFactorValPtr);
 			}
 		}
 		break;

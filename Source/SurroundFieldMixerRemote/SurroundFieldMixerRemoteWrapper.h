@@ -53,7 +53,7 @@ public:
 		virtual void OnRemoteXPosChange(unsigned int channel, float xPosVal) = 0;
 		virtual void OnRemoteYPosChange(unsigned int channel, float yPosVal) = 0;
 		virtual void OnRemoteXYPosChange(unsigned int channel, float xPosVal, float yPosVal) = 0;
-		virtual void OnRemoteSpreadChange(unsigned int channel, float spreadVal) = 0;
+		virtual void OnRemoteSpreadFactorChange(unsigned int channel, float spreadFactorVal) = 0;
 		virtual void OnRemoteReverbSendGainChange(unsigned int channel, float reverbSendGainVal) = 0;
 	};
 public:
@@ -62,8 +62,12 @@ public:
 
 	//==========================================================================
 	void AddListener(SurroundFieldMixerRemoteWrapper::Listener* listener);
-	void setMute(int channel, bool muteState);
-	void setPosition(int channel, juce::Point<float> position);
+	
+	//==========================================================================
+	void setMute(unsigned int channel, bool muteState);
+	void setPosition(unsigned int channel, juce::Point<float> position);
+	void setSpreadFactor(unsigned int channel, float spreadFactor);
+	void setReverbSendGain(unsigned int channel, float reverbSendGain);
 
 	//==========================================================================
 	void Disconnect();
