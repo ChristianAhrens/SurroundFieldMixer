@@ -28,7 +28,7 @@ MainComponent::MainComponent()
     m_ssm = std::make_unique<SurroundFieldMixer::SurroundFieldMixer>();
     addAndMakeVisible(m_ssm->getUIComponent());
 
-    m_setupToggleButton = std::make_unique<TextButton>("Setup");
+    m_setupToggleButton = std::make_unique<TextButton>("Audio Device Setup");
     m_setupToggleButton->onClick = [this] {
         auto setupComponent = m_ssm->getDeviceSetupComponent();
         if (setupComponent)
@@ -58,7 +58,18 @@ MainComponent::~MainComponent()
 
 void MainComponent::paint(Graphics &g)
 {
-    g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
+    g.fillAll(getLookAndFeel().findColour(AlertWindow::backgroundColourId).darker());
+    
+    auto safety = JUCEAppBasics::iOS_utils::getDeviceSafetyMargins();
+    auto safeBounds = getLocalBounds();
+    safeBounds.removeFromTop(safety._top);
+    safeBounds.removeFromBottom(safety._bottom);
+    safeBounds.removeFromLeft(safety._left);
+    safeBounds.removeFromRight(safety._right);
+    
+    auto setupAreaBounds = safeBounds.removeFromTop(26);
+    g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+    g.fillRect(setupAreaBounds.reduced(6, 0));
 }
 
 void MainComponent::resized()
@@ -70,15 +81,18 @@ void MainComponent::resized()
     safeBounds.removeFromLeft(safety._left);
     safeBounds.removeFromRight(safety._right);
 
-    auto SurroundFieldMixerComponent = m_ssm->getUIComponent();
-    if (SurroundFieldMixerComponent)
-        SurroundFieldMixerComponent->setBounds(safeBounds);
+    auto setupAreaBounds = safeBounds.removeFromTop(26);
+    auto contentAreaBounds = safeBounds;
 
     if (m_setupToggleButton)
-        m_setupToggleButton->setBounds(safeBounds.reduced(6).removeFromRight(50).removeFromTop(20));
+        m_setupToggleButton->setBounds(setupAreaBounds.reduced(9, 3).removeFromRight(100).removeFromTop(20));
+
+    auto SurroundFieldMixerComponent = m_ssm->getUIComponent();
+    if (SurroundFieldMixerComponent)
+        SurroundFieldMixerComponent->setBounds(contentAreaBounds);
 
     auto setupComponent = m_ssm->getDeviceSetupComponent();
     if (setupComponent && setupComponent->isVisible())
-        setupComponent->setBounds(safeBounds.reduced(15));
+        setupComponent->setBounds(contentAreaBounds.reduced(15));
 }
 
