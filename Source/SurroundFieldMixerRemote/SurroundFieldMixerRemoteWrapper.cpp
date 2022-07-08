@@ -52,6 +52,10 @@ void SurroundFieldMixerRemoteWrapper::timerCallback()
 	if (nodeXmlElement)
 		m_processingNode.setStateXml(nodeXmlElement);
 
+	auto oh = m_processingNode.GetObjectDataHandling();
+	if (oh)
+		oh->AddStateListener(this);
+
 	m_processingNode.Start();
 }
 
@@ -231,12 +235,30 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 				outputMuteChange(channel, *muteValPtr);
 		}
 		break;
-	case RemoteObjectIdentifier::ROI_HeartbeatPing:
-	case RemoteObjectIdentifier::ROI_HeartbeatPong:
-		OnRemoteHeartbeatReceived();
-		break;
 	default:
 		break;
+	}
+}
+
+/**
+ * Reimplentation of ObjectDataHandling_Abstract::StateListener method to be able
+ * to react on osc online state changes
+ */
+void SurroundFieldMixerRemoteWrapper::protocolStateChanged(ProtocolId id, ObjectHandlingState state)
+{
+	if (onlineStateChangeCallback && DS100_1_PROCESSINGPROTOCOL_ID == id)
+	{
+		switch (state)
+		{
+		case OHS_Protocol_Up:
+			onlineStateChangeCallback(true);
+			break;
+		case OHS_Protocol_Down:
+			onlineStateChangeCallback(false);
+			break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -318,12 +340,5 @@ void SurroundFieldMixerRemoteWrapper::SetupBridgingNode()
 	m_bridgingXml.addChildElement(nodeXmlElement.release());
 }
 
-/**
- * To be called when a heartbeat is received from the remote connection and in consequence update internal connection state.
- */
-void SurroundFieldMixerRemoteWrapper::OnRemoteHeartbeatReceived()
-{
-
-}
 
 }

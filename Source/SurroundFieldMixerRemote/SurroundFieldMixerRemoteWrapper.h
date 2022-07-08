@@ -19,6 +19,7 @@
 #pragma once
 
 #include <ProcessingEngine/ProcessingEngineNode.h>
+#include <ProcessingEngine/ObjectDataHandling/ObjectDataHandling_Abstract.h>
 
 #include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
 
@@ -38,6 +39,7 @@ static constexpr int DEFAULT_PROCNODE_ID = 1;
 static constexpr int DS100_1_PROCESSINGPROTOCOL_ID = 2;
 
 class SurroundFieldMixerRemoteWrapper :	public ProcessingEngineNode::NodeListener,
+										public ObjectDataHandling_Abstract::StateListener,
 										public SurroundFieldMixerProcessor::InputCommander,
 										public SurroundFieldMixerProcessor::OutputCommander,
 										public juce::Timer
@@ -63,16 +65,19 @@ public:
 	//==========================================================================
 	void timerCallback() override;
 
+	//==========================================================================
+	std::function<void(bool)> onlineStateChangeCallback;
+
 private:
 	//==========================================================================
 	void HandleNodeData(const ProcessingEngineNode::NodeCallbackMessage* callbackMessage) override;
 	bool SendMessage(RemoteObjectIdentifier Id, RemoteObjectMessageData& msgData);
 
 	//==========================================================================
-	void SetupBridgingNode();
+	void protocolStateChanged(ProtocolId id, ObjectHandlingState state) override;
 
 	//==========================================================================
-	void OnRemoteHeartbeatReceived();
+	void SetupBridgingNode();
 
 	ProcessingEngineNode							m_processingNode;	/**< The node that encapsulates the protocols that are used to send, receive and bridge data. */
 	XmlElement										m_bridgingXml;		/**< The current xml config for bridging (contains node xml). */

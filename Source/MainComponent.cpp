@@ -26,6 +26,7 @@ MainComponent::MainComponent()
     : juce::Component()
 {
     m_ssm = std::make_unique<SurroundFieldMixer::SurroundFieldMixer>();
+    m_ssm->m_remoteOnlineCallback = std::bind(static_cast<void(MainComponent::*)(void)>(&MainComponent::repaint), this);
     addAndMakeVisible(m_ssm->getUIComponent());
 
     m_setupToggleButton = std::make_unique<TextButton>("Audio Device Setup");
@@ -70,6 +71,26 @@ void MainComponent::paint(Graphics &g)
     auto setupAreaBounds = safeBounds.removeFromTop(26);
     g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
     g.fillRect(setupAreaBounds.reduced(6, 0));
+
+    if (m_ssm)
+    {
+        setupAreaBounds.removeFromLeft(5);
+        auto onlineButtonBounds = setupAreaBounds.removeFromLeft(setupAreaBounds.getHeight()).reduced(5).toFloat();
+        if (m_ssm->isControlOnline())
+        {
+            g.setColour(juce::Colours::green);
+            g.fillEllipse(onlineButtonBounds);
+            g.setColour(juce::Colours::black);
+            g.drawEllipse(onlineButtonBounds, 1);
+        }
+        else
+        {
+            g.setColour(juce::Colours::grey);
+            g.fillEllipse(onlineButtonBounds);
+            g.setColour(juce::Colours::black);
+            g.drawEllipse(onlineButtonBounds, 1);
+        }
+    }
 }
 
 void MainComponent::resized()

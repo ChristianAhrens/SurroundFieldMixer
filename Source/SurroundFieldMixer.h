@@ -49,10 +49,17 @@ public:
     std::unique_ptr<XmlElement> createStateXml() override;
     bool setStateXml(XmlElement* stateXml) override;
 
+    bool isControlOnline();
+    std::function<void()>   m_remoteOnlineCallback;
+
 private:
+    void setControlOnlineState(bool online);
+
+
     std::unique_ptr<SurroundFieldMixerProcessor>        m_SurroundFieldMixerProcessor;
 
     std::unique_ptr<SurroundFieldMixerRemoteWrapper>    m_SurroundFieldMixerRemote;
+    bool                                                m_SurroundFieldMixerRemoteOnline;
 
     std::unique_ptr<SurroundFieldMixerEditor>           m_audioVisuComponent;
     std::unique_ptr<AudioSelectComponent>               m_audioDeviceSelectComponent;

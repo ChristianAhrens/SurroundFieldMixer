@@ -63,25 +63,25 @@ void SurroundFieldMixerProcessor::InputCommander::setReverbSendGainChangeCallbac
 void SurroundFieldMixerProcessor::InputCommander::inputMuteChange(int channel, bool muteState)
 {
 	if (m_inputMuteChangeCallback)
-		m_inputMuteChangeCallback(nullptr, channel, muteState);
+		m_inputMuteChangeCallback(this, channel, muteState);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::positionChange(int channel, const juce::Point<float>& position)
 {
 	if (m_positionChangeCallback)
-		m_positionChangeCallback(nullptr, channel, position);
+		m_positionChangeCallback(this, channel, position);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::spreadFactorChange(int channel, const float spreadFactor)
 {
 	if (m_spreadFactorChangeCallback)
-		m_spreadFactorChangeCallback(nullptr, channel, spreadFactor);
+		m_spreadFactorChangeCallback(this, channel, spreadFactor);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::reverbSendGainChange(int channel, const float reverbSendGain)
 {
 	if (m_reverbSendGainChangeCallback)
-		m_reverbSendGainChangeCallback(nullptr, channel, reverbSendGain);
+		m_reverbSendGainChangeCallback(this, channel, reverbSendGain);
 }
 
 SurroundFieldMixerProcessor::OutputCommander::OutputCommander()
