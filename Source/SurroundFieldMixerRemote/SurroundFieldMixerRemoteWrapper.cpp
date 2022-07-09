@@ -178,7 +178,9 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && muteValPtr)
+			{
 				inputMuteChange(channel, *muteValPtr);
+			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_X:
@@ -187,7 +189,10 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto xPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && xPosValPtr)
+			{
 				positionChange(channel, juce::Point<float>(*xPosValPtr, 0.0f));	// TODO
+				jassertfalse;
+			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_Y:
@@ -196,7 +201,10 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto yPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && yPosValPtr)
+			{
 				positionChange(channel, juce::Point<float>(0.0f, *yPosValPtr));	// TODO
+				jassertfalse;
+			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_XY:
@@ -205,7 +213,10 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 2 == messageDataValCount;
 			auto xyPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && xyPosValPtr)
-				positionChange(channel, juce::Point<float>(xyPosValPtr[0], xyPosValPtr[1]));
+			{
+				auto xyPos = juce::Point<float>(xyPosValPtr[0], xyPosValPtr[1]);
+				positionChange(channel, xyPos);
+			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_Positioning_SourceSpread:
@@ -214,7 +225,9 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto spreadFactorValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && spreadFactorValPtr)
+			{
 				spreadFactorChange(channel, *spreadFactorValPtr);
+			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_MatrixInput_ReverbSendGain:
@@ -223,7 +236,9 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto reverbSendGainValPtr = reinterpret_cast<const float*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && reverbSendGainValPtr)
+			{
 				reverbSendGainChange(channel, *reverbSendGainValPtr);
+			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_MatrixOutput_Mute:
@@ -232,7 +247,9 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			auto valCountMatch = 1 == messageDataValCount;
 			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
 			if (valTypeMatch && valCountMatch && muteValPtr)
+			{
 				outputMuteChange(channel, *muteValPtr);
+			}
 		}
 		break;
 	default:
@@ -302,11 +319,11 @@ void SurroundFieldMixerRemoteWrapper::SetupBridgingNode()
         
 		auto simChCountXmlElement = objectHandlingXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::SIMCHCNT));
 		if (simChCountXmlElement)
-			simChCountXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::COUNT), 64);
+			simChCountXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::COUNT), 0);
 
 		auto simMappingsCountXmlElement = objectHandlingXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::SIMMAPCNT));
 		if (simMappingsCountXmlElement)
-			simMappingsCountXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::COUNT), 4);
+			simMappingsCountXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::COUNT), 0);
 
 		auto simRefreshIntervalXmlElement = objectHandlingXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::REFRESHINTERVAL));
 		if (simRefreshIntervalXmlElement)

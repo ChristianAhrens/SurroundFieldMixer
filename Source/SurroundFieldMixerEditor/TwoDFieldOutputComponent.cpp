@@ -21,7 +21,7 @@
 namespace SurroundFieldMixer
 {
 
-#define PAINTINGHELPER
+//#define PAINTINGHELPER
 
 //==============================================================================
 TwoDFieldOutputComponent::TwoDFieldOutputComponent()

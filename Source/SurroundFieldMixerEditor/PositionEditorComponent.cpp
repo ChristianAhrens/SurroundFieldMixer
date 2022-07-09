@@ -95,7 +95,9 @@ void PositionEditorPopupComponent::updatePosition(const juce::Point<int>& mouseP
         auto relPosX = mousePos.getX() / static_cast<float>(positioningNormalArea.getWidth());
         auto relPosY = mousePos.getY() / static_cast<float>(positioningNormalArea.getHeight());
 
-        setCurrentPositionCallback(juce::Point<float>(relPosX, relPosY));
+        auto currentPosition = juce::Point<float>(relPosX, -1.0f * (relPosY - 1.0f));
+
+        setCurrentPositionCallback(currentPosition);
     }
 }
 
@@ -172,92 +174,6 @@ void PositionEditorComponent::mouseUp(const MouseEvent& event)
     Component::mouseUp(event);
 }
 
-void PositionEditorComponent::handleMessage(const Message& /*msg*/)
-{
-    //if (auto* callbackMessage = dynamic_cast<const CallbackMidiMessage*> (&msg))
-    //{
-    //    auto& midiMessage = callbackMessage->_message;
-    //
-    //    DBG(String(__FUNCTION__) + " MIDI received: " + midiMessage.getDescription());
-    //
-    //    // sanity check if the incoming message comes from the device we want to listen to
-    //    if (m_deviceIdentifier.isEmpty() || (m_deviceIdentifier != callbackMessage->_source->getDeviceInfo().identifier))
-    //        return;
-    //
-    //    // start handling of the incoming data
-    //    auto commandRangeAssi = JUCEAppBasics::MidiCommandRangeAssignment(midiMessage);
-    //    auto commandType = commandRangeAssi.getCommandType();
-    //    auto& commandData = commandRangeAssi.getCommandData();
-    //
-    //    // direct command assignments without value or command range
-    //    {
-    //        // iterate through already known command data/type to find if existing entries can be extended
-    //        auto directAssisKeyIndex = -1;
-    //        if (m_learnedDirectAssis.count(commandType) > 0)
-    //            for (auto& learnedAssiKV : m_learnedDirectAssis.at(commandType))
-    //                if (learnedAssiKV.second.getCommandData() == commandData && learnedAssiKV.second.isMatchingValueRange(midiMessage))
-    //                    directAssisKeyIndex = learnedAssiKV.first;
-    //
-    //        // if the command data/type is not yet represented, create new entries for it
-    //        if (directAssisKeyIndex == -1)
-    //        {
-    //            auto nextKey = ++m_popupItemIndexCounter;
-    //            m_learnedDirectAssis[commandType][nextKey] = commandRangeAssi;
-    //        }
-    //    }
-    //
-    //    // command assignments with value range
-    //    {
-    //        // iterate through already known command data/type to find if existing entries can be extended
-    //        auto commandAssisKeyIndex = -1;
-    //        if (m_learnedValueRangeAssis.count(commandType) > 0)
-    //        {
-    //            for (auto& learnedAssiKV : m_learnedValueRangeAssis.at(commandType))
-    //            {
-    //                if (learnedAssiKV.second.getCommandData() == commandData)
-    //                {
-    //                    learnedAssiKV.second.extendValueRange(midiMessage);
-    //                    commandAssisKeyIndex = learnedAssiKV.first;
-    //                }
-    //            }
-    //        }
-    //
-    //        // if the command data/type is not yet represented, create new entries for it
-    //        if (commandAssisKeyIndex == -1)
-    //        {
-    //            auto nextKey = ++m_popupItemIndexCounter;
-    //            m_learnedValueRangeAssis[commandType][nextKey] = commandRangeAssi;
-    //        }
-    //    }
-    //
-    //    // assignment of a range of command and range of values
-    //    {
-    //        // iterate through already known command data/type to find if existing entries can be extended
-    //        auto commandAndValueAssisKeyIndex = -1;
-    //        if (m_learnedCommandAndValueRangeAssis.count(commandType) > 0)
-    //        {
-    //            jassert(m_learnedCommandAndValueRangeAssis.at(commandType).size() == 1);
-    //            auto learnedAssiKV = m_learnedCommandAndValueRangeAssis.at(commandType).begin();
-    //            
-    //            learnedAssiKV->second.extendCommandRange(midiMessage);
-    //            learnedAssiKV->second.extendValueRange(midiMessage);
-    //            commandAndValueAssisKeyIndex = learnedAssiKV->first;
-    //        }
-    //
-    //        // if the command data/type is not yet represented, create new entries for it
-    //        if (commandAndValueAssisKeyIndex == -1)
-    //        {
-    //            auto nextKey = ++m_popupItemIndexCounter;
-    //            m_learnedCommandAndValueRangeAssis[commandType][nextKey] = commandRangeAssi;
-    //        }
-    //    }
-    //
-    //    // if the cyclical updating of the popup menu contents is not active, start now to display the new available assignments
-    //    if (!isTimerUpdatingPopup())
-    //        startTimerUpdatingPopup();
-    //}
-}
-
 void PositionEditorComponent::lookAndFeelChanged()
 {
     Component::lookAndFeelChanged();
@@ -305,9 +221,7 @@ void PositionEditorComponent::closePositioningPopup()
 
 void PositionEditorComponent::setCurrentPosition(const juce::Point<float>& currentPosition)
 {
-    m_currentPosition = juce::Point<float>(
-        currentPosition.getX(),
-        -1.0f * (currentPosition.getY() - 1.0f));
+    m_currentPosition = currentPosition;
 
     if (setPositionCallback)
         setPositionCallback(this, m_currentPosition);
