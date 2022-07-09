@@ -78,7 +78,7 @@ void MainComponent::paint(Graphics &g)
         auto onlineButtonBounds = setupAreaBounds.removeFromLeft(setupAreaBounds.getHeight()).reduced(5).toFloat();
         if (m_ssm->isControlOnline())
         {
-            g.setColour(juce::Colours::green);
+            g.setColour(juce::Colours::white.darker());
             g.fillEllipse(onlineButtonBounds);
             g.setColour(juce::Colours::black);
             g.drawEllipse(onlineButtonBounds, 1);
