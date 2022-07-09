@@ -27,7 +27,14 @@ SurroundFieldMixer::SurroundFieldMixer() :
     JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement()
 {
     m_SurroundFieldMixerProcessor = std::make_unique<SurroundFieldMixerProcessor>();
+    m_SurroundFieldMixerRemote = std::make_unique<SurroundFieldMixerRemoteWrapper>();
+    m_SurroundFieldMixerRemoteOnline = false;
+    m_SurroundFieldMixerRemote->onlineStateChangeCallback = [this](bool online) { setControlOnlineState(online); };
+
     m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
+
+    m_SurroundFieldMixerProcessor->addInputCommander(m_SurroundFieldMixerRemote.get());
+    m_SurroundFieldMixerProcessor->addOutputCommander(m_SurroundFieldMixerRemote.get());
 }
 
 SurroundFieldMixer::~SurroundFieldMixer()
@@ -67,5 +74,19 @@ bool SurroundFieldMixer::setStateXml(XmlElement* stateXml)
     jassertfalse;
     return false;
 }
+
+void SurroundFieldMixer::setControlOnlineState(bool online)
+{
+    m_SurroundFieldMixerRemoteOnline = online;
+
+    if (m_remoteOnlineCallback)
+        m_remoteOnlineCallback();
+}
+
+bool SurroundFieldMixer::isControlOnline()
+{
+    return m_SurroundFieldMixerRemoteOnline;
+}
+
 
 }

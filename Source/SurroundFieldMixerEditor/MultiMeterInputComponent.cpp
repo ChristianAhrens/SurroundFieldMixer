@@ -150,22 +150,40 @@ void MultiMeterInputComponent::paint(Graphics& g)
     }
 }
 
-void MultiMeterInputComponent::setMute(int channel, bool muteState)
+void MultiMeterInputComponent::setInputMute(unsigned int channel, bool muteState)
 {
     if (channel > m_inputMutes.size())
         return;
 
-    auto muteButtonIter = m_inputMutes.begin() + channel;
-    muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
+    auto muteButtonIter = m_inputMutes.begin() + channel - 1;
+    if (muteButtonIter != m_inputMutes.end() && muteButtonIter->get())
+        muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
-void MultiMeterInputComponent::setPosition(int channel, juce::Point<float> position)
+void MultiMeterInputComponent::setPosition(unsigned int channel, juce::Point<float> position)
 {
     if (channel > m_inputPositions.size())
         return;
 
-    auto positionComponentIter = m_inputPositions.begin() + channel;
-    positionComponentIter->get()->setCurrentPosition(position);
+    auto positionComponentIter = m_inputPositions.begin() + channel - 1;
+    if (positionComponentIter != m_inputPositions.end() && positionComponentIter->get())
+        positionComponentIter->get()->setCurrentPosition(position);
+}
+
+void MultiMeterInputComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
+{
+    if (channel > m_inputPositions.size())
+        return;
+
+    ignoreUnused(spreadFactor);
+}
+
+void MultiMeterInputComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
+{
+    if (channel > m_inputPositions.size())
+        return;
+
+    ignoreUnused(reverbSendGain);
 }
 
 void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data)
@@ -207,7 +225,7 @@ void MultiMeterInputComponent::processChanges()
                     auto channelIdx = foundMuteButtonIter - m_inputMutes.begin();
                     auto channel = static_cast<int>(channelIdx + 1);
                     auto muteState = muteButton->getToggleState();
-                    muteChange(channel, muteState);
+                    inputMuteChange(channel, muteState);
                 };
                 addAndMakeVisible(*m_inputMutes.back());
             }

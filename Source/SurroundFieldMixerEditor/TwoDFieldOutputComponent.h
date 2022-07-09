@@ -44,8 +44,8 @@ public:
     void processingDataChanged(AbstractProcessorData *data) override;
 
     //==============================================================================
-    void setMute(int channel, bool muteState) override;
-    void setOutputScheme(int dummyschemetobechanged) override;
+    void setOutputMute(unsigned int channel, bool muteState) override;
+    void setOutputScheme(unsigned int dummyschemetobechanged) override;
 
 private:
     unsigned long   m_channelL{ 1 };

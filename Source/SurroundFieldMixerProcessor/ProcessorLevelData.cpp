@@ -58,7 +58,7 @@ void ProcessorLevelData::SetChannelCount(unsigned long count)
 
 unsigned long ProcessorLevelData::GetChannelCount()
 {
-    return m_levelMap.size();
+    return static_cast<unsigned long>(m_levelMap.size());
 }
 
 }

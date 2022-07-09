@@ -48,7 +48,7 @@ private:
 };
 
 
-class PositionEditorComponent : public Component, private MessageListener
+class PositionEditorComponent : public Component
 {
 public:
     PositionEditorComponent();
@@ -61,9 +61,6 @@ public:
     //==============================================================================
     void mouseDown(const MouseEvent& event) override;
     void mouseUp(const MouseEvent& event) override;
-    
-    //==============================================================================
-    void handleMessage(const Message& msg) override;
 
     //==============================================================================
     void lookAndFeelChanged() override;
