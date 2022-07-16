@@ -30,7 +30,8 @@ namespace SurroundFieldMixer
 /*
 */
 class AbstractAudioVisualizer : public Component, 
-                                public ProcessorDataAnalyzer::Listener
+                                public ProcessorDataAnalyzer::Listener,
+                                public juce::Timer
 {
 public:
     AbstractAudioVisualizer();
@@ -44,6 +45,10 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     void mouseDown(const MouseEvent& event) override;
+
+    //==============================================================================
+    void setRefreshFrequency(int frequency);
+    void timerCallback() override;
 
 protected:
     //==============================================================================

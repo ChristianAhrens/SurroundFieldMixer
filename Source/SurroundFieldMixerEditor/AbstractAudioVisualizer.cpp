@@ -28,6 +28,8 @@ namespace SurroundFieldMixer
 AbstractAudioVisualizer::AbstractAudioVisualizer()
 {
     m_changesPending = false;
+
+    setRefreshFrequency(30);
 }
 
 AbstractAudioVisualizer::~AbstractAudioVisualizer()
@@ -47,6 +49,16 @@ void AbstractAudioVisualizer::resized()
 void AbstractAudioVisualizer::mouseDown(const MouseEvent& event)
 {
     Component::mouseDown(event);
+}
+
+void AbstractAudioVisualizer::setRefreshFrequency(int frequency)
+{
+    startTimerHz(frequency);
+}
+
+void AbstractAudioVisualizer::timerCallback()
+{
+    processChanges();
 }
 
 void AbstractAudioVisualizer::setUsesValuesInDB(bool useValuesInDB)
@@ -116,7 +128,6 @@ bool AbstractAudioVisualizer::getUsesValuesInDB()
 void AbstractAudioVisualizer::notifyChanges()
 {
     m_changesPending = true;
-    processChanges();
 }
 
 void AbstractAudioVisualizer::processChanges()
