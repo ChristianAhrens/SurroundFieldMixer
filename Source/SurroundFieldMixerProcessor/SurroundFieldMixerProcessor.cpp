@@ -32,12 +32,10 @@ SurroundFieldMixerProcessor::ChannelCommander::~ChannelCommander()
 
 SurroundFieldMixerProcessor::InputCommander::InputCommander()
 {
-
 }
 
 SurroundFieldMixerProcessor::InputCommander::~InputCommander()
 {
-
 }
 
 void SurroundFieldMixerProcessor::InputCommander::setInputMuteChangeCallback(const std::function<void(InputCommander* sender, int, bool)>& callback)
@@ -86,12 +84,10 @@ void SurroundFieldMixerProcessor::InputCommander::reverbSendGainChange(int chann
 
 SurroundFieldMixerProcessor::OutputCommander::OutputCommander()
 {
-
 }
 
 SurroundFieldMixerProcessor::OutputCommander::~OutputCommander()
 {
-
 }
 
 void SurroundFieldMixerProcessor::OutputCommander::setOutputMuteChangeCallback(const std::function<void(OutputCommander* sender, int, bool)>& callback)
@@ -121,6 +117,25 @@ void SurroundFieldMixerProcessor::OutputCommander::outputSchemeChange(unsigned i
 SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 	AudioProcessor()
 {
+	// setup class member variable default values before audio device init, etc., since they might be required then already!
+
+	auto orig = s_defaultPos();
+	auto a = 0.5f * sinf(juce::MathConstants<float>::pi / 6); // pi * (30/180)
+	auto b = 0.5f * sinf(juce::MathConstants<float>::pi / 3); // pi * (60/180)
+	m_leftPos = orig + juce::Point<float>(-a, b);
+	m_rightPos = orig + juce::Point<float>(a, b);
+	m_centerPos = orig + juce::Point<float>(0.f, 0.5f);
+	m_leftSurroundPos = orig + juce::Point<float>(-b, -a);
+	m_rightSurroundPos = orig + juce::Point<float>(b, -a);
+
+	m_useCodecOutput = false;
+
+#if JUCE_IOS || JUCE_MAC
+	m_encodeAudioFormat = std::make_unique<juce::CoreAudioFormat>();
+#elif JUCE_WINDOWS
+	m_encodeAudioFormat = std::make_unique<juce::WindowsMediaAudioFormat>();
+#endif
+
 	// prepare max sized processing data buffer
 	m_processorChannels = new float* [s_maxChannelCount];
 	for (auto i = 0; i < s_maxChannelCount; i++)
@@ -153,16 +168,6 @@ SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 		audioDeviceSetup.bufferSize = 512; // temp. workaround for iOS where buffersizes <512 lead to no sample data being delivered?
 #endif
 	m_deviceManager->setAudioDeviceSetup(audioDeviceSetup, true);
-
-
-	auto orig = s_defaultPos();
-	auto a = 0.5f * sinf(juce::MathConstants<float>::pi / 6); // pi * (30/180)
-	auto b = 0.5f * sinf(juce::MathConstants<float>::pi / 3); // pi * (60/180)
-	m_leftPos = orig + juce::Point<float>(-a, b);
-	m_rightPos = orig + juce::Point<float>(a, b);
-	m_centerPos = orig + juce::Point<float>(0.f, 0.5f);
-	m_leftSurroundPos = orig + juce::Point<float>(-b, -a);
-	m_rightSurroundPos = orig + juce::Point<float>(b, -a);
 }
 
 SurroundFieldMixerProcessor::~SurroundFieldMixerProcessor()
@@ -324,6 +329,13 @@ void SurroundFieldMixerProcessor::prepareToPlay(double sampleRate, int maximumEx
 		m_inputDataAnalyzer->initializeParameters(sampleRate, maximumExpectedSamplesPerBlock);
 	if (m_outputDataAnalyzer)
 		m_outputDataAnalyzer->initializeParameters(sampleRate, maximumExpectedSamplesPerBlock);
+
+#if JUCE_IOS || JUCE_MAC
+	m_encodeAudioFormatWriter = std::unique_ptr<juce::AudioFormatWriter>(m_encodeAudioFormat->createWriterFor(new juce::MemoryOutputStream, sampleRate, s_testingOutputChannels, /*dbg*/16, juce::StringPairArray(), 0));
+#elif JUCE_WINDOWS
+	// WindowsMediaAudoFormat has no writer implementation currently :(
+	//m_encodeAudioFormatWriter = std::unique_ptr<juce::AudioFormatWriter>(m_encodeAudioFormat->createWriterFor(new juce::MemoryOutputStream, sampleRate, s_testingOutputChannels, /*dbg*/16, juce::StringPairArray(), 0));
+#endif
 }
 
 void SurroundFieldMixerProcessor::releaseResources()
@@ -355,7 +367,7 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 
 	// process data in buffer to be what shall be used as output
 	auto inputChannels = buffer.getNumChannels();
-	auto outputChannels = 5;
+	auto outputChannels = s_testingOutputChannels;
 	AudioBuffer<float> processedBuffer;
 	processedBuffer.setSize(outputChannels, buffer.getNumSamples(), false, true, true);
 	for (auto inputIdx = 0; inputIdx < inputChannels; inputIdx++)
@@ -379,6 +391,12 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	}
 
 	postMessage(new AudioOutputBufferMessage(buffer));
+
+	if (m_useCodecOutput)
+	{
+		encodeBuffer(buffer);
+		buffer.clear();
+	}
 }
 
 float SurroundFieldMixerProcessor::getInputToOutputGain(int input, int output)
@@ -393,6 +411,24 @@ float SurroundFieldMixerProcessor::getInputToOutputGain(int input, int output)
 	//}
 
 	return 1.0f - inputPos.getDistanceFrom(outputPos);
+}
+
+bool SurroundFieldMixerProcessor::encodeBuffer(AudioBuffer<float>& buffer)
+{
+#if JUCE_IOS || JUCE_MAC
+	if (m_encodeAudioFormatWriter)
+		return m_encodeAudioFormatWriter->writeFromAudioSampleBuffer(buffer, 0, buffer.getNumSamples());
+	return false;
+#elif JUCE_WINDOWS
+	// WindowsMediaAudoFormat has no writer implementation currently :(
+	//if (m_encodeAudioFormatWriter)
+	//	return m_encodeAudioFormatWriter->writeFromAudioSampleBuffer(buffer, 0, buffer.getNumSamples());
+	ignoreUnused(buffer);
+	return false;
+#else
+	ignoreUnused(buffer);
+	return false;
+#endif
 }
 
 const juce::Point<float> SurroundFieldMixerProcessor::getInputPosition(int channelNumber)

@@ -163,6 +163,7 @@ public:
     //==============================================================================
     void handleMessage(const Message& message) override;
 
+
     //==============================================================================
     enum dBRange
     {
@@ -182,6 +183,7 @@ public:
 
     static constexpr int s_maxChannelCount = 64;
     static constexpr int s_maxNumSamples = 1024;
+    static constexpr int s_testingOutputChannels = 5;
 
     static constexpr juce::Point<float> s_defaultPos(){return juce::Point<float>(0.5f, 0.5f);};
     juce::Point<float> m_leftPos;
@@ -191,6 +193,10 @@ public:
     juce::Point<float> m_rightSurroundPos;
 
 private:
+    //==============================================================================
+    bool encodeBuffer(AudioBuffer<float>& buffer);
+
+    //==============================================================================
     const juce::Point<float> getInputPosition(int channelNumber);
     const juce::Point<float> getOutputPosition(int channelNumber);
 
@@ -198,7 +204,7 @@ private:
     const juce::Point<float> getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType channelIdent);
 
     //==============================================================================
-    String                      m_Name;
+    String              m_Name;
 
     //==============================================================================
     CriticalSection     m_readLock;
@@ -225,6 +231,15 @@ private:
 
     //==============================================================================
     std::unique_ptr<SurroundFieldMixerEditor>  m_processorEditor;
+
+    //==============================================================================
+    bool                                            m_useCodecOutput;
+#if JUCE_IOS || JUCE_MAC
+    std::unique_ptr<juce::CoreAudioFormat>          m_encodeAudioFormat;
+#elif JUCE_WINDOWS
+    std::unique_ptr<juce::WindowsMediaAudioFormat>  m_encodeAudioFormat;
+#endif
+    std::unique_ptr<juce::AudioFormatWriter>        m_encodeAudioFormatWriter;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundFieldMixerProcessor)
 };
