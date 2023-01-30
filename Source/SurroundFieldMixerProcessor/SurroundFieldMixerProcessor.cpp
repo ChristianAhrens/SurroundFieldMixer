@@ -587,9 +587,11 @@ void SurroundFieldMixerProcessor::setStateInformation(const void* data, int size
 	/*dbg*/ignoreUnused(sizeInBytes);
 }
 
-void SurroundFieldMixerProcessor::audioDeviceIOCallback(const float** inputChannelData, int numInputChannels,
-	float** outputChannelData, int numOutputChannels, int numSamples)
+void SurroundFieldMixerProcessor::audioDeviceIOCallbackWithContext(const float* const* inputChannelData, int numInputChannels,
+	float* const* outputChannelData, int numOutputChannels, int numSamples, const AudioIODeviceCallbackContext& context)
 {
+    ignoreUnused(context);
+    
 	const ScopedLock sl(m_readLock);
 
 	auto maxActiveChannels = std::max(numInputChannels, numOutputChannels);

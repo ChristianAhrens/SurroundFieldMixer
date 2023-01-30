@@ -144,6 +144,10 @@
                       file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OSCProtocolProcessor/OSCProtocolProcessor.cpp"/>
                 <FILE id="oZ95aR" name="OSCProtocolProcessor.h" compile="0" resource="0"
                       file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OSCProtocolProcessor/OSCProtocolProcessor.h"/>
+                <FILE id="Gc9eHB" name="RemapOSCProtocolProcessor.cpp" compile="1"
+                      resource="0" file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OSCProtocolProcessor/RemapOSCProtocolProcessor.cpp"/>
+                <FILE id="HuRBhc" name="RemapOSCProtocolProcessor.h" compile="0" resource="0"
+                      file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OSCProtocolProcessor/RemapOSCProtocolProcessor.h"/>
                 <FILE id="leNSh0" name="SenderAwareOSCReceiver.cpp" compile="1" resource="0"
                       file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OSCProtocolProcessor/SenderAwareOSCReceiver.cpp"/>
                 <FILE id="lEivjG" name="SenderAwareOSCReceiver.h" compile="0" resource="0"

@@ -147,11 +147,13 @@ public:
     void setStateInformation(const void* data, int sizeInBytes) override;
 
     //==============================================================================
-    void audioDeviceIOCallback(const float** inputChannelData,
-        int numInputChannels,
-        float** outputChannelData,
-        int numOutputChannels,
-        int numSamples) override;
+    void audioDeviceIOCallbackWithContext (const float* const* inputChannelData,
+                                           int numInputChannels,
+                                           float* const* outputChannelData,
+                                           int numOutputChannels,
+                                           int numSamples,
+                                           const AudioIODeviceCallbackContext& context) override;
+    
     void audioDeviceAboutToStart(AudioIODevice* device) override;
     void audioDeviceStopped() override;
 
