@@ -50,13 +50,27 @@ public:
 	
 	//==========================================================================
 	void setInputMute(unsigned int channel, bool muteState) override;
+	void setInputLevel(unsigned int channel, float levelValue) override;
 	void setPosition(unsigned int channel, juce::Point<float> position) override;
 	void setSpreadFactor(unsigned int channel, float spreadFactor) override;
 	void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
 
 	//==========================================================================
 	void setOutputMute(unsigned int channel, bool muteState) override;
+	void setOutputLevel(unsigned int channel, float levelValue) override;
 	void setOutputScheme(unsigned int outputScheme) override;
+
+	//==========================================================================
+	bool getInputMute(unsigned int channel);
+	float getInputLevel(unsigned int channel);
+	juce::Point<float> getPosition(unsigned int channel);
+	float getSpreadFactor(unsigned int channel);
+	float getReverbSendGain(unsigned int channel);
+
+	//==========================================================================
+	bool getOutputMute(unsigned int channel);
+	float getOutputLevel(unsigned int channel);
+	unsigned int getOutputScheme();
 
 	//==========================================================================
 	void Disconnect();
@@ -67,6 +81,19 @@ public:
 
 	//==========================================================================
 	std::function<void(bool)> onlineStateChangeCallback;
+
+protected:
+	//==========================================================================
+	void sendInputMute(unsigned int channel);
+	void sendInputLevel(unsigned int channel);
+	void sendPosition(unsigned int channel);
+	void sendSpreadFactor(unsigned int channel);
+	void sendReverbSendGain(unsigned int channel);
+
+	//==========================================================================
+	void sendOutputMute(unsigned int channel);
+	void sendOutputLevel(unsigned int channel);
+	void sendOutputScheme(unsigned int outputScheme);
 
 private:
 	//==========================================================================
@@ -81,6 +108,18 @@ private:
 
 	ProcessingEngineNode							m_processingNode;	/**< The node that encapsulates the protocols that are used to send, receive and bridge data. */
 	XmlElement										m_bridgingXml;		/**< The current xml config for bridging (contains node xml). */
+
+	//==========================================================================
+	std::map<unsigned int, bool>				m_inputMutes;
+	std::map<unsigned int, float>				m_inputLevels;
+	std::map<unsigned int, juce::Point<float>>	m_inputPositions;
+	std::map<unsigned int, float>				m_inputSpreadFactors;
+	std::map<unsigned int, float>				m_inputReverbSendGains;
+
+	//==========================================================================
+	std::map<unsigned int, bool>	m_outputMutes;
+	std::map<unsigned int, float>	m_outputLevels;
+	unsigned int					m_outputScheme;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundFieldMixerRemoteWrapper)
 };

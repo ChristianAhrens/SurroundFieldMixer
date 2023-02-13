@@ -61,7 +61,87 @@ void SurroundFieldMixerRemoteWrapper::timerCallback()
 
 void SurroundFieldMixerRemoteWrapper::setInputMute(unsigned int channel, bool muteState)
 {
-	int muteValue = muteState ? 1 : 0;
+	m_inputMutes[channel] = muteState;
+}
+
+void SurroundFieldMixerRemoteWrapper::setInputLevel(unsigned int channel, float levelValue)
+{
+	m_inputLevels[channel] = levelValue;
+}
+
+void SurroundFieldMixerRemoteWrapper::setPosition(unsigned int channel, juce::Point<float> position)
+{
+	m_inputPositions[channel] = position;
+}
+
+void SurroundFieldMixerRemoteWrapper::setSpreadFactor(unsigned int channel, float spreadFactor)
+{
+	m_inputSpreadFactors[channel] = spreadFactor;
+}
+
+void SurroundFieldMixerRemoteWrapper::setReverbSendGain(unsigned int channel, float reverbSendGain)
+{
+	m_inputReverbSendGains[channel] = reverbSendGain;
+}
+
+void SurroundFieldMixerRemoteWrapper::setOutputMute(unsigned int channel, bool muteState)
+{
+	m_outputMutes[channel] = muteState;
+}
+
+void SurroundFieldMixerRemoteWrapper::setOutputLevel(unsigned int channel, float levelValue)
+{
+	m_outputLevels[channel] = levelValue;
+}
+
+void SurroundFieldMixerRemoteWrapper::setOutputScheme(unsigned int /*outputScheme*/)
+{
+	/*t.b.d*/
+}
+
+bool SurroundFieldMixerRemoteWrapper::getInputMute(unsigned int channel)
+{
+	return m_inputMutes[channel];
+}
+
+float SurroundFieldMixerRemoteWrapper::getInputLevel(unsigned int channel)
+{
+	return m_inputLevels[channel];
+}
+
+juce::Point<float> SurroundFieldMixerRemoteWrapper::getPosition(unsigned int channel)
+{
+	return m_inputPositions[channel];
+}
+
+float SurroundFieldMixerRemoteWrapper::getSpreadFactor(unsigned int channel)
+{
+	return m_inputSpreadFactors[channel];
+}
+
+float SurroundFieldMixerRemoteWrapper::getReverbSendGain(unsigned int channel)
+{
+	return m_inputReverbSendGains[channel];
+}
+
+bool SurroundFieldMixerRemoteWrapper::getOutputMute(unsigned int channel)
+{
+	return m_outputMutes[channel];
+}
+
+float SurroundFieldMixerRemoteWrapper::getOutputLevel(unsigned int channel)
+{
+	return m_outputLevels[channel];
+}
+
+unsigned int SurroundFieldMixerRemoteWrapper::getOutputScheme()
+{
+	return m_outputScheme;
+}
+
+void SurroundFieldMixerRemoteWrapper::sendInputMute(unsigned int channel)
+{
+	int muteValue = m_inputMutes[channel] ? 1 : 0;
 
 	RemoteObjectMessageData msgData;
 	msgData._addrVal._first = channel;
@@ -75,11 +155,28 @@ void SurroundFieldMixerRemoteWrapper::setInputMute(unsigned int channel, bool mu
 	SendMessage(ROI_MatrixInput_Mute, msgData);
 }
 
-void SurroundFieldMixerRemoteWrapper::setPosition(unsigned int channel, juce::Point<float> position)
+void SurroundFieldMixerRemoteWrapper::sendInputLevel(unsigned int channel)
+{
+	auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixInput_LevelMeterPreMute);
+	auto inputLevel = ProtocolProcessorBase::MapNormalizedValueToRange(m_inputLevels[channel], range);
+
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 0;
+	msgData._valCount = 1;
+	msgData._valType = ROVT_FLOAT;
+	msgData._payloadSize = sizeof(float);
+	msgData._payloadOwned = false;
+	msgData._payload = &inputLevel;
+
+	SendMessage(ROI_MatrixInput_LevelMeterPreMute, msgData);
+}
+
+void SurroundFieldMixerRemoteWrapper::sendPosition(unsigned int channel)
 {
 	float positionValues[2];
-	positionValues[0] = position.getX();
-	positionValues[1] = position.getY();
+	positionValues[0] = m_inputPositions[channel].getX();
+	positionValues[1] = m_inputPositions[channel].getY();
 
 	RemoteObjectMessageData msgData;
 	msgData._addrVal._first = channel;
@@ -93,8 +190,11 @@ void SurroundFieldMixerRemoteWrapper::setPosition(unsigned int channel, juce::Po
 	SendMessage(ROI_CoordinateMapping_SourcePosition_XY, msgData);
 }
 
-void SurroundFieldMixerRemoteWrapper::setSpreadFactor(unsigned int channel, float spreadFactor)
+void SurroundFieldMixerRemoteWrapper::sendSpreadFactor(unsigned int channel)
 {
+	auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_Positioning_SourceSpread);
+	auto inputSpreadFactor = ProtocolProcessorBase::MapNormalizedValueToRange(m_inputSpreadFactors[channel], range);
+
 	RemoteObjectMessageData msgData;
 	msgData._addrVal._first = channel;
 	msgData._addrVal._second = 0;
@@ -102,13 +202,16 @@ void SurroundFieldMixerRemoteWrapper::setSpreadFactor(unsigned int channel, floa
 	msgData._valType = ROVT_FLOAT;
 	msgData._payloadSize = sizeof(float);
 	msgData._payloadOwned = false;
-	msgData._payload = &spreadFactor;
+	msgData._payload = &inputSpreadFactor;
 
 	SendMessage(ROI_Positioning_SourceSpread, msgData);
 }
 
-void SurroundFieldMixerRemoteWrapper::setReverbSendGain(unsigned int channel, float reverbSendGain)
+void SurroundFieldMixerRemoteWrapper::sendReverbSendGain(unsigned int channel)
 {
+	auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixInput_ReverbSendGain);
+	auto inputReverbSendGain = ProtocolProcessorBase::MapNormalizedValueToRange(m_inputReverbSendGains[channel], range);
+
 	RemoteObjectMessageData msgData;
 	msgData._addrVal._first = channel;
 	msgData._addrVal._second = 0;
@@ -116,14 +219,14 @@ void SurroundFieldMixerRemoteWrapper::setReverbSendGain(unsigned int channel, fl
 	msgData._valType = ROVT_FLOAT;
 	msgData._payloadSize = sizeof(float);
 	msgData._payloadOwned = false;
-	msgData._payload = &reverbSendGain;
+	msgData._payload = &inputReverbSendGain;
 
 	SendMessage(ROI_MatrixInput_ReverbSendGain, msgData);
 }
 
-void SurroundFieldMixerRemoteWrapper::setOutputMute(unsigned int channel, bool muteState)
+void SurroundFieldMixerRemoteWrapper::sendOutputMute(unsigned int channel)
 {
-	int muteValue = muteState ? 1 : 0;
+	int muteValue = m_outputMutes[channel] ? 1 : 0;
 
 	RemoteObjectMessageData msgData;
 	msgData._addrVal._first = channel;
@@ -137,7 +240,24 @@ void SurroundFieldMixerRemoteWrapper::setOutputMute(unsigned int channel, bool m
 	SendMessage(ROI_MatrixOutput_Mute, msgData);
 }
 
-void SurroundFieldMixerRemoteWrapper::setOutputScheme(unsigned int /*outputScheme*/)
+void SurroundFieldMixerRemoteWrapper::sendOutputLevel(unsigned int channel)
+{
+	auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixOutput_LevelMeterPostMute);
+	auto outputLevel = ProtocolProcessorBase::MapNormalizedValueToRange(m_outputLevels[channel], range);
+
+	RemoteObjectMessageData msgData;
+	msgData._addrVal._first = channel;
+	msgData._addrVal._second = 0;
+	msgData._valCount = 1;
+	msgData._valType = ROVT_FLOAT;
+	msgData._payloadSize = sizeof(float);
+	msgData._payloadOwned = false;
+	msgData._payload = &outputLevel;
+
+	SendMessage(ROI_MatrixOutput_LevelMeterPostMute, msgData);
+}
+
+void SurroundFieldMixerRemoteWrapper::sendOutputScheme(unsigned int /*outputScheme*/)
 {
 	/*t.b.d*/
 }
@@ -166,89 +286,197 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 	auto& remoteObjectId = callbackMessage->_protocolMessage._Id;
 	auto& messageDataValType = callbackMessage->_protocolMessage._msgData._valType;
 	auto& messageDataValCount = callbackMessage->_protocolMessage._msgData._valCount;
+	auto& messageDataPayloadSize = callbackMessage->_protocolMessage._msgData._payloadSize;
 	auto& messageDataPayload = callbackMessage->_protocolMessage._msgData._payload;
 	auto& channel = callbackMessage->_protocolMessage._msgData._addrVal._first;
 	//auto& record = callbackMessage->_protocolMessage._msgData._addrVal._second;
+	auto valuePoll = 0 == messageDataValCount && 0 == messageDataPayloadSize;
+	auto emptyRemoteObjectData = RemoteObjectMessageData();
 
 	switch (remoteObjectId)
 	{
+	case RemoteObjectIdentifier::ROI_HeartbeatPing:
+		SendMessage(RemoteObjectIdentifier::ROI_HeartbeatPong, emptyRemoteObjectData);
+		break;
+	case RemoteObjectIdentifier::ROI_HeartbeatPong:
+		SendMessage(RemoteObjectIdentifier::ROI_HeartbeatPing, emptyRemoteObjectData);
+		break;
 	case RemoteObjectIdentifier::ROI_MatrixInput_Mute:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_INT;
-			auto valCountMatch = 1 == messageDataValCount;
-			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && muteValPtr)
+			if (valuePoll)
 			{
-				inputMuteChange(channel, *muteValPtr);
+				inputMutePoll(channel);
+				sendInputMute(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_INT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && muteValPtr)
+				{
+					inputMuteChange(channel, *muteValPtr);
+					setInputMute(channel, *muteValPtr);
+				}
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_MatrixInput_LevelMeterPreMute:
+		{
+			if (valuePoll)
+			{
+				inputLevelPoll(channel);
+				sendInputLevel(channel);
+			}
+			else
+			{
+				ignoreUnused(channel);
 			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_X:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
-			auto valCountMatch = 1 == messageDataValCount;
-			auto xPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && xPosValPtr)
+			if (valuePoll)
 			{
-				positionChange(channel, juce::Point<float>(*xPosValPtr, 0.0f));	// TODO
-				jassertfalse;
+				positionPoll(channel);
+				sendPosition(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto xPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && xPosValPtr)
+				{
+					auto pos = getPosition(channel);
+					pos.setX(*xPosValPtr);
+					positionChange(channel, pos);
+					setPosition(channel, pos);
+					jassertfalse;
+				}
 			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_Y:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
-			auto valCountMatch = 1 == messageDataValCount;
-			auto yPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && yPosValPtr)
+			if (valuePoll)
 			{
-				positionChange(channel, juce::Point<float>(0.0f, *yPosValPtr));	// TODO
-				jassertfalse;
+				positionPoll(channel);
+				sendPosition(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto yPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && yPosValPtr)
+				{
+					auto pos = getPosition(channel);
+					pos.setY(*yPosValPtr);
+					positionChange(channel, pos);
+					setPosition(channel, pos);
+					jassertfalse;
+				}
 			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_CoordinateMapping_SourcePosition_XY:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
-			auto valCountMatch = 2 == messageDataValCount;
-			auto xyPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && xyPosValPtr)
+			if (valuePoll)
 			{
-				auto xyPos = juce::Point<float>(xyPosValPtr[0], xyPosValPtr[1]);
-				positionChange(channel, xyPos);
+				positionPoll(channel);
+				sendPosition(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 2 == messageDataValCount;
+				auto xyPosValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && xyPosValPtr)
+				{
+					auto xyPos = juce::Point<float>(xyPosValPtr[0], xyPosValPtr[1]);
+					positionChange(channel, xyPos);
+					setPosition(channel, xyPos);
+				}
 			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_Positioning_SourceSpread:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
-			auto valCountMatch = 1 == messageDataValCount;
-			auto spreadFactorValPtr = reinterpret_cast<const float*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && spreadFactorValPtr)
+			if (valuePoll)
 			{
-				spreadFactorChange(channel, *spreadFactorValPtr);
+				spreadFactorPoll(channel);
+				sendSpreadFactor(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto spreadFactorValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && spreadFactorValPtr)
+				{
+					auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_Positioning_SourceSpread);
+					auto inputSpreadFactor = ProtocolProcessorBase::NormalizeValueByRange(*spreadFactorValPtr, range);
+
+					spreadFactorChange(channel, inputSpreadFactor);
+					setSpreadFactor(channel, inputSpreadFactor);
+				}
 			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_MatrixInput_ReverbSendGain:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
-			auto valCountMatch = 1 == messageDataValCount;
-			auto reverbSendGainValPtr = reinterpret_cast<const float*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && reverbSendGainValPtr)
+			if (valuePoll)
 			{
-				reverbSendGainChange(channel, *reverbSendGainValPtr);
+				reverbSendGainPoll(channel);
+				sendReverbSendGain(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto reverbSendGainValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && reverbSendGainValPtr)
+				{
+					auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixInput_ReverbSendGain);
+					auto inputReverbSendGain = ProtocolProcessorBase::NormalizeValueByRange(*reverbSendGainValPtr, range);
+
+					reverbSendGainChange(channel, inputReverbSendGain);
+					setReverbSendGain(channel, inputReverbSendGain);
+				}
 			}
 		}
 		break;
 	case RemoteObjectIdentifier::ROI_MatrixOutput_Mute:
 		{
-			auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_INT;
-			auto valCountMatch = 1 == messageDataValCount;
-			auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
-			if (valTypeMatch && valCountMatch && muteValPtr)
+			if (valuePoll)
 			{
-				outputMuteChange(channel, *muteValPtr);
+				outputMutePoll(channel);
+				sendOutputMute(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_INT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto muteValPtr = reinterpret_cast<const int*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && muteValPtr)
+				{
+					outputMuteChange(channel, *muteValPtr);
+					setOutputMute(channel, *muteValPtr);
+				}
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_MatrixOutput_LevelMeterPostMute:
+		{
+			if (valuePoll)
+			{
+				outputLevelPoll(channel);
+				sendOutputLevel(channel);
+			}
+			else
+			{
+				ignoreUnused(channel);
 			}
 		}
 		break;

@@ -92,6 +92,11 @@ public:
 
     void setHoldTime(int holdTimeMs);
 
+    ProcessorAudioSignalData& GetCentiSecondBuffer() { return m_centiSecondBuffer; };
+    ProcessorLevelData& GetLevel() { return m_level; };
+    ProcessorSpectrumData& GetSpectrum() { return m_spectrum; };
+    String& GetName() { return m_Name; };
+
     //==============================================================================
     void addListener(Listener* listener);
     void removeListener(Listener* listener);

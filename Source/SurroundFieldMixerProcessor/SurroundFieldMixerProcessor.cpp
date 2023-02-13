@@ -32,17 +32,20 @@ SurroundFieldMixerProcessor::ChannelCommander::~ChannelCommander()
 
 SurroundFieldMixerProcessor::InputCommander::InputCommander()
 {
-
 }
 
 SurroundFieldMixerProcessor::InputCommander::~InputCommander()
 {
-
 }
 
 void SurroundFieldMixerProcessor::InputCommander::setInputMuteChangeCallback(const std::function<void(InputCommander* sender, int, bool)>& callback)
 {
 	m_inputMuteChangeCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setInputLevelChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback)
+{
+	m_inputLevelChangeCallback = callback;
 }
 
 void SurroundFieldMixerProcessor::InputCommander::setPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback)
@@ -60,10 +63,41 @@ void SurroundFieldMixerProcessor::InputCommander::setReverbSendGainChangeCallbac
 	m_reverbSendGainChangeCallback = callback;
 }
 
+void SurroundFieldMixerProcessor::InputCommander::setInputMutePollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+{
+	m_inputMutePollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setInputLevelPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+{
+	m_inputLevelPollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setPositionPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+{
+	m_positionPollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setSpreadFactorPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+{
+	m_spreadFactorPollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setReverbSendGainPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+{
+	m_reverbSendGainPollCallback = callback;
+}
+
 void SurroundFieldMixerProcessor::InputCommander::inputMuteChange(int channel, bool muteState)
 {
 	if (m_inputMuteChangeCallback)
 		m_inputMuteChangeCallback(this, channel, muteState);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::inputLevelChange(int channel, float levelValue)
+{
+	if (m_inputLevelChangeCallback)
+		m_inputLevelChangeCallback(this, channel, levelValue);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::positionChange(int channel, const juce::Point<float>& position)
@@ -84,14 +118,42 @@ void SurroundFieldMixerProcessor::InputCommander::reverbSendGainChange(int chann
 		m_reverbSendGainChangeCallback(this, channel, reverbSendGain);
 }
 
+void SurroundFieldMixerProcessor::InputCommander::inputMutePoll(int channel)
+{
+	if (m_inputMutePollCallback)
+		m_inputMutePollCallback(this, channel);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::inputLevelPoll(int channel)
+{
+	if (m_inputLevelPollCallback)
+		m_inputLevelPollCallback(this, channel);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::positionPoll(int channel)
+{
+	if (m_positionPollCallback)
+		m_positionPollCallback(this, channel);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::spreadFactorPoll(int channel)
+{
+	if (m_spreadFactorPollCallback)
+		m_spreadFactorPollCallback(this, channel);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::reverbSendGainPoll(int channel)
+{
+	if (m_reverbSendGainPollCallback)
+		m_reverbSendGainPollCallback(this, channel);
+}
+
 SurroundFieldMixerProcessor::OutputCommander::OutputCommander()
 {
-
 }
 
 SurroundFieldMixerProcessor::OutputCommander::~OutputCommander()
 {
-
 }
 
 void SurroundFieldMixerProcessor::OutputCommander::setOutputMuteChangeCallback(const std::function<void(OutputCommander* sender, int, bool)>& callback)
@@ -99,9 +161,29 @@ void SurroundFieldMixerProcessor::OutputCommander::setOutputMuteChangeCallback(c
 	m_outputMuteChangeCallback = callback;
 }
 
+void SurroundFieldMixerProcessor::OutputCommander::setOutputLevelChangeCallback(const std::function<void(OutputCommander* sender, int, float)>& callback)
+{
+	m_outputLevelChangeCallback = callback;
+}
+
 void SurroundFieldMixerProcessor::OutputCommander::setOutputSchemeChangeCallback(const std::function<void(OutputCommander* sender, unsigned int)>& callback)
 {
 	m_outputSchemeChangeCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::OutputCommander::setOutputMutePollCallback(const std::function<void(OutputCommander* sender, int)>& callback)
+{
+	m_outputMutePollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::OutputCommander::setOutputLevelPollCallback(const std::function<void(OutputCommander* sender, int)>& callback)
+{
+	m_outputLevelPollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::OutputCommander::setOutputSchemePollCallback(const std::function<void(OutputCommander* sender)>& callback)
+{
+	m_outputSchemePollCallback = callback;
 }
 
 void SurroundFieldMixerProcessor::OutputCommander::outputMuteChange(int channel, bool muteState)
@@ -110,10 +192,34 @@ void SurroundFieldMixerProcessor::OutputCommander::outputMuteChange(int channel,
 		m_outputMuteChangeCallback(nullptr, channel, muteState);
 }
 
+void SurroundFieldMixerProcessor::OutputCommander::outputLevelChange(int channel, float levelValue)
+{
+	if (m_outputLevelChangeCallback)
+		m_outputLevelChangeCallback(nullptr, channel, levelValue);
+}
+
 void SurroundFieldMixerProcessor::OutputCommander::outputSchemeChange(unsigned int outputScheme)
 {
 	if (m_outputSchemeChangeCallback)
 		m_outputSchemeChangeCallback(nullptr, outputScheme);
+}
+
+void SurroundFieldMixerProcessor::OutputCommander::outputMutePoll(int channel)
+{
+	if (m_outputMutePollCallback)
+		m_outputMutePollCallback(nullptr, channel);
+}
+
+void SurroundFieldMixerProcessor::OutputCommander::outputLevelPoll(int channel)
+{
+	if (m_outputLevelPollCallback)
+		m_outputLevelPollCallback(nullptr, channel);
+}
+
+void SurroundFieldMixerProcessor::OutputCommander::outputSchemePoll()
+{
+	if (m_outputSchemePollCallback)
+		m_outputSchemePollCallback(nullptr);
 }
 
 
@@ -515,9 +621,29 @@ void SurroundFieldMixerProcessor::handleMessage(const Message& message)
 	if (auto m = dynamic_cast<const AudioBufferMessage*> (&message))
 	{
 		if (m->getFlowDirection() == AudioBufferMessage::FlowDirection::Input && m_inputDataAnalyzer)
+		{
 			m_inputDataAnalyzer->analyzeData(m->getAudioBuffer());
+
+			for (auto const& inputCommander : m_inputCommanders)
+			{
+				auto levelData = m_inputDataAnalyzer->GetLevel();
+				auto channelCount = levelData.GetChannelCount();
+				for (std::uint16_t i = 1; i < channelCount+1; i++)
+					inputCommander->setInputLevel(i, levelData.GetLevel(i).GetFactorRMSdB());
+			}
+		}
 		else if (m->getFlowDirection() == AudioBufferMessage::FlowDirection::Output && m_outputDataAnalyzer)
+		{
 			m_outputDataAnalyzer->analyzeData(m->getAudioBuffer());
+
+			for (auto const& outputCommander : m_outputCommanders)
+			{
+				auto levelData = m_outputDataAnalyzer->GetLevel();
+				auto channelCount = levelData.GetChannelCount();
+				for (std::uint16_t i = 1; i < channelCount + 1; i++)
+					outputCommander->setOutputLevel(i, levelData.GetLevel(i).GetFactorRMSdB());
+			}
+		}
 	}
 }
 
