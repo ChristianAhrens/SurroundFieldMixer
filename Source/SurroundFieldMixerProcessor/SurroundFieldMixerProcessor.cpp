@@ -830,11 +830,8 @@ void SurroundFieldMixerProcessor::audioDeviceAboutToStart(AudioIODevice* device)
 	{
 		prepareToPlay(device->getCurrentSampleRate(), device->getCurrentBufferSizeSamples());
 
-		auto inputChannels = device->getActiveInputChannels().toInteger();
-		for (auto i = 1; i <= inputChannels; i++)
-			setInputPositionValue(nullptr, i, s_defaultPos());
-
-		//auto outputChannels = device->getActiveOutputChannels();
+		initializeInputCtrlValues(device->getActiveInputChannels().toInteger());
+		initializeOutputCtrlValues(device->getActiveOutputChannels().toInteger());
 	}
 }
 
@@ -842,5 +839,25 @@ void SurroundFieldMixerProcessor::audioDeviceStopped()
 {
 	releaseResources();
 }
+
+void SurroundFieldMixerProcessor::initializeInputCtrlValues(int inputCount)
+{
+	for (auto i = 1; i <= inputCount; i++)
+	{
+		setInputMuteState(nullptr, i, false);
+		setInputGainValue(nullptr, i, 1.0f);
+		setInputPositionValue(nullptr, i, s_defaultPos());
+	}
+}
+
+void SurroundFieldMixerProcessor::initializeOutputCtrlValues(int outputCount)
+{
+	for (auto i = 1; i <= outputCount; i++)
+	{
+		setOutputMuteState(nullptr, i, false);
+		setOutputGainValue(nullptr, i, 1.0f);
+	}
+}
+
 
 } // namespace SurroundFieldMixer

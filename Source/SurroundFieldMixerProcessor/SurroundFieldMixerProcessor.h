@@ -248,6 +248,11 @@ public:
     juce::Point<float> m_leftSurroundPos;
     juce::Point<float> m_rightSurroundPos;
 
+protected:
+    //==============================================================================
+    void initializeInputCtrlValues(int inputCount);
+    void initializeOutputCtrlValues(int outputCount);
+
 private:
     const juce::Point<float> getInputPosition(int channelNumber);
     const juce::Point<float> getOutputPosition(int channelNumber);
