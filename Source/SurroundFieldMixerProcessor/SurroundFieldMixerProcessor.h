@@ -168,16 +168,16 @@ public:
     void removeOutputCommander(OutputCommander* comander);
 
     bool getInputMuteState(int channelNumber);
-    void setInputMuteState(ChannelCommander* sender, int channelNumber, bool muted);
+    void setInputMuteState(int channelNumber, bool muted, ChannelCommander* sender = nullptr);
     float getInputGainValue(int channelNumber);
-    void setInputGainValue(ChannelCommander* sender, int channelNumber, float value);
+    void setInputGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
     bool getOutputMuteState(int channelNumber);
-    void setOutputMuteState(ChannelCommander* sender, int channelNumber, bool muted);
+    void setOutputMuteState(int channelNumber, bool muted, ChannelCommander* sender = nullptr);
     float getOutputGainValue(int channelNumber);
-    void setOutputGainValue(ChannelCommander* sender, int channelNumber, float value);
+    void setOutputGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
 
     const juce::Point<float>& getInputPositionValue(int channelNumber);
-    void setInputPositionValue(InputCommander* sender, int channelNumber, const juce::Point<float>& position);
+    void setInputPositionValue(int channelNumber, const juce::Point<float>& position, ChannelCommander* sender = nullptr);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
