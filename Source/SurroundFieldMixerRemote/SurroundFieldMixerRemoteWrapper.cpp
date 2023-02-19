@@ -375,6 +375,26 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 			}
 		}
 		break;
+	case RemoteObjectIdentifier::ROI_MatrixInput_Gain:
+		{
+			if (valuePoll)
+			{
+				inputGainPoll(channel);
+				sendInputGain(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto gainValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && gainValPtr)
+				{
+					inputGainChange(channel, *gainValPtr);
+					setInputGain(channel, *gainValPtr);
+				}
+			}
+		}
+		break;
 	case RemoteObjectIdentifier::ROI_MatrixInput_LevelMeterPreMute:
 		{
 			if (valuePoll)
@@ -517,6 +537,26 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 				{
 					outputMuteChange(channel, *muteValPtr);
 					setOutputMute(channel, *muteValPtr);
+				}
+			}
+		}
+		break;
+	case RemoteObjectIdentifier::ROI_MatrixOutput_Gain:
+		{
+			if (valuePoll)
+			{
+				outputGainPoll(channel);
+				sendOutputGain(channel);
+			}
+			else
+			{
+				auto valTypeMatch = messageDataValType == RemoteObjectValueType::ROVT_FLOAT;
+				auto valCountMatch = 1 == messageDataValCount;
+				auto gainValPtr = reinterpret_cast<const float*>(messageDataPayload);
+				if (valTypeMatch && valCountMatch && gainValPtr)
+				{
+					outputGainChange(channel, *gainValPtr);
+					setOutputGain(channel, *gainValPtr);
 				}
 			}
 		}
