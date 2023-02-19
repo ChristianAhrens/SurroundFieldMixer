@@ -98,7 +98,7 @@ void MultiMeterInputComponent::paint(Graphics& g)
 	auto outerMargin = 20;
     auto maxMeterWidth = 30;
 	auto visuAreaWidth = width - 2 * outerMargin;
-	auto visuAreaHeight = height - 2 * outerMargin - controlElementsGap;
+	auto visuAreaHeight = height - outerMargin - controlElementsGap;
 
 	auto visuArea = Rectangle<int>(outerMargin, outerMargin, visuAreaWidth, visuAreaHeight);
 
