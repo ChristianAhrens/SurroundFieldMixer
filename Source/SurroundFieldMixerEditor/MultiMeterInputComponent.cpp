@@ -281,6 +281,8 @@ void MultiMeterInputComponent::processChanges()
                 m_inputGains.push_back(std::make_unique<Slider>("M"));
                 auto gainSlider = m_inputGains.back().get();
                 gainSlider->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+                gainSlider->setRange(0.0, 1.0);
+                gainSlider->setValue(1.0, dontSendNotification);
                 gainSlider->onValueChange = [gainSlider, this] {
                     auto foundGainSliderIter = std::find_if(m_inputGains.begin(), m_inputGains.end(), [gainSlider](std::unique_ptr<Slider>& b) { return b.get() == gainSlider; });
                     if (foundGainSliderIter == m_inputGains.end())

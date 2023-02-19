@@ -389,8 +389,11 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 				auto gainValPtr = reinterpret_cast<const float*>(messageDataPayload);
 				if (valTypeMatch && valCountMatch && gainValPtr)
 				{
-					inputGainChange(channel, *gainValPtr);
-					setInputGain(channel, *gainValPtr);
+					auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixInput_Gain);
+					auto inputGainValue = ProtocolProcessorBase::NormalizeValueByRange(*gainValPtr, range);
+
+					inputGainChange(channel, inputGainValue);
+					setInputGain(channel, inputGainValue);
 				}
 			}
 		}
@@ -555,8 +558,11 @@ void SurroundFieldMixerRemoteWrapper::HandleNodeData(const ProcessingEngineNode:
 				auto gainValPtr = reinterpret_cast<const float*>(messageDataPayload);
 				if (valTypeMatch && valCountMatch && gainValPtr)
 				{
-					outputGainChange(channel, *gainValPtr);
-					setOutputGain(channel, *gainValPtr);
+					auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixOutput_Gain);
+					auto outputGainValue = ProtocolProcessorBase::NormalizeValueByRange(*gainValPtr, range);
+
+					outputGainChange(channel, outputGainValue);
+					setOutputGain(channel, outputGainValue);
 				}
 			}
 		}
