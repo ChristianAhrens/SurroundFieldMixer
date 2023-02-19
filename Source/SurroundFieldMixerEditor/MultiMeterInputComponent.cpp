@@ -40,7 +40,7 @@ void MultiMeterInputComponent::resized()
         auto usableBounds = getLocalBounds().reduced(20);
 
         auto fixedSizeCtrlsBounds = usableBounds.removeFromBottom(55);
-        auto resizingCtrlsBounds = usableBounds.removeFromBottom(0.5f * usableBounds.getHeight());
+        auto resizingCtrlsBounds = usableBounds.removeFromBottom(static_cast<int>(0.5f * usableBounds.getHeight()));
 
         auto maxcontrolElementWidth = 30;
 
@@ -90,7 +90,7 @@ void MultiMeterInputComponent::paint(Graphics& g)
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    auto controlElementsGap = 60 + (0.5f * (getHeight() - 60));
+    auto controlElementsGap = 60 + static_cast<int>(0.5f * (getHeight() - 60));
 
 	// calculate what we need for our center circle
 	auto width = getWidth();

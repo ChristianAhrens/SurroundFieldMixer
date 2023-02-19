@@ -146,7 +146,7 @@ public:
         std::function<void(OutputCommander* sender, unsigned int)>  m_outputSchemeChangeCallback{ nullptr };
 
         std::function<void(OutputCommander* sender, int)>   m_outputMutePollCallback{ nullptr };
-        std::function<void(OutputCommander* sender, float)> m_outputGainPollCallback{ nullptr };
+        std::function<void(OutputCommander* sender, int)>   m_outputGainPollCallback{ nullptr };
         std::function<void(OutputCommander* sender, int)>   m_outputLevelPollCallback{ nullptr };
         std::function<void(OutputCommander* sender)>        m_outputSchemePollCallback{ nullptr };
     };
