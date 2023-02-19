@@ -260,6 +260,11 @@ void TwoDFieldOutputComponent::setOutputMute(unsigned int /*channel*/, bool /*mu
 
 }
 
+void TwoDFieldOutputComponent::setOutputGain(unsigned int /*channel*/, float /*gainValue*/)
+{
+
+}
+
 void TwoDFieldOutputComponent::setOutputScheme(unsigned int /*dummyschemetobechanged*/)
 {
 

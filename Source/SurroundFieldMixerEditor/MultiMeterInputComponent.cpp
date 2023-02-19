@@ -35,32 +35,48 @@ MultiMeterInputComponent::~MultiMeterInputComponent()
 
 void MultiMeterInputComponent::resized()
 {
-    if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputPositions.size())
+    if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputGains.size() && m_inputMutes.size() == m_inputPositions.size())
     {
-        auto controlElementsBounds = getLocalBounds().reduced(20).removeFromBottom(55);
+        auto usableBounds = getLocalBounds().reduced(20);
+
+        auto fixedSizeCtrlsBounds = usableBounds.removeFromBottom(55);
+        auto resizingCtrlsBounds = usableBounds.removeFromBottom(0.5f * usableBounds.getHeight());
+
         auto maxcontrolElementWidth = 30;
 
-        auto controlElementWidth = controlElementsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
+        auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
         controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
 
-        auto positionComponentBounds = controlElementsBounds.removeFromTop(30);
+        auto positionComponentBounds = fixedSizeCtrlsBounds.removeFromTop(30);
         for (auto i = 0; i < m_inputPositions.size(); i++)
         {
             auto const& positionComponent = m_inputPositions.at(i);
-
+            if (!positionComponent)
+                continue;
             positionComponentBounds.removeFromLeft(10);
             positionComponent->setBounds(positionComponentBounds.removeFromLeft(controlElementWidth));
         }
 
-        controlElementsBounds.removeFromTop(5);
+        fixedSizeCtrlsBounds.removeFromTop(5);
 
-        auto muteButtonBounds = controlElementsBounds.removeFromTop(20);
+        auto muteButtonBounds = fixedSizeCtrlsBounds.removeFromTop(20);
         for (auto i = 0; i < m_inputMutes.size(); i++)
         {
             auto const& muteButton = m_inputMutes.at(i);
-
+            if (!muteButton)
+                continue;
             muteButtonBounds.removeFromLeft(10);
             muteButton->setBounds(muteButtonBounds.removeFromLeft(controlElementWidth));
+        }
+
+        auto gainSliderBounds = resizingCtrlsBounds;
+        for (auto i = 0; i < m_inputGains.size(); i++)
+        {
+            auto const& gainSlider = m_inputGains.at(i);
+            if (!gainSlider)
+                continue;
+            gainSliderBounds.removeFromLeft(10);
+            gainSlider->setBounds(gainSliderBounds.removeFromLeft(controlElementWidth));
         }
     }
 
@@ -74,7 +90,7 @@ void MultiMeterInputComponent::paint(Graphics& g)
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 
-    auto controlElementsGap = 60;
+    auto controlElementsGap = 60 + (0.5f * (getHeight() - 60));
 
 	// calculate what we need for our center circle
 	auto width = getWidth();
@@ -160,6 +176,16 @@ void MultiMeterInputComponent::setInputMute(unsigned int channel, bool muteState
         muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
+void MultiMeterInputComponent::setInputGain(unsigned int channel, float gainValue)
+{
+    if (channel > m_inputPositions.size())
+        return;
+
+    auto gainSliderIter = m_inputGains.begin() + channel - 1;
+    if (gainSliderIter != m_inputGains.end() && gainSliderIter->get())
+        gainSliderIter->get()->setValue(gainValue, juce::dontSendNotification);
+}
+
 void MultiMeterInputComponent::setPosition(unsigned int channel, juce::Point<float> position)
 {
     if (channel > m_inputPositions.size())
@@ -207,6 +233,8 @@ void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data
 
 void MultiMeterInputComponent::processChanges()
 {
+    auto resizeRequired = false;
+
     if (m_inputMutes.size() != m_levelData.GetChannelCount())
     {
         if (m_inputMutes.size() < m_levelData.GetChannelCount())
@@ -240,7 +268,42 @@ void MultiMeterInputComponent::processChanges()
             }
         }
 
-        resized();
+        resizeRequired = true;
+    }
+
+    if (m_inputGains.size() != m_levelData.GetChannelCount())
+    {
+        if (m_inputGains.size() < m_levelData.GetChannelCount())
+        {
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputGains.size();
+            for (; missingCnt > 0; missingCnt--)
+            {
+                m_inputGains.push_back(std::make_unique<Slider>("M"));
+                auto gainSlider = m_inputGains.back().get();
+                gainSlider->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+                gainSlider->onValueChange = [gainSlider, this] {
+                    auto foundGainSliderIter = std::find_if(m_inputGains.begin(), m_inputGains.end(), [gainSlider](std::unique_ptr<Slider>& b) { return b.get() == gainSlider; });
+                    if (foundGainSliderIter == m_inputGains.end())
+                        return;
+                    auto channelIdx = foundGainSliderIter - m_inputGains.begin();
+                    auto channel = static_cast<int>(channelIdx + 1);
+                    auto gainValue = static_cast<float>(gainSlider->getValue());
+                    inputGainChange(channel, gainValue);
+                };
+                addAndMakeVisible(*m_inputGains.back());
+            }
+        }
+        else if (m_inputGains.size() > m_levelData.GetChannelCount())
+        {
+            auto overheadCnt = m_inputGains.size() - m_levelData.GetChannelCount();
+            for (; overheadCnt; overheadCnt--)
+            {
+                removeChildComponent(m_inputGains.back().get());
+                m_inputGains.erase(m_inputGains.end());
+            }
+        }
+
+        resizeRequired = true;
     }
 
     if (m_inputPositions.size() != m_levelData.GetChannelCount())
@@ -274,8 +337,11 @@ void MultiMeterInputComponent::processChanges()
             }
         }
 
-        resized();
+        resizeRequired = true;
     }
+
+    if (resizeRequired)
+        resized();
 
     AbstractAudioVisualizer::processChanges();
 }

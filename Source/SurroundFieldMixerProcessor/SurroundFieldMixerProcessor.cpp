@@ -43,6 +43,11 @@ void SurroundFieldMixerProcessor::InputCommander::setInputMuteChangeCallback(con
 	m_inputMuteChangeCallback = callback;
 }
 
+void SurroundFieldMixerProcessor::InputCommander::setInputGainChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback)
+{
+	m_inputGainChangeCallback = callback;
+}
+
 void SurroundFieldMixerProcessor::InputCommander::setInputLevelChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback)
 {
 	m_inputLevelChangeCallback = callback;
@@ -66,6 +71,11 @@ void SurroundFieldMixerProcessor::InputCommander::setReverbSendGainChangeCallbac
 void SurroundFieldMixerProcessor::InputCommander::setInputMutePollCallback(const std::function<void(InputCommander* sender, int)>& callback)
 {
 	m_inputMutePollCallback = callback;
+}
+
+void SurroundFieldMixerProcessor::InputCommander::setInputGainPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+{
+	m_inputGainPollCallback = callback;
 }
 
 void SurroundFieldMixerProcessor::InputCommander::setInputLevelPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
@@ -92,6 +102,12 @@ void SurroundFieldMixerProcessor::InputCommander::inputMuteChange(int channel, b
 {
 	if (m_inputMuteChangeCallback)
 		m_inputMuteChangeCallback(this, channel, muteState);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::inputGainChange(int channel, float gainValue)
+{
+	if (m_inputGainChangeCallback)
+		m_inputGainChangeCallback(this, channel, gainValue);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::inputLevelChange(int channel, float levelValue)
@@ -122,6 +138,12 @@ void SurroundFieldMixerProcessor::InputCommander::inputMutePoll(int channel)
 {
 	if (m_inputMutePollCallback)
 		m_inputMutePollCallback(this, channel);
+}
+
+void SurroundFieldMixerProcessor::InputCommander::inputGainPoll(int channel)
+{
+	if (m_inputGainPollCallback)
+		m_inputGainPollCallback(this, channel);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::inputLevelPoll(int channel)
@@ -314,6 +336,7 @@ void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 	{
 		m_inputCommanders.push_back(commander);
 		commander->setInputMuteChangeCallback([=](ChannelCommander* sender, int channel, bool state) { return setInputMuteState(sender, channel, state); } );
+		commander->setInputGainChangeCallback([=](ChannelCommander* sender, int channel, float value) { return setInputGainValue(sender, channel, value); });
 		commander->setPositionChangeCallback([=](InputCommander* sender, int channel, const juce::Point<float>& position) { return setInputPositionValue(sender, channel, position); });
 	}
 }
@@ -370,6 +393,26 @@ void SurroundFieldMixerProcessor::setInputMuteState(ChannelCommander* sender, in
 	}
 }
 
+float SurroundFieldMixerProcessor::getInputGainValue(int inputChannelNumber)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	return m_inputGainValues[inputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::setInputGainValue(ChannelCommander* sender, int inputChannelNumber, float value)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	m_inputGainValues[inputChannelNumber] = value;
+
+	for (auto const& inputCommander : m_inputCommanders)
+	{
+		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
+			inputCommander->setInputGain(inputChannelNumber, value);
+	}
+}
+
 bool SurroundFieldMixerProcessor::getOutputMuteState(int outputChannelNumber)
 {
 	jassert(outputChannelNumber > 0);
@@ -387,6 +430,26 @@ void SurroundFieldMixerProcessor::setOutputMuteState(ChannelCommander* sender, i
 	{
 		if (outputCommander != reinterpret_cast<OutputCommander*>(sender))
 			outputCommander->setOutputMute(outputChannelNumber, muted);
+	}
+}
+
+float SurroundFieldMixerProcessor::getOutputGainValue(int outputChannelNumber)
+{
+	jassert(outputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	return m_outputGainValues[outputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::setOutputGainValue(ChannelCommander* sender, int outputChannelNumber, float value)
+{
+	jassert(outputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	m_outputGainValues[outputChannelNumber] = value;
+
+	for (auto const& outputCommander : m_outputCommanders)
+	{
+		if (outputCommander != reinterpret_cast<OutputCommander*>(sender))
+			outputCommander->setOutputGain(outputChannelNumber, value);
 	}
 }
 
@@ -457,6 +520,14 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 		}
 	}
 
+	for (auto const& inputGainValueKV : m_inputGainValues)
+	{
+		auto& channel = inputGainValueKV.first;
+		auto channelIdx = channel - 1;
+		auto& gainValue = inputGainValueKV.second;
+		buffer.applyGain(channelIdx, 0, buffer.getNumSamples(), gainValue);
+	}
+
 	postMessage(new AudioInputBufferMessage(buffer));
 
 	// process data in buffer to be what shall be used as output
@@ -482,6 +553,14 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 			auto channelIdx = channel - 1;
 			buffer.clear(channelIdx, 0, buffer.getNumSamples());
 		}
+	}
+
+	for (auto const& outputGainValueKV : m_outputGainValues)
+	{
+		auto& channel = outputGainValueKV.first;
+		auto channelIdx = channel - 1;
+		auto& gainValue = outputGainValueKV.second;
+		buffer.applyGain(channelIdx, 0, buffer.getNumSamples(), gainValue);
 	}
 
 	postMessage(new AudioOutputBufferMessage(buffer));
