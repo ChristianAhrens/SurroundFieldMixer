@@ -38,9 +38,20 @@ class SurroundFieldMixerEditor :    public AudioProcessorEditor,
                                     public JUCEAppBasics::AppConfigurationBase::XmlConfigurableElement
 {
 public:
+    enum EditorLayout
+    {
+        EL_Dynamic,
+        EL_Horizontal,
+        EL_Vertical
+    };
+
+public:
     SurroundFieldMixerEditor(AudioProcessor& processor);
     SurroundFieldMixerEditor(AudioProcessor* processor);
     ~SurroundFieldMixerEditor();
+
+    //==============================================================================
+    void lockCurrentLayout(bool doLock);
 
     //==============================================================================
     void paint(Graphics&) override;
@@ -54,8 +65,10 @@ public:
     bool setStateXml(XmlElement* stateXml) override;
 
 private:
-    std::unique_ptr<MultiMeterInputComponent>  m_meterBank;
+    std::unique_ptr<MultiMeterInputComponent>   m_meterBank;
     std::unique_ptr<TwoDFieldOutputComponent>   m_surroundField;
+
+    EditorLayout    m_editorLayouting{ EL_Dynamic };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundFieldMixerEditor)
 };

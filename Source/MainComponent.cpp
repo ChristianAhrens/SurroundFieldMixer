@@ -26,7 +26,7 @@ MainComponent::MainComponent()
     : juce::Component()
 {
     m_ssm = std::make_unique<SurroundFieldMixer::SurroundFieldMixer>();
-    m_ssm->m_remoteOnlineCallback = std::bind(static_cast<void(MainComponent::*)(void)>(&MainComponent::repaint), this);
+    m_ssm->onRemoteOnlineCallback = std::bind(static_cast<void(MainComponent::*)(void)>(&MainComponent::repaint), this);
     addAndMakeVisible(m_ssm->getUIComponent());
 
     m_setupToggleButton = std::make_unique<TextButton>("Audio Device Setup");
@@ -49,6 +49,13 @@ MainComponent::MainComponent()
         }
     };
     addAndMakeVisible(m_setupToggleButton.get());
+
+    m_lockLayoutButton = std::make_unique<TextButton>("Lock Layout");
+    m_lockLayoutButton->setClickingTogglesState(true);
+    m_lockLayoutButton->onClick = [this] {
+        m_ssm->lockCurrentLayout(m_lockLayoutButton->getToggleState());
+    };
+    addAndMakeVisible(m_lockLayoutButton.get());
 
     setSize(300, 500);
 }
@@ -102,11 +109,15 @@ void MainComponent::resized()
     safeBounds.removeFromLeft(safety._left);
     safeBounds.removeFromRight(safety._right);
 
-    auto setupAreaBounds = safeBounds.removeFromTop(26);
+    auto margin = 3;
+    auto setupAreaBounds = safeBounds.removeFromTop(26).reduced(9, margin);
     auto contentAreaBounds = safeBounds;
 
     if (m_setupToggleButton)
-        m_setupToggleButton->setBounds(setupAreaBounds.reduced(9, 3).removeFromRight(100).removeFromTop(20));
+        m_setupToggleButton->setBounds(setupAreaBounds.removeFromRight(100).removeFromTop(20));
+    setupAreaBounds.removeFromRight(margin);
+    if (m_lockLayoutButton)
+        m_lockLayoutButton->setBounds(setupAreaBounds.removeFromRight(100).removeFromTop(20));
 
     auto SurroundFieldMixerComponent = m_ssm->getUIComponent();
     if (SurroundFieldMixerComponent)

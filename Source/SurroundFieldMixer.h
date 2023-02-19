@@ -22,13 +22,17 @@
 
 #include "AppConfigurationBase.h"
 
-#include "SurroundFieldMixerEditor/SurroundFieldMixerEditor.h"
-#include "SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
-#include "SurroundFieldMixerRemote/SurroundFieldMixerRemoteWrapper.h"
-
 
 namespace SurroundFieldMixer
 {
+
+/**
+ * Fwd. decls
+ */
+class AudioSelectComponent;
+class SurroundFieldMixerEditor;
+class SurroundFieldMixerProcessor;
+class SurroundFieldMixerRemoteWrapper;
 
 //==============================================================================
 /*
@@ -49,8 +53,12 @@ public:
     std::unique_ptr<XmlElement> createStateXml() override;
     bool setStateXml(XmlElement* stateXml) override;
 
+    //==========================================================================
     bool isControlOnline();
-    std::function<void()>   m_remoteOnlineCallback;
+    std::function<void()>   onRemoteOnlineCallback;
+
+    //==========================================================================
+    void lockCurrentLayout(bool doLock);
 
 private:
     void setControlOnlineState(bool online);

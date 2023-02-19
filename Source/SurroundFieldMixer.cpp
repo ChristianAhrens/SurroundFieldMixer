@@ -18,6 +18,10 @@
 
 #include "SurroundFieldMixer.h"
 
+#include "SurroundFieldMixerEditor/SurroundFieldMixerEditor.h"
+#include "SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
+#include "SurroundFieldMixerRemote/SurroundFieldMixerRemoteWrapper.h"
+
 namespace SurroundFieldMixer
 {
 
@@ -79,13 +83,20 @@ void SurroundFieldMixer::setControlOnlineState(bool online)
 {
     m_SurroundFieldMixerRemoteOnline = online;
 
-    if (m_remoteOnlineCallback)
-        m_remoteOnlineCallback();
+    if (onRemoteOnlineCallback)
+        onRemoteOnlineCallback();
 }
 
 bool SurroundFieldMixer::isControlOnline()
 {
     return m_SurroundFieldMixerRemoteOnline;
+}
+
+void SurroundFieldMixer::lockCurrentLayout(bool doLock)
+{
+    auto surroundFieldMixerProcessorEditor = dynamic_cast<SurroundFieldMixerEditor*>(getUIComponent());
+    if (surroundFieldMixerProcessorEditor)
+        surroundFieldMixerProcessorEditor->lockCurrentLayout(doLock);
 }
 
 

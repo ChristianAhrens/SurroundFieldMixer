@@ -74,7 +74,7 @@ void SurroundFieldMixerEditor::resized()
     auto surroundFieldBounds = bounds;
 
     // horizontal layout
-    if (bounds.getWidth() > bounds.getHeight())
+    if (m_editorLayouting == EL_Horizontal || (m_editorLayouting == EL_Dynamic && bounds.getWidth() > bounds.getHeight()))
     {
         meterBankBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.3f));
         meterBankBounds.reduce(0, 5);
@@ -86,7 +86,7 @@ void SurroundFieldMixerEditor::resized()
         surroundFieldBounds.removeFromRight(5);
     }
     // vertical layout
-    else
+    else if (m_editorLayouting == EL_Vertical || (m_editorLayouting == EL_Dynamic && bounds.getWidth() <= bounds.getHeight()))
     {
         meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.3f));
         meterBankBounds.reduce(5, 0);
@@ -165,6 +165,16 @@ bool SurroundFieldMixerEditor::setStateXml(XmlElement* /*stateXml*/)
     //}
 
     return true;
+}
+
+void SurroundFieldMixerEditor::lockCurrentLayout(bool doLock)
+{
+    if (doLock)
+        m_editorLayouting = (getLocalBounds().getWidth() > getLocalBounds().getHeight()) ? EL_Horizontal : EL_Vertical;
+    else
+        m_editorLayouting = EL_Dynamic;
+
+    resized();
 }
 
 }
