@@ -533,6 +533,10 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	// the lock is currently gloablly taken in audioDeviceIOCallback which is calling this method
 	//const ScopedLock sl(m_readLock);
 
+	auto inputChannels = buffer.getNumChannels();
+	auto outputChannels = s_minOutputsCount;
+
+	jassert(inputChannels == m_inputMuteStates.size());
 	for (auto const& inputMuteStateKV : m_inputMuteStates)
 	{
 		if (inputMuteStateKV.second)
@@ -543,6 +547,7 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 		}
 	}
 
+	jassert(inputChannels == m_inputGainValues.size());
 	for (auto const& inputGainValueKV : m_inputGainValues)
 	{
 		auto& channel = inputGainValueKV.first;
@@ -554,8 +559,6 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	postMessage(new AudioInputBufferMessage(buffer));
 
 	// process data in buffer to be what shall be used as output
-	auto inputChannels = buffer.getNumChannels();
-	auto outputChannels = 5;
 	AudioBuffer<float> processedBuffer;
 	processedBuffer.setSize(outputChannels, buffer.getNumSamples(), false, true, true);
 	for (auto inputIdx = 0; inputIdx < inputChannels; inputIdx++)
@@ -568,6 +571,7 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	}
 	buffer.makeCopyOf(processedBuffer, true);
 
+	jassert(outputChannels == m_outputMuteStates.size());
 	for (auto const& outputMuteStateKV : m_outputMuteStates)
 	{
 		if (outputMuteStateKV.second)
@@ -578,6 +582,7 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 		}
 	}
 
+	jassert(outputChannels == m_outputGainValues.size());
 	for (auto const& outputGainValueKV : m_outputGainValues)
 	{
 		auto& channel = outputGainValueKV.first;
@@ -853,8 +858,15 @@ void SurroundFieldMixerProcessor::audioDeviceAboutToStart(AudioIODevice* device)
 	{
 		prepareToPlay(device->getCurrentSampleRate(), device->getCurrentBufferSizeSamples());
 
-		initializeInputCtrlValues(device->getActiveInputChannels().toInteger());
-		initializeOutputCtrlValues(device->getActiveOutputChannels().toInteger());
+		// the following somehow returns weird incorrect counts, instead the name list count used below seems to be correct...?
+		//auto inputChannels = device->getActiveInputChannels().toInteger();
+		//auto outputChannels = device->getActiveOutputChannels().toInteger();
+
+		auto inputChannelNames = device->getInputChannelNames();
+		auto outputChannelNames = device->getOutputChannelNames();
+
+		initializeInputCtrlValues(inputChannelNames.size());
+		initializeOutputCtrlValues(outputChannelNames.size());
 	}
 }
 
@@ -865,7 +877,9 @@ void SurroundFieldMixerProcessor::audioDeviceStopped()
 
 void SurroundFieldMixerProcessor::initializeInputCtrlValues(int inputCount)
 {
-	for (auto channel = 1; channel <= inputCount; channel++)
+	auto channelCount = (inputCount > s_minInputsCount) ? inputCount : s_minInputsCount;
+
+	for (auto channel = 1; channel <= channelCount; channel++)
 	{
 		setInputMuteState(channel, false);
 		setInputGainValue(channel, 1.0f);
@@ -875,7 +889,9 @@ void SurroundFieldMixerProcessor::initializeInputCtrlValues(int inputCount)
 
 void SurroundFieldMixerProcessor::initializeOutputCtrlValues(int outputCount)
 {
-	for (auto channel = 1; channel <= outputCount; channel++)
+	auto channelCount = (outputCount > s_minOutputsCount) ? outputCount : s_minOutputsCount;
+
+	for (auto channel = 1; channel <= channelCount; channel++)
 	{
 		setOutputMuteState(channel, false);
 		setOutputGainValue(channel, 1.0f);
