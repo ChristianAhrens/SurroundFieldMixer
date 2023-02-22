@@ -41,30 +41,17 @@ void MeterbridgeComponent::paint(Graphics& g)
 	// calculate what we need for our center circle
 	auto margin = 20;
     auto maxMeterWidth = 30;
-	auto visuAreaWidth = getWidth();
-	auto visuAreaHeight = getHeight();
+	auto visuAreaWidth = static_cast<float>(getWidth());
+	auto visuAreaHeight = static_cast<float>(getHeight());
 
     auto visuArea = getLocalBounds();
-	auto visuAreaOrigY = float(visuAreaHeight);
-
-	// draw a simple baseline
-    g.setColour(Colours::grey);
-	g.drawLine(Line<float>(0.0f, visuAreaOrigY, visuAreaWidth, visuAreaOrigY));
-    // draw dBFS
-    g.setFont(12.0f);
-    g.setColour(Colours::grey);
-    String rangeText;
-    if (getUsesValuesInDB())
-        rangeText = String(SurroundFieldMixerProcessor::getGlobalMindB()) + " ... " + String(SurroundFieldMixerProcessor::getGlobalMaxdB()) + " dBFS";
-    else
-        rangeText = "0 ... 1";
-    g.drawText(rangeText, Rectangle<float>(visuAreaWidth - 100.0f, 0.0f, 110.0f, float(margin)), Justification::centred, true);
+	auto visuAreaOrigY = visuAreaHeight;
 
 	// draw meters
     auto meterSpacing = margin * 0.5f;
     auto meterWidth = (visuArea.getWidth() - (m_levelData.GetChannelCount() + 1) * meterSpacing) / m_levelData.GetChannelCount();
     meterWidth = meterWidth > maxMeterWidth ? maxMeterWidth : meterWidth;
-    auto meterMaxHeight = visuArea.getHeight() - 2 * meterSpacing;
+    auto meterMaxHeight = visuArea.getHeight();
     auto meterLeft = meterSpacing;
 
     g.setFont(14.0f);
@@ -102,6 +89,19 @@ void MeterbridgeComponent::paint(Graphics& g)
 
         meterLeft += meterWidth + meterSpacing;
     }
+
+    // draw a simple baseline
+    g.setColour(Colours::grey);
+    g.drawLine(Line<float>(0.0f, visuAreaOrigY, visuAreaWidth, visuAreaOrigY));
+    // draw dBFS
+    g.setFont(12.0f);
+    g.setColour(Colours::grey);
+    String rangeText;
+    if (getUsesValuesInDB())
+        rangeText = String(SurroundFieldMixerProcessor::getGlobalMindB()) + " ... " + String(SurroundFieldMixerProcessor::getGlobalMaxdB()) + " dBFS";
+    else
+        rangeText = "0 ... 1";
+    g.drawText(rangeText, Rectangle<float>(visuAreaWidth - 100.0f, 0.0f, 110.0f, float(margin)), Justification::centred, true);
 }
 
 void MeterbridgeComponent::processingDataChanged(AbstractProcessorData* data)
