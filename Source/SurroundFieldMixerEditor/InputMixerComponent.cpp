@@ -18,6 +18,10 @@
 
 #include "InputMixerComponent.h"
 
+#include "AbstractAudioVisualizer.h"
+#include "MeterbridgeComponent.h"
+#include "PositionEditorComponent.h"
+
 namespace SurroundFieldMixer
 {
 
@@ -26,6 +30,9 @@ InputMixerComponent::InputMixerComponent()
     : AbstractAudioVisualizer()
 {
     setUsesValuesInDB(true);
+
+    m_inputLevels = std::make_unique<MeterbridgeComponent>();
+    addAndMakeVisible(m_inputLevels.get());
 }
 
 InputMixerComponent::~InputMixerComponent()
@@ -41,11 +48,15 @@ void InputMixerComponent::resized()
 
         auto fixedSizeCtrlsBounds = usableBounds.removeFromBottom(55);
         auto resizingCtrlsBounds = usableBounds.removeFromBottom(static_cast<int>(0.5f * usableBounds.getHeight()));
+        auto meterBridgeBounds = usableBounds;
 
         auto maxcontrolElementWidth = 30;
 
         auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
         controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
+
+        if (m_inputLevels)
+            m_inputLevels->setBounds(meterBridgeBounds);
 
         auto positionComponentBounds = fixedSizeCtrlsBounds.removeFromTop(30);
         for (auto i = 0; i < m_inputPositions.size(); i++)
@@ -89,81 +100,6 @@ void InputMixerComponent::paint(Graphics& g)
 
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
-
-    auto controlElementsGap = 60 + static_cast<int>(0.5f * (getHeight() - 60));
-
-	// calculate what we need for our center circle
-	auto width = getWidth();
-	auto height = getHeight();
-	auto outerMargin = 20;
-    auto maxMeterWidth = 30;
-	auto visuAreaWidth = width - 2 * outerMargin;
-	auto visuAreaHeight = height - outerMargin - controlElementsGap;
-
-	auto visuArea = Rectangle<int>(outerMargin, outerMargin, visuAreaWidth, visuAreaHeight);
-
-	// fill our visualization area background
-	g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
-	g.fillRect(visuArea);
-
-	auto visuAreaOrigX = float(outerMargin);
-	auto visuAreaOrigY = float(outerMargin + visuAreaHeight);
-
-	// draw a simple baseline
-    g.setColour(Colours::grey);
-	g.drawLine(Line<float>(visuAreaOrigX, visuAreaOrigY, visuAreaOrigX + visuAreaWidth, visuAreaOrigY));
-    // draw dBFS
-    g.setFont(12.0f);
-    g.setColour(Colours::grey);
-    String rangeText;
-    if (getUsesValuesInDB())
-        rangeText = String(SurroundFieldMixerProcessor::getGlobalMindB()) + " ... " + String(SurroundFieldMixerProcessor::getGlobalMaxdB()) + " dBFS";
-    else
-        rangeText = "0 ... 1";
-    g.drawText(rangeText, Rectangle<float>(visuAreaOrigX + visuAreaWidth - 100.0f, float(outerMargin), 110.0f, float(outerMargin)), Justification::centred, true);
-
-	// draw meters
-    auto meterSpacing = outerMargin * 0.5f;
-    auto meterWidth = (visuArea.getWidth() - (m_levelData.GetChannelCount() + 1) * meterSpacing) / m_levelData.GetChannelCount();
-    meterWidth = meterWidth > maxMeterWidth ? maxMeterWidth : meterWidth;
-    auto meterMaxHeight = visuArea.getHeight() - 2 * meterSpacing;
-    auto meterLeft = visuAreaOrigX + meterSpacing;
-
-    g.setFont(14.0f);
-    for(unsigned long i=1; i<=m_levelData.GetChannelCount(); ++i)
-    {
-        auto level = m_levelData.GetLevel(i);
-        float peakMeterHeight {0};
-        float rmsMeterHeight  {0};
-        float holdMeterHeight {0};
-        if (getUsesValuesInDB())
-        {
-            peakMeterHeight = meterMaxHeight * level.GetFactorPEAKdB();
-            rmsMeterHeight = meterMaxHeight * level.GetFactorRMSdB();
-            holdMeterHeight = meterMaxHeight * level.GetFactorHOLDdB();
-        }
-        else
-        {
-            peakMeterHeight = meterMaxHeight * level.peak;
-            rmsMeterHeight = meterMaxHeight * level.rms;
-            holdMeterHeight = meterMaxHeight * level.hold;
-        }
-
-        // peak bar
-        g.setColour(Colours::forestgreen.darker());
-        g.fillRect(Rectangle<float>(meterLeft, visuAreaOrigY - peakMeterHeight, meterWidth, peakMeterHeight));
-        // rms bar
-        g.setColour(Colours::forestgreen);
-        g.fillRect(Rectangle<float>(meterLeft, visuAreaOrigY - rmsMeterHeight, meterWidth, rmsMeterHeight));
-        // hold strip
-        g.setColour(Colours::grey);
-        g.drawLine(Line<float>(meterLeft, visuAreaOrigY - holdMeterHeight, meterLeft + meterWidth, visuAreaOrigY - holdMeterHeight));
-        // channel # label
-		g.setColour(Colours::white);
-        g.drawText(String(i), Rectangle<float>(meterLeft, visuAreaOrigY + controlElementsGap, meterWidth, float(outerMargin)), Justification::centred, true);
-
-        meterLeft += meterWidth + meterSpacing;
-    }
 }
 
 void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
@@ -216,11 +152,14 @@ void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)
         return;
+
+    if (m_inputLevels)
+        m_inputLevels->processingDataChanged(data);
     
     switch(data->GetDataType())
     {
         case AbstractProcessorData::Level:
-            m_levelData = *(static_cast<ProcessorLevelData*>(data));
+            m_levelData = *(dynamic_cast<ProcessorLevelData*>(data));
             notifyChanges();
             break;
         case AbstractProcessorData::AudioSignal:

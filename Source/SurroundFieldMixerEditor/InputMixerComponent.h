@@ -21,13 +21,17 @@
 #include <JuceHeader.h>
 
 #include "AbstractAudioVisualizer.h"
-
 #include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
 
-#include "PositionEditorComponent.h"
 
 namespace SurroundFieldMixer
 {
+
+/**
+ * fwd. decls.
+ */
+class PositionEditorComponent;
+class MeterbridgeComponent;
 
 //==============================================================================
 /*
@@ -58,6 +62,7 @@ public:
 
 private:
     ProcessorLevelData                                      m_levelData;
+    std::unique_ptr<MeterbridgeComponent>                   m_inputLevels;
     std::vector<std::unique_ptr<juce::Slider>>              m_inputGains;
     std::vector<std::unique_ptr<TextButton>>                m_inputMutes;
     std::vector<std::unique_ptr<PositionEditorComponent>>   m_inputPositions;

@@ -292,6 +292,10 @@
               file="Source/SurroundFieldMixerEditor/InputMixerComponent.cpp"/>
         <FILE id="UVegTH" name="InputMixerComponent.h" compile="0" resource="0"
               file="Source/SurroundFieldMixerEditor/InputMixerComponent.h"/>
+        <FILE id="eafkqa" name="MeterbridgeComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/MeterbridgeComponent.cpp"/>
+        <FILE id="xHSRjo" name="MeterbridgeComponent.h" compile="0" resource="0"
+              file="Source/SurroundFieldMixerEditor/MeterbridgeComponent.h"/>
         <FILE id="YorTha" name="PositionEditorComponent.cpp" compile="1" resource="0"
               file="Source/SurroundFieldMixerEditor/PositionEditorComponent.cpp"/>
         <FILE id="OIO2EI" name="PositionEditorComponent.h" compile="0" resource="0"
