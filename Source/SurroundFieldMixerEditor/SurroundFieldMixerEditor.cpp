@@ -20,7 +20,7 @@
 
 #include <JuceHeader.h>
 
-#include "../SurroundFieldMixerEditor/MultiMeterInputComponent.h"
+#include "../SurroundFieldMixerEditor/InputMixerComponent.h"
 #include "../SurroundFieldMixerEditor/TwoDFieldOutputComponent.h"
 
 
@@ -31,7 +31,7 @@ namespace SurroundFieldMixer
 SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor& processor)
     : AudioProcessorEditor(processor)
 {
-    m_meterBank = std::make_unique<MultiMeterInputComponent>();
+    m_meterBank = std::make_unique<InputMixerComponent>();
     addAndMakeVisible(m_meterBank.get());
 
     m_surroundField = std::make_unique<TwoDFieldOutputComponent>();

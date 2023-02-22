@@ -1,4 +1,4 @@
-/* Copyright (c) 2022, Christian Ahrens
+/* Copyright (c) 2022 - 2023, Christian Ahrens
  *
  * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
@@ -32,12 +32,12 @@ namespace SurroundFieldMixer
 //==============================================================================
 /*
 */
-class MultiMeterInputComponent :    public AbstractAudioVisualizer, 
-                                    public SurroundFieldMixerProcessor::InputCommander
+class InputMixerComponent : public AbstractAudioVisualizer, 
+                            public SurroundFieldMixerProcessor::InputCommander
 {
 public:
-    MultiMeterInputComponent();
-    ~MultiMeterInputComponent();
+    InputMixerComponent();
+    ~InputMixerComponent();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -62,7 +62,7 @@ private:
     std::vector<std::unique_ptr<TextButton>>                m_inputMutes;
     std::vector<std::unique_ptr<PositionEditorComponent>>   m_inputPositions;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiMeterInputComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputMixerComponent)
 };
 
 }

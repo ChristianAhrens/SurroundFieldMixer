@@ -1,4 +1,4 @@
-/* Copyright (c) 2022, Christian Ahrens
+/* Copyright (c) 2022 - 2023, Christian Ahrens
  *
  * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
@@ -16,24 +16,24 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "MultiMeterInputComponent.h"
+#include "InputMixerComponent.h"
 
 namespace SurroundFieldMixer
 {
 
 //==============================================================================
-MultiMeterInputComponent::MultiMeterInputComponent()
+InputMixerComponent::InputMixerComponent()
     : AbstractAudioVisualizer()
 {
     setUsesValuesInDB(true);
 }
 
-MultiMeterInputComponent::~MultiMeterInputComponent()
+InputMixerComponent::~InputMixerComponent()
 {
 
 }
 
-void MultiMeterInputComponent::resized()
+void InputMixerComponent::resized()
 {
     if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputGains.size() && m_inputMutes.size() == m_inputPositions.size())
     {
@@ -83,7 +83,7 @@ void MultiMeterInputComponent::resized()
     AbstractAudioVisualizer::resized();
 }
 
-void MultiMeterInputComponent::paint(Graphics& g)
+void InputMixerComponent::paint(Graphics& g)
 {
     AbstractAudioVisualizer::paint(g);
 
@@ -166,7 +166,7 @@ void MultiMeterInputComponent::paint(Graphics& g)
     }
 }
 
-void MultiMeterInputComponent::setInputMute(unsigned int channel, bool muteState)
+void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
 {
     if (channel > m_inputMutes.size())
         return;
@@ -176,7 +176,7 @@ void MultiMeterInputComponent::setInputMute(unsigned int channel, bool muteState
         muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
-void MultiMeterInputComponent::setInputGain(unsigned int channel, float gainValue)
+void InputMixerComponent::setInputGain(unsigned int channel, float gainValue)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -186,7 +186,7 @@ void MultiMeterInputComponent::setInputGain(unsigned int channel, float gainValu
         gainSliderIter->get()->setValue(gainValue, juce::dontSendNotification);
 }
 
-void MultiMeterInputComponent::setPosition(unsigned int channel, juce::Point<float> position)
+void InputMixerComponent::setPosition(unsigned int channel, juce::Point<float> position)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -196,7 +196,7 @@ void MultiMeterInputComponent::setPosition(unsigned int channel, juce::Point<flo
         positionComponentIter->get()->setCurrentPosition(position);
 }
 
-void MultiMeterInputComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
+void InputMixerComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -204,7 +204,7 @@ void MultiMeterInputComponent::setSpreadFactor(unsigned int channel, float sprea
     ignoreUnused(spreadFactor);
 }
 
-void MultiMeterInputComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
+void InputMixerComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -212,7 +212,7 @@ void MultiMeterInputComponent::setReverbSendGain(unsigned int channel, float rev
     ignoreUnused(reverbSendGain);
 }
 
-void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data)
+void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)
         return;
@@ -231,7 +231,7 @@ void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data
     }
 }
 
-void MultiMeterInputComponent::processChanges()
+void InputMixerComponent::processChanges()
 {
     auto resizeRequired = false;
 
