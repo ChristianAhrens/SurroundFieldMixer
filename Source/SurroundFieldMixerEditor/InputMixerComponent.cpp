@@ -44,19 +44,23 @@ void InputMixerComponent::resized()
 {
     if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputGains.size() && m_inputMutes.size() == m_inputPositions.size())
     {
-        auto usableBounds = getLocalBounds().reduced(20);
-
-        auto fixedSizeCtrlsBounds = usableBounds.removeFromBottom(55);
-        auto resizingCtrlsBounds = usableBounds.removeFromBottom(static_cast<int>(0.5f * usableBounds.getHeight()));
-        auto meterBridgeBounds = usableBounds;
+        auto usableBounds = getLocalBounds().reduced(15);
 
         auto maxcontrolElementWidth = 30;
+        auto fixedSizeCtrlsHeight = 60;
+        auto dynamicSizeCtrlsHeight = usableBounds.getHeight() - fixedSizeCtrlsHeight;
+
+        auto meterBridgeBounds = usableBounds.removeFromTop(static_cast<int>(0.4f * dynamicSizeCtrlsHeight));
+        auto fixedSizeCtrlsBounds = usableBounds.removeFromTop(fixedSizeCtrlsHeight);
+        auto gainCtrlBounds = usableBounds;
 
         auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
         controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
 
         if (m_inputLevels)
             m_inputLevels->setBounds(meterBridgeBounds);
+
+        fixedSizeCtrlsBounds.removeFromTop(5);
 
         auto positionComponentBounds = fixedSizeCtrlsBounds.removeFromTop(30);
         for (auto i = 0; i < m_inputPositions.size(); i++)
@@ -80,7 +84,7 @@ void InputMixerComponent::resized()
             muteButton->setBounds(muteButtonBounds.removeFromLeft(controlElementWidth));
         }
 
-        auto gainSliderBounds = resizingCtrlsBounds;
+        auto gainSliderBounds = gainCtrlBounds;
         for (auto i = 0; i < m_inputGains.size(); i++)
         {
             auto const& gainSlider = m_inputGains.at(i);
