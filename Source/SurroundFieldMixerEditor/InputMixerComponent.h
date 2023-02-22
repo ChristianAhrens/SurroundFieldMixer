@@ -1,4 +1,4 @@
-/* Copyright (c) 2022, Christian Ahrens
+/* Copyright (c) 2022 - 2023, Christian Ahrens
  *
  * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
@@ -21,23 +21,27 @@
 #include <JuceHeader.h>
 
 #include "AbstractAudioVisualizer.h"
-
 #include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
 
-#include "PositionEditorComponent.h"
 
 namespace SurroundFieldMixer
 {
 
+/**
+ * fwd. decls.
+ */
+class PositionEditorComponent;
+class MeterbridgeComponent;
+
 //==============================================================================
 /*
 */
-class MultiMeterInputComponent :    public AbstractAudioVisualizer, 
-                                    public SurroundFieldMixerProcessor::InputCommander
+class InputMixerComponent : public AbstractAudioVisualizer, 
+                            public SurroundFieldMixerProcessor::InputCommander
 {
 public:
-    MultiMeterInputComponent();
-    ~MultiMeterInputComponent();
+    InputMixerComponent();
+    ~InputMixerComponent();
 
     //==============================================================================
     void paint (Graphics&) override;
@@ -51,16 +55,19 @@ public:
 
     //==============================================================================
     void setInputMute(unsigned int channel, bool muteState) override;
+    void setInputGain(unsigned int channel, float gainValue) override;
     void setPosition(unsigned int channel, juce::Point<float> position) override;
     void setSpreadFactor(unsigned int channel, float spreadFactor) override;
     void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
 
 private:
     ProcessorLevelData                                      m_levelData;
+    std::unique_ptr<MeterbridgeComponent>                   m_inputLevels;
+    std::vector<std::unique_ptr<juce::Slider>>              m_inputGains;
     std::vector<std::unique_ptr<TextButton>>                m_inputMutes;
     std::vector<std::unique_ptr<PositionEditorComponent>>   m_inputPositions;
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiMeterInputComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputMixerComponent)
 };
 
 }

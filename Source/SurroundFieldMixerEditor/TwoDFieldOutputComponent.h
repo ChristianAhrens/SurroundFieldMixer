@@ -45,6 +45,7 @@ public:
 
     //==============================================================================
     void setOutputMute(unsigned int channel, bool muteState) override;
+    void setOutputGain(unsigned int channel, float gainValue) override;
     void setOutputScheme(unsigned int dummyschemetobechanged) override;
 
 private:

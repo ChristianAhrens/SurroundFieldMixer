@@ -1,4 +1,4 @@
-/* Copyright (c) 2022, Christian Ahrens
+/* Copyright (c) 2022 - 2023, Christian Ahrens
  *
  * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
@@ -16,141 +16,97 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-#include "MultiMeterInputComponent.h"
+#include "InputMixerComponent.h"
+
+#include "AbstractAudioVisualizer.h"
+#include "MeterbridgeComponent.h"
+#include "PositionEditorComponent.h"
 
 namespace SurroundFieldMixer
 {
 
 //==============================================================================
-MultiMeterInputComponent::MultiMeterInputComponent()
+InputMixerComponent::InputMixerComponent()
     : AbstractAudioVisualizer()
 {
     setUsesValuesInDB(true);
+
+    m_inputLevels = std::make_unique<MeterbridgeComponent>();
+    addAndMakeVisible(m_inputLevels.get());
 }
 
-MultiMeterInputComponent::~MultiMeterInputComponent()
+InputMixerComponent::~InputMixerComponent()
 {
 
 }
 
-void MultiMeterInputComponent::resized()
+void InputMixerComponent::resized()
 {
-    if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputPositions.size())
+    if (!m_inputMutes.empty() && m_inputMutes.size() == m_inputGains.size() && m_inputMutes.size() == m_inputPositions.size())
     {
-        auto controlElementsBounds = getLocalBounds().reduced(20).removeFromBottom(55);
-        auto maxcontrolElementWidth = 30;
+        auto usableBounds = getLocalBounds().reduced(15);
 
-        auto controlElementWidth = controlElementsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
+        auto maxcontrolElementWidth = 30;
+        auto fixedSizeCtrlsHeight = 60;
+        auto dynamicSizeCtrlsHeight = usableBounds.getHeight() - fixedSizeCtrlsHeight;
+
+        auto meterBridgeBounds = usableBounds.removeFromTop(static_cast<int>(0.4f * dynamicSizeCtrlsHeight));
+        auto fixedSizeCtrlsBounds = usableBounds.removeFromTop(fixedSizeCtrlsHeight);
+        auto gainCtrlBounds = usableBounds;
+
+        auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputMutes.size());
         controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
 
-        auto positionComponentBounds = controlElementsBounds.removeFromTop(30);
+        if (m_inputLevels)
+            m_inputLevels->setBounds(meterBridgeBounds);
+
+        fixedSizeCtrlsBounds.removeFromTop(5);
+
+        auto positionComponentBounds = fixedSizeCtrlsBounds.removeFromTop(30);
         for (auto i = 0; i < m_inputPositions.size(); i++)
         {
             auto const& positionComponent = m_inputPositions.at(i);
-
+            if (!positionComponent)
+                continue;
             positionComponentBounds.removeFromLeft(10);
             positionComponent->setBounds(positionComponentBounds.removeFromLeft(controlElementWidth));
         }
 
-        controlElementsBounds.removeFromTop(5);
+        fixedSizeCtrlsBounds.removeFromTop(5);
 
-        auto muteButtonBounds = controlElementsBounds.removeFromTop(20);
+        auto muteButtonBounds = fixedSizeCtrlsBounds.removeFromTop(20);
         for (auto i = 0; i < m_inputMutes.size(); i++)
         {
             auto const& muteButton = m_inputMutes.at(i);
-
+            if (!muteButton)
+                continue;
             muteButtonBounds.removeFromLeft(10);
             muteButton->setBounds(muteButtonBounds.removeFromLeft(controlElementWidth));
+        }
+
+        auto gainSliderBounds = gainCtrlBounds;
+        for (auto i = 0; i < m_inputGains.size(); i++)
+        {
+            auto const& gainSlider = m_inputGains.at(i);
+            if (!gainSlider)
+                continue;
+            gainSliderBounds.removeFromLeft(10);
+            gainSlider->setBounds(gainSliderBounds.removeFromLeft(controlElementWidth));
         }
     }
 
     AbstractAudioVisualizer::resized();
 }
 
-void MultiMeterInputComponent::paint(Graphics& g)
+void InputMixerComponent::paint(Graphics& g)
 {
     AbstractAudioVisualizer::paint(g);
 
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
-
-    auto controlElementsGap = 60;
-
-	// calculate what we need for our center circle
-	auto width = getWidth();
-	auto height = getHeight();
-	auto outerMargin = 20;
-    auto maxMeterWidth = 30;
-	auto visuAreaWidth = width - 2 * outerMargin;
-	auto visuAreaHeight = height - 2 * outerMargin - controlElementsGap;
-
-	auto visuArea = Rectangle<int>(outerMargin, outerMargin, visuAreaWidth, visuAreaHeight);
-
-	// fill our visualization area background
-	g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId).darker());
-	g.fillRect(visuArea);
-
-	auto visuAreaOrigX = float(outerMargin);
-	auto visuAreaOrigY = float(outerMargin + visuAreaHeight);
-
-	// draw a simple baseline
-    g.setColour(Colours::grey);
-	g.drawLine(Line<float>(visuAreaOrigX, visuAreaOrigY, visuAreaOrigX + visuAreaWidth, visuAreaOrigY));
-    // draw dBFS
-    g.setFont(12.0f);
-    g.setColour(Colours::grey);
-    String rangeText;
-    if (getUsesValuesInDB())
-        rangeText = String(SurroundFieldMixerProcessor::getGlobalMindB()) + " ... " + String(SurroundFieldMixerProcessor::getGlobalMaxdB()) + " dBFS";
-    else
-        rangeText = "0 ... 1";
-    g.drawText(rangeText, Rectangle<float>(visuAreaOrigX + visuAreaWidth - 100.0f, float(outerMargin), 110.0f, float(outerMargin)), Justification::centred, true);
-
-	// draw meters
-    auto meterSpacing = outerMargin * 0.5f;
-    auto meterWidth = (visuArea.getWidth() - (m_levelData.GetChannelCount() + 1) * meterSpacing) / m_levelData.GetChannelCount();
-    meterWidth = meterWidth > maxMeterWidth ? maxMeterWidth : meterWidth;
-    auto meterMaxHeight = visuArea.getHeight() - 2 * meterSpacing;
-    auto meterLeft = visuAreaOrigX + meterSpacing;
-
-    g.setFont(14.0f);
-    for(unsigned long i=1; i<=m_levelData.GetChannelCount(); ++i)
-    {
-        auto level = m_levelData.GetLevel(i);
-        float peakMeterHeight {0};
-        float rmsMeterHeight  {0};
-        float holdMeterHeight {0};
-        if (getUsesValuesInDB())
-        {
-            peakMeterHeight = meterMaxHeight * level.GetFactorPEAKdB();
-            rmsMeterHeight = meterMaxHeight * level.GetFactorRMSdB();
-            holdMeterHeight = meterMaxHeight * level.GetFactorHOLDdB();
-        }
-        else
-        {
-            peakMeterHeight = meterMaxHeight * level.peak;
-            rmsMeterHeight = meterMaxHeight * level.rms;
-            holdMeterHeight = meterMaxHeight * level.hold;
-        }
-
-        // peak bar
-        g.setColour(Colours::forestgreen.darker());
-        g.fillRect(Rectangle<float>(meterLeft, visuAreaOrigY - peakMeterHeight, meterWidth, peakMeterHeight));
-        // rms bar
-        g.setColour(Colours::forestgreen);
-        g.fillRect(Rectangle<float>(meterLeft, visuAreaOrigY - rmsMeterHeight, meterWidth, rmsMeterHeight));
-        // hold strip
-        g.setColour(Colours::grey);
-        g.drawLine(Line<float>(meterLeft, visuAreaOrigY - holdMeterHeight, meterLeft + meterWidth, visuAreaOrigY - holdMeterHeight));
-        // channel # label
-		g.setColour(Colours::white);
-        g.drawText(String(i), Rectangle<float>(meterLeft, visuAreaOrigY + controlElementsGap, meterWidth, float(outerMargin)), Justification::centred, true);
-
-        meterLeft += meterWidth + meterSpacing;
-    }
 }
 
-void MultiMeterInputComponent::setInputMute(unsigned int channel, bool muteState)
+void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
 {
     if (channel > m_inputMutes.size())
         return;
@@ -160,7 +116,17 @@ void MultiMeterInputComponent::setInputMute(unsigned int channel, bool muteState
         muteButtonIter->get()->setToggleState(muteState, juce::dontSendNotification);
 }
 
-void MultiMeterInputComponent::setPosition(unsigned int channel, juce::Point<float> position)
+void InputMixerComponent::setInputGain(unsigned int channel, float gainValue)
+{
+    if (channel > m_inputPositions.size())
+        return;
+
+    auto gainSliderIter = m_inputGains.begin() + channel - 1;
+    if (gainSliderIter != m_inputGains.end() && gainSliderIter->get())
+        gainSliderIter->get()->setValue(gainValue, juce::dontSendNotification);
+}
+
+void InputMixerComponent::setPosition(unsigned int channel, juce::Point<float> position)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -170,7 +136,7 @@ void MultiMeterInputComponent::setPosition(unsigned int channel, juce::Point<flo
         positionComponentIter->get()->setCurrentPosition(position);
 }
 
-void MultiMeterInputComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
+void InputMixerComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -178,7 +144,7 @@ void MultiMeterInputComponent::setSpreadFactor(unsigned int channel, float sprea
     ignoreUnused(spreadFactor);
 }
 
-void MultiMeterInputComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
+void InputMixerComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
 {
     if (channel > m_inputPositions.size())
         return;
@@ -186,15 +152,18 @@ void MultiMeterInputComponent::setReverbSendGain(unsigned int channel, float rev
     ignoreUnused(reverbSendGain);
 }
 
-void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data)
+void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
 {
     if(!data)
         return;
+
+    if (m_inputLevels)
+        m_inputLevels->processingDataChanged(data);
     
     switch(data->GetDataType())
     {
         case AbstractProcessorData::Level:
-            m_levelData = *(static_cast<ProcessorLevelData*>(data));
+            m_levelData = *(dynamic_cast<ProcessorLevelData*>(data));
             notifyChanges();
             break;
         case AbstractProcessorData::AudioSignal:
@@ -205,8 +174,10 @@ void MultiMeterInputComponent::processingDataChanged(AbstractProcessorData *data
     }
 }
 
-void MultiMeterInputComponent::processChanges()
+void InputMixerComponent::processChanges()
 {
+    auto resizeRequired = false;
+
     if (m_inputMutes.size() != m_levelData.GetChannelCount())
     {
         if (m_inputMutes.size() < m_levelData.GetChannelCount())
@@ -240,7 +211,44 @@ void MultiMeterInputComponent::processChanges()
             }
         }
 
-        resized();
+        resizeRequired = true;
+    }
+
+    if (m_inputGains.size() != m_levelData.GetChannelCount())
+    {
+        if (m_inputGains.size() < m_levelData.GetChannelCount())
+        {
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputGains.size();
+            for (; missingCnt > 0; missingCnt--)
+            {
+                m_inputGains.push_back(std::make_unique<Slider>("M"));
+                auto gainSlider = m_inputGains.back().get();
+                gainSlider->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+                gainSlider->setRange(0.0, 1.0);
+                gainSlider->setValue(1.0, dontSendNotification);
+                gainSlider->onValueChange = [gainSlider, this] {
+                    auto foundGainSliderIter = std::find_if(m_inputGains.begin(), m_inputGains.end(), [gainSlider](std::unique_ptr<Slider>& b) { return b.get() == gainSlider; });
+                    if (foundGainSliderIter == m_inputGains.end())
+                        return;
+                    auto channelIdx = foundGainSliderIter - m_inputGains.begin();
+                    auto channel = static_cast<int>(channelIdx + 1);
+                    auto gainValue = static_cast<float>(gainSlider->getValue());
+                    inputGainChange(channel, gainValue);
+                };
+                addAndMakeVisible(*m_inputGains.back());
+            }
+        }
+        else if (m_inputGains.size() > m_levelData.GetChannelCount())
+        {
+            auto overheadCnt = m_inputGains.size() - m_levelData.GetChannelCount();
+            for (; overheadCnt; overheadCnt--)
+            {
+                removeChildComponent(m_inputGains.back().get());
+                m_inputGains.erase(m_inputGains.end());
+            }
+        }
+
+        resizeRequired = true;
     }
 
     if (m_inputPositions.size() != m_levelData.GetChannelCount())
@@ -274,8 +282,11 @@ void MultiMeterInputComponent::processChanges()
             }
         }
 
-        resized();
+        resizeRequired = true;
     }
+
+    if (resizeRequired)
+        resized();
 
     AbstractAudioVisualizer::processChanges();
 }

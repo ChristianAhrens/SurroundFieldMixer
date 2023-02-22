@@ -288,10 +288,14 @@
               file="Source/SurroundFieldMixerEditor/AudioSelectComponent.cpp"/>
         <FILE id="EJ7QTb" name="AudioSelectComponent.h" compile="0" resource="0"
               file="Source/SurroundFieldMixerEditor/AudioSelectComponent.h"/>
-        <FILE id="E2lQVU" name="MultiMeterInputComponent.cpp" compile="1" resource="0"
-              file="Source/SurroundFieldMixerEditor/MultiMeterInputComponent.cpp"/>
-        <FILE id="RI7BTa" name="MultiMeterInputComponent.h" compile="0" resource="0"
-              file="Source/SurroundFieldMixerEditor/MultiMeterInputComponent.h"/>
+        <FILE id="JZJM7p" name="InputMixerComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/InputMixerComponent.cpp"/>
+        <FILE id="UVegTH" name="InputMixerComponent.h" compile="0" resource="0"
+              file="Source/SurroundFieldMixerEditor/InputMixerComponent.h"/>
+        <FILE id="eafkqa" name="MeterbridgeComponent.cpp" compile="1" resource="0"
+              file="Source/SurroundFieldMixerEditor/MeterbridgeComponent.cpp"/>
+        <FILE id="xHSRjo" name="MeterbridgeComponent.h" compile="0" resource="0"
+              file="Source/SurroundFieldMixerEditor/MeterbridgeComponent.h"/>
         <FILE id="YorTha" name="PositionEditorComponent.cpp" compile="1" resource="0"
               file="Source/SurroundFieldMixerEditor/PositionEditorComponent.cpp"/>
         <FILE id="OIO2EI" name="PositionEditorComponent.h" compile="0" resource="0"

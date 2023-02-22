@@ -75,6 +75,7 @@ std::unique_ptr<XmlElement> SurroundFieldMixer::createStateXml()
 
 bool SurroundFieldMixer::setStateXml(XmlElement* stateXml)
 {
+    ignoreUnused(stateXml);
     jassertfalse;
     return false;
 }
