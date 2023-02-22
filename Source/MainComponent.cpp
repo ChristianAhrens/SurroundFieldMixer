@@ -57,7 +57,7 @@ MainComponent::MainComponent()
     };
     addAndMakeVisible(m_lockLayoutButton.get());
 
-    setSize(300, 500);
+    setSize(900, 600);
 }
 
 MainComponent::~MainComponent()
