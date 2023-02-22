@@ -47,7 +47,7 @@ void InputMixerComponent::resized()
         auto usableBounds = getLocalBounds().reduced(15);
 
         auto maxcontrolElementWidth = 30;
-        auto fixedSizeCtrlsHeight = 60;
+        auto fixedSizeCtrlsHeight = 130;
         auto dynamicSizeCtrlsHeight = usableBounds.getHeight() - fixedSizeCtrlsHeight;
 
         auto meterBridgeBounds = usableBounds.removeFromTop(static_cast<int>(0.4f * dynamicSizeCtrlsHeight));
@@ -62,36 +62,64 @@ void InputMixerComponent::resized()
 
         fixedSizeCtrlsBounds.removeFromTop(5);
 
-        auto positionComponentBounds = fixedSizeCtrlsBounds.removeFromTop(30);
+        auto reverbGainSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth);
+        for (auto i = 0; i < m_inputReverbGains.size(); i++)
+        {
+            auto const& reverbGainSlider = m_inputReverbGains.at(i);
+            if (!reverbGainSlider)
+                continue;
+            reverbGainSlidersBounds.removeFromLeft(10);
+            auto reverbGainSliderBounds = reverbGainSlidersBounds.removeFromLeft(controlElementWidth);
+            reverbGainSliderBounds.expand(7, 7); // weird enough, this is neccessary to make the rotary fit the given bounds nicely...
+            reverbGainSlider->setBounds(reverbGainSliderBounds);
+        }
+
+        fixedSizeCtrlsBounds.removeFromTop(5);
+
+        auto spreadSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth);
+        for (auto i = 0; i < m_inputSpreads.size(); i++)
+        {
+            auto const& spreadSlider = m_inputSpreads.at(i);
+            if (!spreadSlider)
+                continue;
+            spreadSlidersBounds.removeFromLeft(10);
+            auto spreadSliderBounds = spreadSlidersBounds.removeFromLeft(controlElementWidth);
+            spreadSliderBounds.expand(7, 7); // weird enough, this is neccessary to make the rotary fit the given bounds nicely...
+            spreadSlider->setBounds(spreadSliderBounds);
+        }
+
+        fixedSizeCtrlsBounds.removeFromTop(5);
+
+        auto positionComponentsBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth);
         for (auto i = 0; i < m_inputPositions.size(); i++)
         {
             auto const& positionComponent = m_inputPositions.at(i);
             if (!positionComponent)
                 continue;
-            positionComponentBounds.removeFromLeft(10);
-            positionComponent->setBounds(positionComponentBounds.removeFromLeft(controlElementWidth));
+            positionComponentsBounds.removeFromLeft(10);
+            positionComponent->setBounds(positionComponentsBounds.removeFromLeft(controlElementWidth));
         }
 
         fixedSizeCtrlsBounds.removeFromTop(5);
 
-        auto muteButtonBounds = fixedSizeCtrlsBounds.removeFromTop(20);
+        auto muteButtonsBounds = fixedSizeCtrlsBounds.removeFromTop(20);
         for (auto i = 0; i < m_inputMutes.size(); i++)
         {
             auto const& muteButton = m_inputMutes.at(i);
             if (!muteButton)
                 continue;
-            muteButtonBounds.removeFromLeft(10);
-            muteButton->setBounds(muteButtonBounds.removeFromLeft(controlElementWidth));
+            muteButtonsBounds.removeFromLeft(10);
+            muteButton->setBounds(muteButtonsBounds.removeFromLeft(controlElementWidth));
         }
 
-        auto gainSliderBounds = gainCtrlBounds;
+        auto gainSlidersBounds = gainCtrlBounds;
         for (auto i = 0; i < m_inputGains.size(); i++)
         {
             auto const& gainSlider = m_inputGains.at(i);
             if (!gainSlider)
                 continue;
-            gainSliderBounds.removeFromLeft(10);
-            gainSlider->setBounds(gainSliderBounds.removeFromLeft(controlElementWidth));
+            gainSlidersBounds.removeFromLeft(10);
+            gainSlider->setBounds(gainSlidersBounds.removeFromLeft(controlElementWidth));
         }
     }
 
@@ -100,10 +128,54 @@ void InputMixerComponent::resized()
 
 void InputMixerComponent::paint(Graphics& g)
 {
-    AbstractAudioVisualizer::paint(g);
-
 	// (Our component is opaque, so we must completely fill the background with a solid colour)
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+
+    // Paint whatever the base class does ontop of the solid fill
+    AbstractAudioVisualizer::paint(g);
+
+    // and draw text indication on spread/reverb sliders
+    if (m_inputReverbGains.empty())
+        return;
+
+    g.setColour(getLookAndFeel().findColour(TextButton::textColourOnId));
+    g.setFont(11);
+
+    auto usableBounds = getLocalBounds().reduced(15);
+
+    auto maxcontrolElementWidth = 30;
+    auto fixedSizeCtrlsHeight = 130;
+    auto dynamicSizeCtrlsHeight = usableBounds.getHeight() - fixedSizeCtrlsHeight;
+
+    auto meterBridgeBounds = usableBounds.removeFromTop(static_cast<int>(0.4f * dynamicSizeCtrlsHeight));
+    auto fixedSizeCtrlsBounds = usableBounds.removeFromTop(fixedSizeCtrlsHeight);
+    auto gainCtrlBounds = usableBounds;
+
+    auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputReverbGains.size());
+    controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
+
+    fixedSizeCtrlsBounds.removeFromTop(5);
+
+    auto reverbGainSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth - 1);
+    for (auto i = 0; i < m_inputReverbGains.size(); i++)
+    {
+        reverbGainSlidersBounds.removeFromLeft(10);
+        auto reverbGainSliderBounds = reverbGainSlidersBounds.removeFromLeft(controlElementWidth);
+        g.drawText("rv", reverbGainSliderBounds, juce::Justification::centred);
+    }
+
+    fixedSizeCtrlsBounds.removeFromTop(5);
+
+    auto spreadSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth);
+    for (auto i = 0; i < m_inputSpreads.size(); i++)
+    {
+        auto const& spreadSlider = m_inputSpreads.at(i);
+        if (!spreadSlider)
+            continue;
+        spreadSlidersBounds.removeFromLeft(10);
+        auto spreadSliderBounds = spreadSlidersBounds.removeFromLeft(controlElementWidth);
+        g.drawText("s", spreadSliderBounds, juce::Justification::centred);
+    }
 }
 
 void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
@@ -118,7 +190,7 @@ void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
 
 void InputMixerComponent::setInputGain(unsigned int channel, float gainValue)
 {
-    if (channel > m_inputPositions.size())
+    if (channel > m_inputGains.size())
         return;
 
     auto gainSliderIter = m_inputGains.begin() + channel - 1;
@@ -138,18 +210,22 @@ void InputMixerComponent::setPosition(unsigned int channel, juce::Point<float> p
 
 void InputMixerComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
 {
-    if (channel > m_inputPositions.size())
+    if (channel > m_inputSpreads.size())
         return;
 
-    ignoreUnused(spreadFactor);
+    auto spreadSliderIter = m_inputSpreads.begin() + channel - 1;
+    if (spreadSliderIter != m_inputSpreads.end() && spreadSliderIter->get())
+        spreadSliderIter->get()->setValue(spreadFactor, juce::dontSendNotification);
 }
 
 void InputMixerComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
 {
-    if (channel > m_inputPositions.size())
+    if (channel > m_inputReverbGains.size())
         return;
 
-    ignoreUnused(reverbSendGain);
+    auto reverbGainSliderIter = m_inputReverbGains.begin() + channel - 1;
+    if (reverbGainSliderIter != m_inputReverbGains.end() && reverbGainSliderIter->get())
+        reverbGainSliderIter->get()->setValue(reverbSendGain, juce::dontSendNotification);
 }
 
 void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
@@ -214,37 +290,76 @@ void InputMixerComponent::processChanges()
         resizeRequired = true;
     }
 
-    if (m_inputGains.size() != m_levelData.GetChannelCount())
+    if (m_inputReverbGains.size() != m_levelData.GetChannelCount())
     {
-        if (m_inputGains.size() < m_levelData.GetChannelCount())
+        if (m_inputReverbGains.size() < m_levelData.GetChannelCount())
         {
-            auto missingCnt = m_levelData.GetChannelCount() - m_inputGains.size();
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputReverbGains.size();
             for (; missingCnt > 0; missingCnt--)
             {
-                m_inputGains.push_back(std::make_unique<Slider>("M"));
-                auto gainSlider = m_inputGains.back().get();
-                gainSlider->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
-                gainSlider->setRange(0.0, 1.0);
-                gainSlider->setValue(1.0, dontSendNotification);
-                gainSlider->onValueChange = [gainSlider, this] {
-                    auto foundGainSliderIter = std::find_if(m_inputGains.begin(), m_inputGains.end(), [gainSlider](std::unique_ptr<Slider>& b) { return b.get() == gainSlider; });
-                    if (foundGainSliderIter == m_inputGains.end())
+                m_inputReverbGains.push_back(std::make_unique<Slider>("Rv"));
+                auto rvGainSlider = m_inputReverbGains.back().get();
+                rvGainSlider->setSliderStyle(juce::Slider::SliderStyle::Rotary);
+                rvGainSlider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+                rvGainSlider->setRange(0.0, 1.0);
+                rvGainSlider->setValue(1.0, dontSendNotification);
+                rvGainSlider->onValueChange = [rvGainSlider, this] {
+                    auto foundGainSliderIter = std::find_if(m_inputReverbGains.begin(), m_inputReverbGains.end(), [rvGainSlider](std::unique_ptr<Slider>& b) { return b.get() == rvGainSlider; });
+                    if (foundGainSliderIter == m_inputReverbGains.end())
                         return;
-                    auto channelIdx = foundGainSliderIter - m_inputGains.begin();
+                    auto channelIdx = foundGainSliderIter - m_inputReverbGains.begin();
                     auto channel = static_cast<int>(channelIdx + 1);
-                    auto gainValue = static_cast<float>(gainSlider->getValue());
-                    inputGainChange(channel, gainValue);
+                    auto gainValue = static_cast<float>(rvGainSlider->getValue());
+                    reverbSendGainChange(channel, gainValue);
                 };
-                addAndMakeVisible(*m_inputGains.back());
+                addAndMakeVisible(*m_inputReverbGains.back());
             }
         }
-        else if (m_inputGains.size() > m_levelData.GetChannelCount())
+        else if (m_inputReverbGains.size() > m_levelData.GetChannelCount())
         {
-            auto overheadCnt = m_inputGains.size() - m_levelData.GetChannelCount();
+            auto overheadCnt = m_inputReverbGains.size() - m_levelData.GetChannelCount();
             for (; overheadCnt; overheadCnt--)
             {
-                removeChildComponent(m_inputGains.back().get());
-                m_inputGains.erase(m_inputGains.end());
+                removeChildComponent(m_inputReverbGains.back().get());
+                m_inputReverbGains.erase(m_inputReverbGains.end());
+            }
+        }
+
+        resizeRequired = true;
+    }
+
+    if (m_inputSpreads.size() != m_levelData.GetChannelCount())
+    {
+        if (m_inputSpreads.size() < m_levelData.GetChannelCount())
+        {
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputSpreads.size();
+            for (; missingCnt > 0; missingCnt--)
+            {
+                m_inputSpreads.push_back(std::make_unique<Slider>("S"));
+                auto spreadSlider = m_inputSpreads.back().get();
+                spreadSlider->setSliderStyle(juce::Slider::SliderStyle::Rotary);
+                spreadSlider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
+                spreadSlider->setRange(0.0, 1.0);
+                spreadSlider->setValue(1.0, dontSendNotification);
+                spreadSlider->onValueChange = [spreadSlider, this] {
+                    auto foundSpreadSliderIter = std::find_if(m_inputSpreads.begin(), m_inputSpreads.end(), [spreadSlider](std::unique_ptr<Slider>& b) { return b.get() == spreadSlider; });
+                    if (foundSpreadSliderIter == m_inputSpreads.end())
+                        return;
+                    auto channelIdx = foundSpreadSliderIter - m_inputSpreads.begin();
+                    auto channel = static_cast<int>(channelIdx + 1);
+                    auto spreadValue = static_cast<float>(spreadSlider->getValue());
+                    spreadFactorChange(channel, spreadValue);
+                };
+                addAndMakeVisible(*m_inputSpreads.back());
+            }
+        }
+        else if (m_inputSpreads.size() > m_levelData.GetChannelCount())
+        {
+            auto overheadCnt = m_inputSpreads.size() - m_levelData.GetChannelCount();
+            for (; overheadCnt; overheadCnt--)
+            {
+                removeChildComponent(m_inputSpreads.back().get());
+                m_inputSpreads.erase(m_inputSpreads.end());
             }
         }
 
@@ -279,6 +394,43 @@ void InputMixerComponent::processChanges()
             {
                 removeChildComponent(m_inputPositions.back().get());
                 m_inputPositions.erase(m_inputPositions.end());
+            }
+        }
+
+        resizeRequired = true;
+    }
+
+    if (m_inputGains.size() != m_levelData.GetChannelCount())
+    {
+        if (m_inputGains.size() < m_levelData.GetChannelCount())
+        {
+            auto missingCnt = m_levelData.GetChannelCount() - m_inputGains.size();
+            for (; missingCnt > 0; missingCnt--)
+            {
+                m_inputGains.push_back(std::make_unique<Slider>("M"));
+                auto gainSlider = m_inputGains.back().get();
+                gainSlider->setSliderStyle(juce::Slider::SliderStyle::LinearVertical);
+                gainSlider->setRange(0.0, 1.0);
+                gainSlider->setValue(1.0, dontSendNotification);
+                gainSlider->onValueChange = [gainSlider, this] {
+                    auto foundGainSliderIter = std::find_if(m_inputGains.begin(), m_inputGains.end(), [gainSlider](std::unique_ptr<Slider>& b) { return b.get() == gainSlider; });
+                    if (foundGainSliderIter == m_inputGains.end())
+                        return;
+                    auto channelIdx = foundGainSliderIter - m_inputGains.begin();
+                    auto channel = static_cast<int>(channelIdx + 1);
+                    auto gainValue = static_cast<float>(gainSlider->getValue());
+                    inputGainChange(channel, gainValue);
+                };
+                addAndMakeVisible(*m_inputGains.back());
+            }
+        }
+        else if (m_inputGains.size() > m_levelData.GetChannelCount())
+        {
+            auto overheadCnt = m_inputGains.size() - m_levelData.GetChannelCount();
+            for (; overheadCnt; overheadCnt--)
+            {
+                removeChildComponent(m_inputGains.back().get());
+                m_inputGains.erase(m_inputGains.end());
             }
         }
 

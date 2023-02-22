@@ -360,6 +360,8 @@ void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 		commander->setInputMuteChangeCallback([=](ChannelCommander* sender, int channel, bool state) { return setInputMuteState(channel, state, sender); } );
 		commander->setInputGainChangeCallback([=](ChannelCommander* sender, int channel, float value) { return setInputGainValue(channel, value, sender); });
 		commander->setPositionChangeCallback([=](InputCommander* sender, int channel, const juce::Point<float>& position) { return setInputPositionValue(channel, position, sender); });
+		commander->setReverbSendGainChangeCallback([=](InputCommander* sender, int channel, float value) { return setReverbSendGainValue(channel, value, sender); });
+		commander->setSpreadFactorChangeCallback([=](InputCommander* sender, int channel, float value) { return setSpreadFactorValue(channel, value, sender); });
 	}
 }
 
@@ -433,6 +435,46 @@ void SurroundFieldMixerProcessor::setInputGainValue(int inputChannelNumber, floa
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
 			inputCommander->setInputGain(inputChannelNumber, value);
+	}
+}
+
+float SurroundFieldMixerProcessor::getReverbSendGainValue(int inputChannelNumber)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	return m_reverbSendGainValues[inputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::setReverbSendGainValue(int inputChannelNumber, float value, ChannelCommander* sender)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	m_reverbSendGainValues[inputChannelNumber] = value;
+
+	for (auto const& inputCommander : m_inputCommanders)
+	{
+		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
+			inputCommander->setReverbSendGain(inputChannelNumber, value);
+	}
+}
+
+float SurroundFieldMixerProcessor::getSpreadFactorValue(int inputChannelNumber)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	return m_spreadFactorValues[inputChannelNumber];
+}
+
+void SurroundFieldMixerProcessor::setSpreadFactorValue(int inputChannelNumber, float value, ChannelCommander* sender)
+{
+	jassert(inputChannelNumber > 0);
+	const ScopedLock sl(m_readLock);
+	m_spreadFactorValues[inputChannelNumber] = value;
+
+	for (auto const& inputCommander : m_inputCommanders)
+	{
+		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
+			inputCommander->setSpreadFactor(inputChannelNumber, value);
 	}
 }
 
@@ -883,6 +925,8 @@ void SurroundFieldMixerProcessor::initializeInputCtrlValues(int inputCount)
 	{
 		setInputMuteState(channel, false);
 		setInputGainValue(channel, 1.0f);
+		setReverbSendGainValue(channel, 1.0f);
+		setSpreadFactorValue(channel, 1.0f);
 		setInputPositionValue(channel, s_defaultPos());
 	}
 }

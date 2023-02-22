@@ -171,13 +171,18 @@ public:
     void setInputMuteState(int channelNumber, bool muted, ChannelCommander* sender = nullptr);
     float getInputGainValue(int channelNumber);
     void setInputGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
+    float getReverbSendGainValue(int channelNumber);
+    void setReverbSendGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
+    float getSpreadFactorValue(int channelNumber);
+    void setSpreadFactorValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
+    const juce::Point<float>& getInputPositionValue(int channelNumber);
+    void setInputPositionValue(int channelNumber, const juce::Point<float>& position, ChannelCommander* sender = nullptr);
+
     bool getOutputMuteState(int channelNumber);
     void setOutputMuteState(int channelNumber, bool muted, ChannelCommander* sender = nullptr);
     float getOutputGainValue(int channelNumber);
     void setOutputGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
 
-    const juce::Point<float>& getInputPositionValue(int channelNumber);
-    void setInputPositionValue(int channelNumber, const juce::Point<float>& position, ChannelCommander* sender = nullptr);
 
     //==============================================================================
     AudioDeviceManager* getDeviceManager();
@@ -289,6 +294,12 @@ private:
     //==============================================================================
     std::map<int, float> m_inputGainValues;
     std::map<int, float> m_outputGainValues;
+
+    //==============================================================================
+    std::map<int, float> m_reverbSendGainValues;
+    
+    //==============================================================================
+    std::map<int, float> m_spreadFactorValues;
 
     //==============================================================================
     std::map<int, juce::Point<float>>  m_inputPositionValues;

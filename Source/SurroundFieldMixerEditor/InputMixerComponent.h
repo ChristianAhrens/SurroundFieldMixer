@@ -63,9 +63,11 @@ public:
 private:
     ProcessorLevelData                                      m_levelData;
     std::unique_ptr<MeterbridgeComponent>                   m_inputLevels;
-    std::vector<std::unique_ptr<juce::Slider>>              m_inputGains;
+    std::vector<std::unique_ptr<juce::Slider>>              m_inputReverbGains;
+    std::vector<std::unique_ptr<juce::Slider>>              m_inputSpreads;
     std::vector<std::unique_ptr<TextButton>>                m_inputMutes;
     std::vector<std::unique_ptr<PositionEditorComponent>>   m_inputPositions;
+    std::vector<std::unique_ptr<juce::Slider>>              m_inputGains;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (InputMixerComponent)
 };
