@@ -55,6 +55,9 @@ private:
     unsigned long   m_channelLS{ 5 };
     unsigned long   m_channelRS{ 4 };
 
+    std::map<int, bool>         m_outputMuteState;
+    std::map<int, juce::String> m_outputGainValue;
+
     float m_outerMargin{ 20.0f };
     float m_visuAreaWidth{ 0.0f };
     float m_visuAreaHeight{ 0.0f };

@@ -18,6 +18,9 @@
 
 #include "TwoDFieldOutputComponent.h"
 
+#include <ProcessingEngine/ProcessingEngineNode.h>
+#include <ProcessingEngine/ProcessingEngineConfig.h>
+
 namespace SurroundFieldMixer
 {
 
@@ -28,6 +31,20 @@ TwoDFieldOutputComponent::TwoDFieldOutputComponent()
     : AbstractAudioVisualizer()
 {
     setUsesValuesInDB(true);
+
+    m_outputMuteState[m_channelL] = false;
+    m_outputMuteState[m_channelC] = false;
+    m_outputMuteState[m_channelR] = false;
+    m_outputMuteState[m_channelLS] = false;
+    m_outputMuteState[m_channelRS] = false;
+
+    auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixOutput_Gain);
+    auto defaultGainStrVal = juce::String(ProtocolProcessorBase::MapNormalizedValueToRange(1.0f, range)) + " dB";
+    m_outputGainValue[m_channelL] = defaultGainStrVal;
+    m_outputGainValue[m_channelC] = defaultGainStrVal;
+    m_outputGainValue[m_channelR] = defaultGainStrVal;
+    m_outputGainValue[m_channelLS] = defaultGainStrVal;
+    m_outputGainValue[m_channelRS] = defaultGainStrVal;
 }
 
 TwoDFieldOutputComponent::~TwoDFieldOutputComponent()
@@ -184,17 +201,44 @@ void TwoDFieldOutputComponent::paint (Graphics& g)
 
     // draw L C R LS RS legend
     auto textRectSize = juce::Point<float>(20.0f, 20.0f);
+    auto gainTextRectWidth = juce::Point<float>(40.0f, 0.0f);
     auto textRectSizeInv = juce::Point<float>(20.0f, -20.0f);
-    auto textLRect = juce::Rectangle<float>(m_leftMaxPoint, m_leftMaxPoint - textRectSize);
-    g.drawText("L", textLRect, Justification::centred, true);
-    auto textCRect = juce::Rectangle<float>(m_centerMaxPoint, m_centerMaxPoint - textRectSize) + juce::Point<float>(0.5f * textRectSize.getX(), 0.0f);
-    g.drawText("C", textCRect, Justification::centred, true);
-    auto textRRect = juce::Rectangle<float>(m_rightMaxPoint, m_rightMaxPoint + textRectSizeInv);
-    g.drawText("R", textRRect, Justification::centred, true);
-    auto textLSRect = juce::Rectangle<float>(m_leftSurroundMaxPoint, m_leftSurroundMaxPoint - textRectSizeInv);
-    g.drawText("LS", textLSRect, Justification::centred, true);
-    auto textRSRect = juce::Rectangle<float>(m_rightSurroundMaxPoint, m_rightSurroundMaxPoint + textRectSize);
-    g.drawText("RS", textRSRect, Justification::centred, true);
+
+    auto textLRect = m_outputMuteState[m_channelL] 
+        ? juce::Rectangle<float>(m_leftMaxPoint, m_leftMaxPoint - textRectSize) 
+        : juce::Rectangle<float>(m_leftMaxPoint, m_leftMaxPoint - textRectSize - gainTextRectWidth);
+    g.setColour(m_outputMuteState[m_channelL] ? Colours::red : Colours::white);
+    auto textL = m_outputMuteState[m_channelL] ? "L" : "L " + m_outputGainValue[m_channelL];
+    g.drawText(textL, textLRect, Justification::centred, true);
+
+    auto textCRect = m_outputMuteState[m_channelC] 
+        ? juce::Rectangle<float>(m_centerMaxPoint, m_centerMaxPoint - textRectSize) + juce::Point<float>(0.5f * textRectSize.getX(), 0.0f) 
+        : juce::Rectangle<float>(m_centerMaxPoint + 0.5f * gainTextRectWidth, m_centerMaxPoint - textRectSize - 0.5f * gainTextRectWidth) + juce::Point<float>(0.5f * textRectSize.getX(), 0.0f);
+    g.setColour(m_outputMuteState[m_channelC] ? Colours::red : Colours::white);
+    auto textC = m_outputMuteState[m_channelC] ? "C" : "C " + m_outputGainValue[m_channelC];
+    g.drawText(textC, textCRect, Justification::centred, true);
+
+    auto textRRect = m_outputMuteState[m_channelR] 
+        ? juce::Rectangle<float>(m_rightMaxPoint, m_rightMaxPoint + textRectSizeInv) 
+        : juce::Rectangle<float>(m_rightMaxPoint, m_rightMaxPoint + textRectSizeInv + gainTextRectWidth);
+    g.setColour(m_outputMuteState[m_channelR] ? Colours::red : Colours::white);
+    auto textR = m_outputMuteState[m_channelR] ? "R" : "R " + m_outputGainValue[m_channelR];
+    g.drawText(textR, textRRect, Justification::centred, true);
+
+    auto textLSRect = m_outputMuteState[m_channelLS] 
+        ? juce::Rectangle<float>(m_leftSurroundMaxPoint, m_leftSurroundMaxPoint - textRectSizeInv) 
+        : juce::Rectangle<float>(m_leftSurroundMaxPoint, m_leftSurroundMaxPoint - textRectSizeInv - gainTextRectWidth);
+    g.setColour(m_outputMuteState[m_channelLS] ? Colours::red : Colours::white);
+    auto textLS = m_outputMuteState[m_channelLS] ? "LS" : "LS " + m_outputGainValue[m_channelLS];
+    g.drawText(textLS, textLSRect, Justification::centred, true);
+
+    auto textRSRect = m_outputMuteState[m_channelRS] 
+        ? juce::Rectangle<float>(m_rightSurroundMaxPoint, m_rightSurroundMaxPoint + textRectSize) 
+        : juce::Rectangle<float>(m_rightSurroundMaxPoint, m_rightSurroundMaxPoint + textRectSize + gainTextRectWidth);
+    g.setColour(m_outputMuteState[m_channelRS] ? Colours::red : Colours::white);
+    auto textRS = m_outputMuteState[m_channelRS] ? "RS" : "RS " + m_outputGainValue[m_channelRS];
+    g.drawText(textRS, textRSRect, Justification::centred, true);
+
 #if defined DEBUG && defined PAINTINGHELPER
     g.setColour(juce::Colours::lightblue);
     g.drawRect(textLRect);
@@ -255,14 +299,18 @@ void TwoDFieldOutputComponent::resized()
     AbstractAudioVisualizer::resized();
 }
 
-void TwoDFieldOutputComponent::setOutputMute(unsigned int /*channel*/, bool /*muteState*/)
+void TwoDFieldOutputComponent::setOutputMute(unsigned int channel, bool muteState)
 {
-
+    m_outputMuteState[channel] = muteState;
+    repaint();
 }
 
-void TwoDFieldOutputComponent::setOutputGain(unsigned int /*channel*/, float /*gainValue*/)
+void TwoDFieldOutputComponent::setOutputGain(unsigned int channel, float gainValue)
 {
-
+    auto range = ProcessingEngineConfig::GetRemoteObjectRange(ROI_MatrixOutput_Gain);
+    auto inputGain = ProtocolProcessorBase::MapNormalizedValueToRange(gainValue, range);
+    m_outputGainValue[channel] = juce::String(inputGain) + " dB";
+    repaint();
 }
 
 void TwoDFieldOutputComponent::setOutputScheme(unsigned int /*dummyschemetobechanged*/)
