@@ -1,4 +1,4 @@
-/* Copyright (c) 2022, Christian Ahrens
+/* Copyright (c) 2022 - 2023, Christian Ahrens
  *
  * This file is part of SurroundFieldMixer <https://github.com/ChristianAhrens/SurroundFieldMixer>
  *
@@ -26,11 +26,14 @@ namespace SurroundFieldMixer
  *
  */
 SurroundFieldMixerRemoteWrapper::SurroundFieldMixerRemoteWrapper()
-	:   m_bridgingXml("SurroundFieldMixerRemoteWrapper")
+	:	m_servus("_osc._udp"), 
+		m_bridgingXml("SurroundFieldMixerRemoteWrapper")
 {
 	SetupBridgingNode();
     
     m_processingNode.AddListener(this);
+
+	m_servus.announce(LISTENING_PORT, JUCEApplication::getInstance()->getApplicationName().toStdString());
 
 	startTimer(1500);
 }
@@ -659,11 +662,11 @@ void SurroundFieldMixerRemoteWrapper::SetupBridgingNode()
 
 		auto clientPortXmlElement = protocolAXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::CLIENTPORT));
 		if (clientPortXmlElement)
-			clientPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), RX_PORT_DS100_HOST);
+			clientPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), LISTENING_PORT);
 
 		auto hostPortXmlElement = protocolAXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::HOSTPORT));
 		if (hostPortXmlElement)
-			hostPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), RX_PORT_DS100_DEVICE);
+			hostPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), REPLY_TO_PORT);
 	}
 
 	m_processingNode.setStateXml(nodeXmlElement.get());
