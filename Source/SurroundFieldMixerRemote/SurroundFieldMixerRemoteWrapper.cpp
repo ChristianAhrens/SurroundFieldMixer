@@ -662,11 +662,11 @@ void SurroundFieldMixerRemoteWrapper::SetupBridgingNode()
 
 		auto clientPortXmlElement = protocolAXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::CLIENTPORT));
 		if (clientPortXmlElement)
-			clientPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), LISTENING_PORT);
+			clientPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), REPLY_TO_PORT);
 
 		auto hostPortXmlElement = protocolAXmlElement->createNewChildElement(ProcessingEngineConfig::getTagName(ProcessingEngineConfig::TagID::HOSTPORT));
 		if (hostPortXmlElement)
-			hostPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), REPLY_TO_PORT);
+			hostPortXmlElement->setAttribute(ProcessingEngineConfig::getAttributeName(ProcessingEngineConfig::AttributeID::PORT), LISTENING_PORT);
 	}
 
 	m_processingNode.setStateXml(nodeXmlElement.get());
