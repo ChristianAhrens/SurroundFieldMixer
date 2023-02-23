@@ -4,9 +4,44 @@
               bundleIdentifier="com.ChristianAhrens.SurroundFieldMixer" version="0.1.1"
               companyName="Christian Ahrens" companyCopyright="2023" companyEmail="christianahrens@me.com"
               jucerFormatVersion="1" companyWebsite="https://github.com/ChristianAhrens/SurroundFieldMixer"
-              headerPath="../../submodules/JUCE-AppBasics/Source/&#10;../../submodules/RemoteProtocolBridgeCore/Source/">
+              headerPath="../../submodules/JUCE-AppBasics/Source/&#10;../../submodules/RemoteProtocolBridgeCore/Source/&#10;../../submodules/Servus/">
   <MAINGROUP id="cIkH3v" name="SurroundFieldMixer">
     <GROUP id="{2F00D803-4C7B-B972-8DBF-6BAEC9E73388}" name="submodules">
+      <GROUP id="{2404553C-385D-9C88-3558-E6CB98810F5F}" name="Servus">
+        <GROUP id="{94E6BD1C-27B3-A58D-3E7F-D0BBFA1FB56C}" name="servus">
+          <GROUP id="{AA064A20-4BEB-3430-857F-A103601A32C5}" name="avahi">
+            <FILE id="DOiGVj" name="servus.h" compile="0" resource="0" file="submodules/Servus/servus/avahi/servus.h"/>
+          </GROUP>
+          <GROUP id="{EF8357A2-EB26-0A82-083A-67739921ACD8}" name="dnssd">
+            <FILE id="EYvCM8" name="servus.h" compile="0" resource="0" file="submodules/Servus/servus/dnssd/servus.h"/>
+          </GROUP>
+          <GROUP id="{4A4FCCC1-5BAC-49EE-11E7-83D3E09E5060}" name="md5">
+            <FILE id="Wd0qtD" name="md5.cc" compile="1" resource="0" file="submodules/Servus/servus/md5/md5.cc"/>
+            <FILE id="p599tj" name="md5.hh" compile="0" resource="0" file="submodules/Servus/servus/md5/md5.hh"/>
+          </GROUP>
+          <GROUP id="{AB9AB687-CAC0-90C9-7E74-ECF900DBCEA0}" name="none">
+            <FILE id="JSGxMP" name="servus.h" compile="0" resource="0" file="submodules/Servus/servus/none/servus.h"/>
+          </GROUP>
+          <FILE id="J13Uhh" name="api.h" compile="0" resource="0" file="submodules/Servus/servus/api.h"/>
+          <FILE id="Gy1X65" name="defines.h" compile="0" resource="0" file="submodules/Servus/servus/defines.h"/>
+          <FILE id="W5yqPm" name="definesDarwin.h" compile="0" resource="0" file="submodules/Servus/servus/definesDarwin.h"/>
+          <FILE id="Yy9AYp" name="definesWin32.h" compile="0" resource="0" file="submodules/Servus/servus/definesWin32.h"/>
+          <FILE id="E4SeQB" name="listener.h" compile="0" resource="0" file="submodules/Servus/servus/listener.h"/>
+          <FILE id="WEitDy" name="result.h" compile="0" resource="0" file="submodules/Servus/servus/result.h"/>
+          <FILE id="iij9CD" name="serializable.cpp" compile="1" resource="0"
+                file="submodules/Servus/servus/serializable.cpp"/>
+          <FILE id="EaBwcc" name="serializable.h" compile="0" resource="0" file="submodules/Servus/servus/serializable.h"/>
+          <FILE id="YeN4xo" name="servus.cpp" compile="1" resource="0" file="submodules/Servus/servus/servus.cpp"/>
+          <FILE id="pEe2wK" name="servus.h" compile="0" resource="0" file="submodules/Servus/servus/servus.h"/>
+          <FILE id="r6dH2k" name="types.h" compile="0" resource="0" file="submodules/Servus/servus/types.h"/>
+          <FILE id="Wg7DWe" name="uint128_t.cpp" compile="1" resource="0" file="submodules/Servus/servus/uint128_t.cpp"/>
+          <FILE id="PCsvnp" name="uint128_t.h" compile="0" resource="0" file="submodules/Servus/servus/uint128_t.h"/>
+          <FILE id="SyiJaB" name="uri.cpp" compile="1" resource="0" file="submodules/Servus/servus/uri.cpp"/>
+          <FILE id="MZ1yvO" name="uri.h" compile="0" resource="0" file="submodules/Servus/servus/uri.h"/>
+          <FILE id="ossp9W" name="version.cpp" compile="1" resource="0" file="submodules/Servus/servus/version.cpp"/>
+          <FILE id="rDM3w3" name="version.h" compile="0" resource="0" file="submodules/Servus/servus/version.h"/>
+        </GROUP>
+      </GROUP>
       <GROUP id="{841D0E45-8D36-8B0B-5504-370165681A4C}" name="RemoteProtocolBridgeCore">
         <GROUP id="{2D73F130-0C5C-3687-3AD5-102D2E52CB78}" name="Source">
           <GROUP id="{13A01986-7D3B-DDA8-2B15-DC0102C74933}" name="ProcessingEngine">
