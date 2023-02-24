@@ -269,12 +269,12 @@ private:
     const juce::Point<float> getNormalizedDefaultPosition(juce::AudioChannelSet::ChannelType channelIdent);
 
     //==============================================================================
-    String                      m_Name;
+    String          m_Name;
 
     //==============================================================================
-    CriticalSection     m_readLock;
+    CriticalSection m_readLock;
 
-    float**             m_processorChannels;
+    float**         m_processorChannels;
 
     //==============================================================================
     std::unique_ptr<AudioDeviceManager> m_deviceManager;

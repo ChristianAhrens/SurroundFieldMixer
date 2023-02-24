@@ -33,6 +33,7 @@ class AudioSelectComponent;
 class SurroundFieldMixerEditor;
 class SurroundFieldMixerProcessor;
 class SurroundFieldMixerRemoteWrapper;
+class SurroundFieldMixerSnapshotCommander;
 
 //==============================================================================
 /*
@@ -64,13 +65,15 @@ private:
     void setControlOnlineState(bool online);
 
 
-    std::unique_ptr<SurroundFieldMixerProcessor>        m_SurroundFieldMixerProcessor;
+    std::unique_ptr<SurroundFieldMixerProcessor>            m_SurroundFieldMixerProcessor;
 
-    std::unique_ptr<SurroundFieldMixerRemoteWrapper>    m_SurroundFieldMixerRemote;
-    bool                                                m_SurroundFieldMixerRemoteOnline;
+    std::unique_ptr<SurroundFieldMixerRemoteWrapper>        m_SurroundFieldMixerRemote;
+    bool                                                    m_SurroundFieldMixerRemoteOnline;
 
-    std::unique_ptr<SurroundFieldMixerEditor>           m_audioVisuComponent;
-    std::unique_ptr<AudioSelectComponent>               m_audioDeviceSelectComponent;
+    std::unique_ptr<SurroundFieldMixerSnapshotCommander>    m_SurroundFieldMixerSnapshotCommander;
+
+    std::unique_ptr<SurroundFieldMixerEditor>               m_audioVisuComponent;
+    std::unique_ptr<AudioSelectComponent>                   m_audioDeviceSelectComponent;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SurroundFieldMixer)
 };

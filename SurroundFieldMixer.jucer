@@ -282,6 +282,12 @@
       </GROUP>
     </GROUP>
     <GROUP id="{0480E33C-041F-2346-F9AA-44BBEAD80CFE}" name="Source">
+      <GROUP id="{7FBA02D2-8682-039B-A25E-4778B34B8431}" name="SurroundFieldMixerSnapshotCommander">
+        <FILE id="jmiS6I" name="SurroundFieldMixerSnapshotCommander.cpp" compile="1"
+              resource="0" file="Source/SurroundFieldMixerSnapshotCommander/SurroundFieldMixerSnapshotCommander.cpp"/>
+        <FILE id="jdHBM5" name="SurroundFieldMixerSnapshotCommander.h" compile="0"
+              resource="0" file="Source/SurroundFieldMixerSnapshotCommander/SurroundFieldMixerSnapshotCommander.h"/>
+      </GROUP>
       <GROUP id="{7B5E9D26-7C00-BD4A-AD93-0A7DFE4BB26E}" name="SurroundFieldMixerRemote">
         <FILE id="UQJxvL" name="SurroundFieldMixerRemoteWrapper.cpp" compile="1"
               resource="0" file="Source/SurroundFieldMixerRemote/SurroundFieldMixerRemoteWrapper.cpp"/>
