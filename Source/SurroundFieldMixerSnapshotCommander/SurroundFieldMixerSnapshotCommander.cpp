@@ -35,52 +35,42 @@ SurroundFieldMixerSnapshotCommander::~SurroundFieldMixerSnapshotCommander()
 
 void SurroundFieldMixerSnapshotCommander::setInputMute(unsigned int channel, bool muteState)
 {
-	m_inputMutes[channel] = muteState;
+	m_currentValues[ValueId::InputMute][channel] = muteState;
 }
 
 void SurroundFieldMixerSnapshotCommander::setInputGain(unsigned int channel, float gainValue)
 {
-	m_inputGains[channel] = gainValue;
-}
-
-void SurroundFieldMixerSnapshotCommander::setInputLevel(unsigned int channel, float levelValue)
-{
-	m_inputLevels[channel] = levelValue;
+	m_currentValues[ValueId::InputGain][channel] = gainValue;
 }
 
 void SurroundFieldMixerSnapshotCommander::setPosition(unsigned int channel, juce::Point<float> position)
 {
-	m_inputPositions[channel] = position;
+	m_currentValues[ValueId::InputPosition][channel] = position;
 }
 
 void SurroundFieldMixerSnapshotCommander::setSpreadFactor(unsigned int channel, float spreadFactor)
 {
-	m_inputSpreadFactors[channel] = spreadFactor;
+	m_currentValues[ValueId::InputSpread][channel] = spreadFactor;
 }
 
 void SurroundFieldMixerSnapshotCommander::setReverbSendGain(unsigned int channel, float reverbSendGain)
 {
-	m_inputReverbSendGains[channel] = reverbSendGain;
+	m_currentValues[ValueId::InputReverb][channel] = reverbSendGain;
 }
 
 void SurroundFieldMixerSnapshotCommander::setOutputMute(unsigned int channel, bool muteState)
 {
-	m_outputMutes[channel] = muteState;
+	m_currentValues[ValueId::OutputMute][channel] = muteState;
 }
 
 void SurroundFieldMixerSnapshotCommander::setOutputGain(unsigned int channel, float gainValue)
 {
-	m_outputGains[channel] = gainValue;
+	m_currentValues[ValueId::OutputGain][channel] = gainValue;
 }
 
-void SurroundFieldMixerSnapshotCommander::setOutputLevel(unsigned int channel, float levelValue)
+void SurroundFieldMixerSnapshotCommander::setOutputScheme(unsigned int outputScheme)
 {
-	m_outputLevels[channel] = levelValue;
-}
-
-void SurroundFieldMixerSnapshotCommander::setOutputScheme(unsigned int /*outputScheme*/)
-{
-	/*t.b.d*/
+	m_currentValues[ValueId::OutputScheme][INVALID_CHANNEL] = outputScheme;
 }
 
 

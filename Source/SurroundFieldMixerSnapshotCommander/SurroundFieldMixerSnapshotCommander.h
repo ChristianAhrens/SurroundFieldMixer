@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include <JuceHeader.h>
+#include <variant>
+
 #include "../SurroundFieldMixerProcessor/SurroundFieldMixerProcessor.h"
 
-#include <JuceHeader.h>
 
 namespace SurroundFieldMixer
 {
@@ -30,13 +32,27 @@ class SurroundFieldMixerSnapshotCommander :	public SurroundFieldMixerProcessor::
 											public SurroundFieldMixerProcessor::OutputCommander
 {
 public:
+	enum ValueId
+	{
+		InputMute,
+		InputGain,
+		InputPosition,
+		InputSpread,
+		InputReverb,
+		OutputMute,
+		OutputGain,
+		OutputScheme
+	};
+	typedef std::uint32_t	ChannelNo;
+	static constexpr ChannelNo INVALID_CHANNEL = 0;
+
+public:
 	SurroundFieldMixerSnapshotCommander();
 	~SurroundFieldMixerSnapshotCommander();
 	
 	//==========================================================================
 	void setInputMute(unsigned int channel, bool muteState) override;
 	void setInputGain(unsigned int channel, float gainValue) override;
-	void setInputLevel(unsigned int channel, float levelValue) override;
 	void setPosition(unsigned int channel, juce::Point<float> position) override;
 	void setSpreadFactor(unsigned int channel, float spreadFactor) override;
 	void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
@@ -44,7 +60,6 @@ public:
 	//==========================================================================
 	void setOutputMute(unsigned int channel, bool muteState) override;
 	void setOutputGain(unsigned int channel, float gainValue) override;
-	void setOutputLevel(unsigned int channel, float levelValue) override;
 	void setOutputScheme(unsigned int outputScheme) override;
 
 protected:
@@ -52,18 +67,7 @@ protected:
 
 private:
 	//==========================================================================
-	std::map<unsigned int, bool>				m_inputMutes;
-	std::map<unsigned int, float>				m_inputGains;
-	std::map<unsigned int, float>				m_inputLevels;
-	std::map<unsigned int, juce::Point<float>>	m_inputPositions;
-	std::map<unsigned int, float>				m_inputSpreadFactors;
-	std::map<unsigned int, float>				m_inputReverbSendGains;
-
-	//==========================================================================
-	std::map<unsigned int, bool>	m_outputMutes;
-	std::map<unsigned int, float>	m_outputGains;
-	std::map<unsigned int, float>	m_outputLevels;
-	unsigned int					m_outputScheme;
+	std::map<ValueId, std::map<ChannelNo, std::variant<bool, unsigned int, int, float, juce::Point<float>>>>	m_currentValues;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SurroundFieldMixerSnapshotCommander)
 };
