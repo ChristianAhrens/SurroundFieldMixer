@@ -49,6 +49,14 @@ public:
 public:
 	SurroundFieldMixerSnapshotCommander();
 	~SurroundFieldMixerSnapshotCommander();
+
+	void initialize();
+
+	//==========================================================================
+	void setDefaultValues();
+
+	//==========================================================================
+	void publishCurrentValues();
 	
 	//==========================================================================
 	void setInputMute(unsigned int channel, bool muteState) override;
@@ -61,6 +69,18 @@ public:
 	void setOutputMute(unsigned int channel, bool muteState) override;
 	void setOutputGain(unsigned int channel, float gainValue) override;
 	void setOutputScheme(unsigned int outputScheme) override;
+
+	//==========================================================================
+	bool getInputMute(unsigned int channel);
+	float getInputGain(unsigned int channel);
+	const juce::Point<float> getPosition(unsigned int channel);
+	float getSpreadFactor(unsigned int channel);
+	float getReverbSendGain(unsigned int channel);
+
+	//==========================================================================
+	bool getOutputMute(unsigned int channel) ;
+	float getOutputGain(unsigned int channel) ;
+	unsigned int getOutputScheme() ;
 
 protected:
 	//==========================================================================

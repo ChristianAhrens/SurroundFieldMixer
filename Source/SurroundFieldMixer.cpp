@@ -44,7 +44,7 @@ SurroundFieldMixer::SurroundFieldMixer() :
     m_SurroundFieldMixerProcessor->addInputCommander(m_SurroundFieldMixerSnapshotCommander.get());
     m_SurroundFieldMixerProcessor->addOutputCommander(m_SurroundFieldMixerSnapshotCommander.get());
 
-    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, 64, 1, 8, false, false, false, false);
+    m_audioDeviceSelectComponent = std::make_unique<AudioSelectComponent>(m_SurroundFieldMixerProcessor->getDeviceManager(), 1, SurroundFieldMixerProcessor::s_maxChannelCount, 1, 8, false, false, false, false);
 }
 
 SurroundFieldMixer::~SurroundFieldMixer()

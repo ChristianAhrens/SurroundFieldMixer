@@ -24,13 +24,49 @@ namespace SurroundFieldMixer
 
 
 SurroundFieldMixerSnapshotCommander::SurroundFieldMixerSnapshotCommander()
+	:	SurroundFieldMixerProcessor::InputCommander(),
+		SurroundFieldMixerProcessor::OutputCommander()
 {
-
 }
 
 SurroundFieldMixerSnapshotCommander::~SurroundFieldMixerSnapshotCommander()
 {
-	
+}
+
+void SurroundFieldMixerSnapshotCommander::initialize()
+{
+	setDefaultValues();
+	publishCurrentValues();
+}
+
+void SurroundFieldMixerSnapshotCommander::setDefaultValues()
+{
+	for (auto channel = 1; channel <= SurroundFieldMixerProcessor::s_maxChannelCount; channel++)
+	{
+		setInputMute(channel, false);
+		setInputGain(channel, 0.8f);
+		setPosition(channel, juce::Point<float>(0.5f, 0.5f));
+		setSpreadFactor(channel, 0.5f);
+		setReverbSendGain(channel, 0.0f);
+		setOutputMute(channel, false);
+		setOutputGain(channel, 0.8f);
+	}
+	setOutputScheme(1);
+}
+
+void SurroundFieldMixerSnapshotCommander::publishCurrentValues()
+{
+	for (auto channel = 1; channel <= SurroundFieldMixerProcessor::s_maxChannelCount; channel++)
+	{
+		inputMuteChange(channel, getInputMute(channel));
+		inputGainChange(channel, getInputGain(channel));
+		positionChange(channel, getPosition(channel));
+		spreadFactorChange(channel, getSpreadFactor(channel));
+		reverbSendGainChange(channel, getReverbSendGain(channel));
+		outputMuteChange(channel, getOutputMute(channel));
+		outputGainChange(channel, getOutputGain(channel));
+	}
+	outputSchemeChange(getOutputScheme());
 }
 
 void SurroundFieldMixerSnapshotCommander::setInputMute(unsigned int channel, bool muteState)
@@ -71,6 +107,46 @@ void SurroundFieldMixerSnapshotCommander::setOutputGain(unsigned int channel, fl
 void SurroundFieldMixerSnapshotCommander::setOutputScheme(unsigned int outputScheme)
 {
 	m_currentValues[ValueId::OutputScheme][INVALID_CHANNEL] = outputScheme;
+}
+
+bool SurroundFieldMixerSnapshotCommander::getInputMute(unsigned int channel)
+{
+	return std::get<bool>(m_currentValues[ValueId::InputMute][channel]);
+}
+
+float SurroundFieldMixerSnapshotCommander::getInputGain(unsigned int channel)
+{
+	return std::get<float>(m_currentValues[ValueId::InputGain][channel]);
+}
+
+const juce::Point<float> SurroundFieldMixerSnapshotCommander::getPosition(unsigned int channel)
+{
+	return std::get<juce::Point<float>>(m_currentValues[ValueId::InputPosition][channel]);
+}
+
+float SurroundFieldMixerSnapshotCommander::getSpreadFactor(unsigned int channel)
+{
+	return std::get<float>(m_currentValues[ValueId::InputSpread][channel]);
+}
+
+float SurroundFieldMixerSnapshotCommander::getReverbSendGain(unsigned int channel)
+{
+	return std::get<float>(m_currentValues[ValueId::InputReverb][channel]);
+}
+
+bool SurroundFieldMixerSnapshotCommander::getOutputMute(unsigned int channel)
+{
+	return std::get<bool>(m_currentValues[ValueId::OutputMute][channel]);
+}
+
+float SurroundFieldMixerSnapshotCommander::getOutputGain(unsigned int channel)
+{
+	return std::get<float>(m_currentValues[ValueId::OutputGain][channel]);
+}
+
+unsigned int SurroundFieldMixerSnapshotCommander::getOutputScheme()
+{
+	return std::get<unsigned int>(m_currentValues[ValueId::OutputScheme][INVALID_CHANNEL]);
 }
 
 
