@@ -295,9 +295,9 @@ SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 	// If we did not do so, either the internal xml would not be present as long as the first configuration change was made
 	// and therefor no valid config file could be written by Auvi or the audio would not be running
 	// on first start and manual config would be required.
-	m_deviceManager->initialiseWithDefaultDevices(64, 8/*7.1 setup as temp dev default*/);
+	m_deviceManager->initialiseWithDefaultDevices(s_maxChannelCount, 8/*7.1 setup as temp dev default*/);
 	auto audioDeviceSetup = m_deviceManager->getAudioDeviceSetup();
-	m_deviceManager->initialise(64, 8, nullptr/*std::make_unique<XmlElement>(AppConfiguration::getTagName(AppConfiguration::TagID::DEVCFG)).get()*/, true, {}, &audioDeviceSetup);
+	m_deviceManager->initialise(s_maxChannelCount, 8, nullptr/*std::make_unique<XmlElement>(AppConfiguration::getTagName(AppConfiguration::TagID::DEVCFG)).get()*/, true, {}, &audioDeviceSetup);
 #if JUCE_IOS
 	if (audioDeviceSetup.bufferSize < 512)
 		audioDeviceSetup.bufferSize = 512; // temp. workaround for iOS where buffersizes <512 lead to no sample data being delivered?
@@ -408,14 +408,15 @@ bool SurroundFieldMixerProcessor::getInputMuteState(int inputChannelNumber)
 void SurroundFieldMixerProcessor::setInputMuteState(int inputChannelNumber, bool muted, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_inputMuteStates[inputChannelNumber] = muted;
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
 			inputCommander->setInputMute(inputChannelNumber, muted);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_inputMuteStates[inputChannelNumber] = muted;
 }
 
 float SurroundFieldMixerProcessor::getInputGainValue(int inputChannelNumber)
@@ -428,14 +429,15 @@ float SurroundFieldMixerProcessor::getInputGainValue(int inputChannelNumber)
 void SurroundFieldMixerProcessor::setInputGainValue(int inputChannelNumber, float value, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_inputGainValues[inputChannelNumber] = value;
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
 			inputCommander->setInputGain(inputChannelNumber, value);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_inputGainValues[inputChannelNumber] = value;
 }
 
 float SurroundFieldMixerProcessor::getReverbSendGainValue(int inputChannelNumber)
@@ -448,14 +450,15 @@ float SurroundFieldMixerProcessor::getReverbSendGainValue(int inputChannelNumber
 void SurroundFieldMixerProcessor::setReverbSendGainValue(int inputChannelNumber, float value, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_reverbSendGainValues[inputChannelNumber] = value;
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
 			inputCommander->setReverbSendGain(inputChannelNumber, value);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_reverbSendGainValues[inputChannelNumber] = value;
 }
 
 float SurroundFieldMixerProcessor::getSpreadFactorValue(int inputChannelNumber)
@@ -468,14 +471,15 @@ float SurroundFieldMixerProcessor::getSpreadFactorValue(int inputChannelNumber)
 void SurroundFieldMixerProcessor::setSpreadFactorValue(int inputChannelNumber, float value, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_spreadFactorValues[inputChannelNumber] = value;
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
 			inputCommander->setSpreadFactor(inputChannelNumber, value);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_spreadFactorValues[inputChannelNumber] = value;
 }
 
 bool SurroundFieldMixerProcessor::getOutputMuteState(int outputChannelNumber)
@@ -488,14 +492,15 @@ bool SurroundFieldMixerProcessor::getOutputMuteState(int outputChannelNumber)
 void SurroundFieldMixerProcessor::setOutputMuteState(int outputChannelNumber, bool muted, ChannelCommander* sender)
 {
 	jassert(outputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_outputMuteStates[outputChannelNumber] = muted;
 
 	for (auto const& outputCommander : m_outputCommanders)
 	{
 		if (outputCommander != reinterpret_cast<OutputCommander*>(sender))
 			outputCommander->setOutputMute(outputChannelNumber, muted);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_outputMuteStates[outputChannelNumber] = muted;
 }
 
 float SurroundFieldMixerProcessor::getOutputGainValue(int outputChannelNumber)
@@ -508,14 +513,15 @@ float SurroundFieldMixerProcessor::getOutputGainValue(int outputChannelNumber)
 void SurroundFieldMixerProcessor::setOutputGainValue(int outputChannelNumber, float value, ChannelCommander* sender)
 {
 	jassert(outputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_outputGainValues[outputChannelNumber] = value;
 
 	for (auto const& outputCommander : m_outputCommanders)
 	{
 		if (outputCommander != reinterpret_cast<OutputCommander*>(sender))
 			outputCommander->setOutputGain(outputChannelNumber, value);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_outputGainValues[outputChannelNumber] = value;
 }
 
 const juce::Point<float>& SurroundFieldMixerProcessor::getInputPositionValue(int inputChannelNumber)
@@ -528,14 +534,15 @@ const juce::Point<float>& SurroundFieldMixerProcessor::getInputPositionValue(int
 void SurroundFieldMixerProcessor::setInputPositionValue(int inputChannelNumber, const juce::Point<float>& position, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
-	const ScopedLock sl(m_readLock);
-	m_inputPositionValues[inputChannelNumber] = position;
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
 			inputCommander->setPosition(inputChannelNumber, position);
 	}
+
+	const ScopedLock sl(m_readLock);
+	m_inputPositionValues[inputChannelNumber] = position;
 }
 
 AudioDeviceManager* SurroundFieldMixerProcessor::getDeviceManager()
