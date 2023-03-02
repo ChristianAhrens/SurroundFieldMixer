@@ -578,23 +578,21 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	auto inputChannels = buffer.getNumChannels();
 	auto outputChannels = s_minOutputsCount;
 
-	jassert(inputChannels == m_inputMuteStates.size());
-	for (auto const& inputMuteStateKV : m_inputMuteStates)
+	jassert(inputChannels <= m_inputMuteStates.size());
+	for (auto input = 1; input <= inputChannels; input++)
 	{
-		if (inputMuteStateKV.second)
+		if (m_inputMuteStates[input])
 		{
-			auto channel = inputMuteStateKV.first;
-			auto channelIdx = channel - 1;
+			auto channelIdx = input - 1;
 			buffer.clear(channelIdx, 0, buffer.getNumSamples());
 		}
 	}
 
-	jassert(inputChannels == m_inputGainValues.size());
-	for (auto const& inputGainValueKV : m_inputGainValues)
+	jassert(inputChannels <= m_inputGainValues.size());
+	for (auto input = 1; input <= inputChannels; input++)
 	{
-		auto& channel = inputGainValueKV.first;
-		auto channelIdx = channel - 1;
-		auto& gainValue = inputGainValueKV.second;
+		auto channelIdx = input - 1;
+		auto& gainValue = m_inputGainValues[input];
 		buffer.applyGain(channelIdx, 0, buffer.getNumSamples(), gainValue);
 	}
 
@@ -613,23 +611,21 @@ void SurroundFieldMixerProcessor::processBlock(AudioBuffer<float>& buffer, MidiB
 	}
 	buffer.makeCopyOf(processedBuffer, true);
 
-	jassert(outputChannels == m_outputMuteStates.size());
-	for (auto const& outputMuteStateKV : m_outputMuteStates)
+	jassert(outputChannels <= m_outputMuteStates.size());
+	for (auto output = 1; output <= outputChannels; output++)
 	{
-		if (outputMuteStateKV.second)
+		if (m_outputMuteStates[output])
 		{
-			auto channel = outputMuteStateKV.first;
-			auto channelIdx = channel - 1;
+			auto channelIdx = output - 1;
 			buffer.clear(channelIdx, 0, buffer.getNumSamples());
 		}
 	}
 
-	jassert(outputChannels == m_outputGainValues.size());
-	for (auto const& outputGainValueKV : m_outputGainValues)
+	jassert(outputChannels <= m_outputGainValues.size());
+	for (auto output = 1; output <= outputChannels; output++)
 	{
-		auto& channel = outputGainValueKV.first;
-		auto channelIdx = channel - 1;
-		auto& gainValue = outputGainValueKV.second;
+		auto channelIdx = output - 1;
+		auto& gainValue = m_outputGainValues[output];
 		buffer.applyGain(channelIdx, 0, buffer.getNumSamples(), gainValue);
 	}
 
