@@ -313,9 +313,9 @@ void TwoDFieldOutputComponent::resized()
     AbstractAudioVisualizer::resized();
 }
 
-void TwoDFieldOutputComponent::setPosition(unsigned int channel, juce::Point<float> position)
+void TwoDFieldOutputComponent::setInputPosition(unsigned int channel, juce::Point<float> positionValue)
 {
-    m_inputPositions[channel] = position;
+    m_inputPositions[channel] = positionValue;
     repaint();
 }
 

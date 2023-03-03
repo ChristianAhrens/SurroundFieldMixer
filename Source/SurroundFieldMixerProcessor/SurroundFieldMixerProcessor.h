@@ -56,22 +56,22 @@ public:
         void setInputMuteChangeCallback(const std::function<void(InputCommander* sender, int, bool)>& callback);
         void setInputGainChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback);
         void setInputLevelChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback);
-        void setPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback);
-        void setSpreadFactorChangeCallback(const std::function<void(InputCommander* sender, int, float spreadFactor)>& callback);
-        void setReverbSendGainChangeCallback(const std::function<void(InputCommander* sender, int, float reverbSendGain)>& callback);
+        void setInputPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback);
+        void setInputSpreadChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback);
+        void setInputReverbChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback);
 
         void setInputMutePollCallback(const std::function<void(InputCommander* sender, int)>& callback);
         void setInputGainPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
         void setInputLevelPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
-        void setPositionPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
-        void setSpreadFactorPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
-        void setReverbSendGainPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
+        void setInputPositionPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
+        void setInputSpreadPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
+        void setInputReverbPollCallback(const std::function<void(InputCommander* sender, int)>& callback);
 
         virtual void setInputMute(unsigned int channel, bool muteState) = 0;
         virtual void setInputGain(unsigned int channel, float gainValue) = 0;
-        virtual void setPosition(unsigned int channel, juce::Point<float> position) = 0;
-        virtual void setSpreadFactor(unsigned int channel, float spreadFactor) = 0;
-        virtual void setReverbSendGain(unsigned int channel, float reverbSendGain) = 0;
+        virtual void setInputPosition(unsigned int channel, juce::Point<float> position) = 0;
+        virtual void setInputSpread(unsigned int channel, float spreadValue) = 0;
+        virtual void setInputReverb(unsigned int channel, float reverbValue) = 0;
 
         virtual void setInputLevel(unsigned int channel, float levelValue) { ignoreUnused(channel); ignoreUnused(levelValue); };
 
@@ -79,31 +79,31 @@ public:
         void inputMuteChange(int channel, bool muteState);
         void inputGainChange(int channel, float gainValue);
         void inputLevelChange(int channel, float levelValue);
-        void positionChange(int channel, const juce::Point<float>& position);
-        void spreadFactorChange(int channel, const float spreadFactor);
-        void reverbSendGainChange(int channel, const float reverbSendGain);
+        void inputPositionChange(int channel, const juce::Point<float>& positionValue);
+        void inputSpreadChange(int channel, const float spreadValue);
+        void inputReverbChange(int channel, const float reverbValue);
 
         void inputMutePoll(int channel);
         void inputGainPoll(int channel);
         void inputLevelPoll(int channel);
-        void positionPoll(int channel);
-        void spreadFactorPoll(int channel);
-        void reverbSendGainPoll(int channel);
+        void inputPositionPoll(int channel);
+        void inputSpreadPoll(int channel);
+        void inputReverbPoll(int channel);
 
     private:
         std::function<void(InputCommander* sender, int, bool)>                  m_inputMuteChangeCallback{ nullptr };
         std::function<void(InputCommander* sender, int, float)>                 m_inputGainChangeCallback{ nullptr };
         std::function<void(InputCommander* sender, int, float)>                 m_inputLevelChangeCallback{ nullptr };
-        std::function<void(InputCommander* sender, int, juce::Point<float>)>    m_positionChangeCallback{ nullptr };
-        std::function<void(InputCommander* sender, int, float spreadFactor)>    m_spreadFactorChangeCallback{ nullptr };
-        std::function<void(InputCommander* sender, int, float reverbSendGain)>  m_reverbSendGainChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, juce::Point<float>)>    m_inputPositionChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, float)>                 m_inputSpreadChangeCallback{ nullptr };
+        std::function<void(InputCommander* sender, int, float)>                 m_inputReverbChangeCallback{ nullptr };
 
         std::function<void(InputCommander* sender, int)>    m_inputMutePollCallback{ nullptr };
         std::function<void(InputCommander* sender, int)>    m_inputGainPollCallback{ nullptr };
         std::function<void(InputCommander* sender, int)>    m_inputLevelPollCallback{ nullptr };
-        std::function<void(InputCommander* sender, int)>    m_positionPollCallback{ nullptr };
-        std::function<void(InputCommander* sender, int)>    m_spreadFactorPollCallback{ nullptr };
-        std::function<void(InputCommander* sender, int)>    m_reverbSendGainPollCallback{ nullptr };
+        std::function<void(InputCommander* sender, int)>    m_inputPositionPollCallback{ nullptr };
+        std::function<void(InputCommander* sender, int)>    m_inputSpreadPollCallback{ nullptr };
+        std::function<void(InputCommander* sender, int)>    m_inputReverbPollCallback{ nullptr };
     };
 
     class OutputCommander : public ChannelCommander
@@ -163,18 +163,21 @@ public:
 
     //==============================================================================
     void addInputCommander(InputCommander* commander);
+    void initializeInputCommander(InputCommander* commander);
     void removeInputCommander(InputCommander* commander);
     void addOutputCommander(OutputCommander* commander);
+    void initializeOutputCommander(OutputCommander* commander);
     void removeOutputCommander(OutputCommander* comander);
 
+    //==============================================================================
     bool getInputMuteState(int channelNumber);
     void setInputMuteState(int channelNumber, bool muted, ChannelCommander* sender = nullptr);
     float getInputGainValue(int channelNumber);
     void setInputGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
-    float getReverbSendGainValue(int channelNumber);
-    void setReverbSendGainValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
-    float getSpreadFactorValue(int channelNumber);
-    void setSpreadFactorValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
+    float getInputReverbValue(int channelNumber);
+    void setInputReverbValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
+    float getInputSpreadValue(int channelNumber);
+    void setInputSpreadValue(int channelNumber, float value, ChannelCommander* sender = nullptr);
     const juce::Point<float>& getInputPositionValue(int channelNumber);
     void setInputPositionValue(int channelNumber, const juce::Point<float>& position, ChannelCommander* sender = nullptr);
 
@@ -296,10 +299,10 @@ private:
     std::map<int, float> m_outputGainValues;
 
     //==============================================================================
-    std::map<int, float> m_reverbSendGainValues;
+    std::map<int, float> m_inputReverbValues;
     
     //==============================================================================
-    std::map<int, float> m_spreadFactorValues;
+    std::map<int, float> m_inputSpreadValues;
 
     //==============================================================================
     std::map<int, juce::Point<float>>  m_inputPositionValues;

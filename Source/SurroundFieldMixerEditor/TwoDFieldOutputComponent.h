@@ -46,9 +46,9 @@ public:
 
     void setInputMute(unsigned int channel, bool muteState) override { ignoreUnused(channel); ignoreUnused(muteState); };
     void setInputGain(unsigned int channel, float gainValue) override { ignoreUnused(channel); ignoreUnused(gainValue); };
-    void setPosition(unsigned int channel, juce::Point<float> position) override;
-    void setSpreadFactor(unsigned int channel, float spreadFactor) override { ignoreUnused(channel); ignoreUnused(spreadFactor); };
-    void setReverbSendGain(unsigned int channel, float reverbSendGain) override { ignoreUnused(channel); ignoreUnused(reverbSendGain); };
+    void setInputPosition(unsigned int channel, juce::Point<float> positionValue) override;
+    void setInputSpread(unsigned int channel, float spreadValue) override { ignoreUnused(channel); ignoreUnused(spreadValue); };
+    void setInputReverb(unsigned int channel, float reverbValue) override { ignoreUnused(channel); ignoreUnused(reverbValue); };
 
     //==============================================================================
     void setOutputMute(unsigned int channel, bool muteState) override;

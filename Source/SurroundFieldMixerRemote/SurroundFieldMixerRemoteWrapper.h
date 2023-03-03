@@ -54,9 +54,9 @@ public:
 	void setInputMute(unsigned int channel, bool muteState) override;
 	void setInputGain(unsigned int channel, float gainValue) override;
 	void setInputLevel(unsigned int channel, float levelValue) override;
-	void setPosition(unsigned int channel, juce::Point<float> position) override;
-	void setSpreadFactor(unsigned int channel, float spreadFactor) override;
-	void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
+	void setInputPosition(unsigned int channel, juce::Point<float> position) override;
+	void setInputSpread(unsigned int channel, float spreadValue) override;
+	void setInputReverb(unsigned int channel, float reverbValue) override;
 
 	//==========================================================================
 	void setOutputMute(unsigned int channel, bool muteState) override;
@@ -69,8 +69,8 @@ public:
 	float getInputGain(unsigned int channel);
 	float getInputLevel(unsigned int channel);
 	juce::Point<float> getPosition(unsigned int channel);
-	float getSpreadFactor(unsigned int channel);
-	float getReverbSendGain(unsigned int channel);
+	float getSpread(unsigned int channel);
+	float getReverb(unsigned int channel);
 
 	//==========================================================================
 	bool getOutputMute(unsigned int channel);
@@ -93,9 +93,9 @@ protected:
 	void sendInputMute(unsigned int channel);
 	void sendInputGain(unsigned int channel);
 	void sendInputLevel(unsigned int channel);
-	void sendPosition(unsigned int channel);
-	void sendSpreadFactor(unsigned int channel);
-	void sendReverbSendGain(unsigned int channel);
+	void sendInputPosition(unsigned int channel);
+	void sendInputSpread(unsigned int channel);
+	void sendInputReverb(unsigned int channel);
 
 	//==========================================================================
 	void sendOutputMute(unsigned int channel);
@@ -122,8 +122,8 @@ private:
 	std::map<unsigned int, float>				m_inputGains;
 	std::map<unsigned int, float>				m_inputLevels;
 	std::map<unsigned int, juce::Point<float>>	m_inputPositions;
-	std::map<unsigned int, float>				m_inputSpreadFactors;
-	std::map<unsigned int, float>				m_inputReverbSendGains;
+	std::map<unsigned int, float>				m_inputSpreads;
+	std::map<unsigned int, float>				m_inputReverbs;
 
 	//==========================================================================
 	std::map<unsigned int, bool>	m_outputMutes;

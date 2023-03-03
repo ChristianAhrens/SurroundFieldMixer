@@ -56,14 +56,18 @@ public:
     //==============================================================================
     void setInputMute(unsigned int channel, bool muteState) override;
     void setInputGain(unsigned int channel, float gainValue) override;
-    void setPosition(unsigned int channel, juce::Point<float> position) override;
-    void setSpreadFactor(unsigned int channel, float spreadFactor) override;
-    void setReverbSendGain(unsigned int channel, float reverbSendGain) override;
+    void setInputPosition(unsigned int channel, juce::Point<float> positionValue) override;
+    void setInputSpread(unsigned int channel, float spreadValue) override;
+    void setInputReverb(unsigned int channel, float reverbValue) override;
 
 private:
+    //==============================================================================
+    void setChannelCount(int channelCount);
+
+    //==============================================================================
     ProcessorLevelData                                      m_levelData;
     std::unique_ptr<MeterbridgeComponent>                   m_inputLevels;
-    std::vector<std::unique_ptr<juce::Slider>>              m_inputReverbGains;
+    std::vector<std::unique_ptr<juce::Slider>>              m_inputReverbs;
     std::vector<std::unique_ptr<juce::Slider>>              m_inputSpreads;
     std::vector<std::unique_ptr<TextButton>>                m_inputMutes;
     std::vector<std::unique_ptr<PositionEditorComponent>>   m_inputPositions;

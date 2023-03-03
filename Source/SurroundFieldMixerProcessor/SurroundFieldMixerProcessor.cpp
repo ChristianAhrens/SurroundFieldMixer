@@ -53,19 +53,19 @@ void SurroundFieldMixerProcessor::InputCommander::setInputLevelChangeCallback(co
 	m_inputLevelChangeCallback = callback;
 }
 
-void SurroundFieldMixerProcessor::InputCommander::setPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback)
+void SurroundFieldMixerProcessor::InputCommander::setInputPositionChangeCallback(const std::function<void(InputCommander* sender, int, juce::Point<float>)>& callback)
 {
-	m_positionChangeCallback = callback;
+	m_inputPositionChangeCallback = callback;
 }
 
-void SurroundFieldMixerProcessor::InputCommander::setSpreadFactorChangeCallback(const std::function<void(InputCommander* sender, int, float spreadFactor)>& callback)
+void SurroundFieldMixerProcessor::InputCommander::setInputSpreadChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback)
 {
-	m_spreadFactorChangeCallback = callback;
+	m_inputSpreadChangeCallback = callback;
 }
 
-void SurroundFieldMixerProcessor::InputCommander::setReverbSendGainChangeCallback(const std::function<void(InputCommander* sender, int, float reverbSendGain)>& callback)
+void SurroundFieldMixerProcessor::InputCommander::setInputReverbChangeCallback(const std::function<void(InputCommander* sender, int, float)>& callback)
 {
-	m_reverbSendGainChangeCallback = callback;
+	m_inputReverbChangeCallback = callback;
 }
 
 void SurroundFieldMixerProcessor::InputCommander::setInputMutePollCallback(const std::function<void(InputCommander* sender, int)>& callback)
@@ -83,19 +83,19 @@ void SurroundFieldMixerProcessor::InputCommander::setInputLevelPollCallback(cons
 	m_inputLevelPollCallback = callback;
 }
 
-void SurroundFieldMixerProcessor::InputCommander::setPositionPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+void SurroundFieldMixerProcessor::InputCommander::setInputPositionPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
 {
-	m_positionPollCallback = callback;
+	m_inputPositionPollCallback = callback;
 }
 
-void SurroundFieldMixerProcessor::InputCommander::setSpreadFactorPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+void SurroundFieldMixerProcessor::InputCommander::setInputSpreadPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
 {
-	m_spreadFactorPollCallback = callback;
+	m_inputSpreadPollCallback = callback;
 }
 
-void SurroundFieldMixerProcessor::InputCommander::setReverbSendGainPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
+void SurroundFieldMixerProcessor::InputCommander::setInputReverbPollCallback(const std::function<void(InputCommander* sender, int)>& callback)
 {
-	m_reverbSendGainPollCallback = callback;
+	m_inputReverbPollCallback = callback;
 }
 
 void SurroundFieldMixerProcessor::InputCommander::inputMuteChange(int channel, bool muteState)
@@ -116,22 +116,22 @@ void SurroundFieldMixerProcessor::InputCommander::inputLevelChange(int channel, 
 		m_inputLevelChangeCallback(this, channel, levelValue);
 }
 
-void SurroundFieldMixerProcessor::InputCommander::positionChange(int channel, const juce::Point<float>& position)
+void SurroundFieldMixerProcessor::InputCommander::inputPositionChange(int channel, const juce::Point<float>& position)
 {
-	if (m_positionChangeCallback)
-		m_positionChangeCallback(this, channel, position);
+	if (m_inputPositionChangeCallback)
+		m_inputPositionChangeCallback(this, channel, position);
 }
 
-void SurroundFieldMixerProcessor::InputCommander::spreadFactorChange(int channel, const float spreadFactor)
+void SurroundFieldMixerProcessor::InputCommander::inputSpreadChange(int channel, const float spreadValue)
 {
-	if (m_spreadFactorChangeCallback)
-		m_spreadFactorChangeCallback(this, channel, spreadFactor);
+	if (m_inputSpreadChangeCallback)
+		m_inputSpreadChangeCallback(this, channel, spreadValue);
 }
 
-void SurroundFieldMixerProcessor::InputCommander::reverbSendGainChange(int channel, const float reverbSendGain)
+void SurroundFieldMixerProcessor::InputCommander::inputReverbChange(int channel, const float reverbValue)
 {
-	if (m_reverbSendGainChangeCallback)
-		m_reverbSendGainChangeCallback(this, channel, reverbSendGain);
+	if (m_inputReverbChangeCallback)
+		m_inputReverbChangeCallback(this, channel, reverbValue);
 }
 
 void SurroundFieldMixerProcessor::InputCommander::inputMutePoll(int channel)
@@ -152,22 +152,22 @@ void SurroundFieldMixerProcessor::InputCommander::inputLevelPoll(int channel)
 		m_inputLevelPollCallback(this, channel);
 }
 
-void SurroundFieldMixerProcessor::InputCommander::positionPoll(int channel)
+void SurroundFieldMixerProcessor::InputCommander::inputPositionPoll(int channel)
 {
-	if (m_positionPollCallback)
-		m_positionPollCallback(this, channel);
+	if (m_inputPositionPollCallback)
+		m_inputPositionPollCallback(this, channel);
 }
 
-void SurroundFieldMixerProcessor::InputCommander::spreadFactorPoll(int channel)
+void SurroundFieldMixerProcessor::InputCommander::inputSpreadPoll(int channel)
 {
-	if (m_spreadFactorPollCallback)
-		m_spreadFactorPollCallback(this, channel);
+	if (m_inputSpreadPollCallback)
+		m_inputSpreadPollCallback(this, channel);
 }
 
-void SurroundFieldMixerProcessor::InputCommander::reverbSendGainPoll(int channel)
+void SurroundFieldMixerProcessor::InputCommander::inputReverbPoll(int channel)
 {
-	if (m_reverbSendGainPollCallback)
-		m_reverbSendGainPollCallback(this, channel);
+	if (m_inputReverbPollCallback)
+		m_inputReverbPollCallback(this, channel);
 }
 
 SurroundFieldMixerProcessor::OutputCommander::OutputCommander()
@@ -356,12 +356,46 @@ void SurroundFieldMixerProcessor::addInputCommander(InputCommander* commander)
 
 	if (std::find(m_inputCommanders.begin(), m_inputCommanders.end(), commander) == m_inputCommanders.end())
 	{
+		initializeInputCommander(commander);
+
 		m_inputCommanders.push_back(commander);
 		commander->setInputMuteChangeCallback([=](ChannelCommander* sender, int channel, bool state) { return setInputMuteState(channel, state, sender); } );
 		commander->setInputGainChangeCallback([=](ChannelCommander* sender, int channel, float value) { return setInputGainValue(channel, value, sender); });
-		commander->setPositionChangeCallback([=](InputCommander* sender, int channel, const juce::Point<float>& position) { return setInputPositionValue(channel, position, sender); });
-		commander->setReverbSendGainChangeCallback([=](InputCommander* sender, int channel, float value) { return setReverbSendGainValue(channel, value, sender); });
-		commander->setSpreadFactorChangeCallback([=](InputCommander* sender, int channel, float value) { return setSpreadFactorValue(channel, value, sender); });
+		commander->setInputPositionChangeCallback([=](InputCommander* sender, int channel, const juce::Point<float>& position) { return setInputPositionValue(channel, position, sender); });
+		commander->setInputReverbChangeCallback([=](InputCommander* sender, int channel, float value) { return setInputReverbValue(channel, value, sender); });
+		commander->setInputSpreadChangeCallback([=](InputCommander* sender, int channel, float value) { return setInputSpreadValue(channel, value, sender); });
+	}
+}
+
+void SurroundFieldMixerProcessor::initializeInputCommander(InputCommander* commander)
+{
+	if (nullptr != commander)
+	{
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& inputMuteStatesKV : m_inputMuteStates)
+				commander->setInputMute(inputMuteStatesKV.first, inputMuteStatesKV.second);
+		}
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& inputGainValueKV : m_inputGainValues)
+				commander->setInputGain(inputGainValueKV.first, inputGainValueKV.second);
+		}
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& inputReverbValueKV : m_inputReverbValues)
+				commander->setInputReverb(inputReverbValueKV.first, inputReverbValueKV.second);
+		}
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& inputSpreadValueKV : m_inputSpreadValues)
+				commander->setInputSpread(inputSpreadValueKV.first, inputSpreadValueKV.second);
+		}
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& inputPositionValueKV : m_inputPositionValues)
+				commander->setInputPosition(inputPositionValueKV.first, inputPositionValueKV.second);
+		}
 	}
 }
 
@@ -382,9 +416,28 @@ void SurroundFieldMixerProcessor::addOutputCommander(OutputCommander* commander)
 
 	if (std::find(m_outputCommanders.begin(), m_outputCommanders.end(), commander) == m_outputCommanders.end())
 	{
+		initializeOutputCommander(commander);
+
 		m_outputCommanders.push_back(commander);
 		commander->setOutputMuteChangeCallback([=](ChannelCommander* sender, int channel, bool state) { return setOutputMuteState(channel, state, sender); });
 		commander->setOutputGainChangeCallback([=](ChannelCommander* sender, int channel, float value) { return setOutputGainValue(channel, value, sender); });
+	}
+}
+
+void SurroundFieldMixerProcessor::initializeOutputCommander(OutputCommander* commander)
+{
+	if (nullptr != commander)
+	{
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& outputMuteStatesKV : m_outputMuteStates)
+				commander->setOutputMute(outputMuteStatesKV.first, outputMuteStatesKV.second);
+		}
+		{
+			const ScopedLock sl(m_readLock);
+			for (auto const& outputGainValueKV : m_outputGainValues)
+				commander->setOutputGain(outputGainValueKV.first, outputGainValueKV.second);
+		}
 	}
 }
 
@@ -440,46 +493,46 @@ void SurroundFieldMixerProcessor::setInputGainValue(int inputChannelNumber, floa
 	m_inputGainValues[inputChannelNumber] = value;
 }
 
-float SurroundFieldMixerProcessor::getReverbSendGainValue(int inputChannelNumber)
+float SurroundFieldMixerProcessor::getInputReverbValue(int inputChannelNumber)
 {
 	jassert(inputChannelNumber > 0);
 	const ScopedLock sl(m_readLock);
-	return m_reverbSendGainValues[inputChannelNumber];
+	return m_inputReverbValues[inputChannelNumber];
 }
 
-void SurroundFieldMixerProcessor::setReverbSendGainValue(int inputChannelNumber, float value, ChannelCommander* sender)
+void SurroundFieldMixerProcessor::setInputReverbValue(int inputChannelNumber, float value, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
-			inputCommander->setReverbSendGain(inputChannelNumber, value);
+			inputCommander->setInputReverb(inputChannelNumber, value);
 	}
 
 	const ScopedLock sl(m_readLock);
-	m_reverbSendGainValues[inputChannelNumber] = value;
+	m_inputReverbValues[inputChannelNumber] = value;
 }
 
-float SurroundFieldMixerProcessor::getSpreadFactorValue(int inputChannelNumber)
+float SurroundFieldMixerProcessor::getInputSpreadValue(int inputChannelNumber)
 {
 	jassert(inputChannelNumber > 0);
 	const ScopedLock sl(m_readLock);
-	return m_spreadFactorValues[inputChannelNumber];
+	return m_inputSpreadValues[inputChannelNumber];
 }
 
-void SurroundFieldMixerProcessor::setSpreadFactorValue(int inputChannelNumber, float value, ChannelCommander* sender)
+void SurroundFieldMixerProcessor::setInputSpreadValue(int inputChannelNumber, float value, ChannelCommander* sender)
 {
 	jassert(inputChannelNumber > 0);
 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
-			inputCommander->setSpreadFactor(inputChannelNumber, value);
+			inputCommander->setInputSpread(inputChannelNumber, value);
 	}
 
 	const ScopedLock sl(m_readLock);
-	m_spreadFactorValues[inputChannelNumber] = value;
+	m_inputSpreadValues[inputChannelNumber] = value;
 }
 
 bool SurroundFieldMixerProcessor::getOutputMuteState(int outputChannelNumber)
@@ -538,7 +591,7 @@ void SurroundFieldMixerProcessor::setInputPositionValue(int inputChannelNumber, 
 	for (auto const& inputCommander : m_inputCommanders)
 	{
 		if (inputCommander != reinterpret_cast<InputCommander*>(sender))
-			inputCommander->setPosition(inputChannelNumber, position);
+			inputCommander->setInputPosition(inputChannelNumber, position);
 	}
 
 	const ScopedLock sl(m_readLock);
@@ -927,9 +980,9 @@ void SurroundFieldMixerProcessor::initializeInputCtrlValues(int inputCount)
 	for (auto channel = 1; channel <= channelCount; channel++)
 	{
 		setInputMuteState(channel, false);
-		setInputGainValue(channel, 1.0f);
-		setReverbSendGainValue(channel, 1.0f);
-		setSpreadFactorValue(channel, 1.0f);
+		setInputGainValue(channel, 0.8f);
+		setInputReverbValue(channel, 0.8f);
+		setInputSpreadValue(channel, 0.8f);
 		setInputPositionValue(channel, s_defaultPos());
 	}
 }

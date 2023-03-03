@@ -62,16 +62,16 @@ void InputMixerComponent::resized()
 
         fixedSizeCtrlsBounds.removeFromTop(5);
 
-        auto reverbGainSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth);
-        for (auto i = 0; i < m_inputReverbGains.size(); i++)
+        auto reverbSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth);
+        for (auto i = 0; i < m_inputReverbs.size(); i++)
         {
-            auto const& reverbGainSlider = m_inputReverbGains.at(i);
-            if (!reverbGainSlider)
+            auto const& reverbSlider = m_inputReverbs.at(i);
+            if (!reverbSlider)
                 continue;
-            reverbGainSlidersBounds.removeFromLeft(10);
-            auto reverbGainSliderBounds = reverbGainSlidersBounds.removeFromLeft(controlElementWidth);
-            reverbGainSliderBounds.expand(7, 7); // weird enough, this is neccessary to make the rotary fit the given bounds nicely...
-            reverbGainSlider->setBounds(reverbGainSliderBounds);
+            reverbSlidersBounds.removeFromLeft(10);
+            auto reverbSliderBounds = reverbSlidersBounds.removeFromLeft(controlElementWidth);
+            reverbSliderBounds.expand(7, 7); // weird enough, this is neccessary to make the rotary fit the given bounds nicely...
+            reverbSlider->setBounds(reverbSliderBounds);
         }
 
         fixedSizeCtrlsBounds.removeFromTop(5);
@@ -135,7 +135,7 @@ void InputMixerComponent::paint(Graphics& g)
     AbstractAudioVisualizer::paint(g);
 
     // and draw text indication on spread/reverb sliders
-    if (m_inputReverbGains.empty())
+    if (m_inputReverbs.empty())
         return;
 
     g.setColour(getLookAndFeel().findColour(TextButton::textColourOnId));
@@ -151,17 +151,17 @@ void InputMixerComponent::paint(Graphics& g)
     auto fixedSizeCtrlsBounds = usableBounds.removeFromTop(fixedSizeCtrlsHeight);
     auto gainCtrlBounds = usableBounds;
 
-    auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputReverbGains.size());
+    auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputReverbs.size());
     controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
 
     fixedSizeCtrlsBounds.removeFromTop(5);
 
-    auto reverbGainSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth - 1);
-    for (auto i = 0; i < m_inputReverbGains.size(); i++)
+    auto reverbSlidersBounds = fixedSizeCtrlsBounds.removeFromTop(maxcontrolElementWidth - 1);
+    for (auto i = 0; i < m_inputReverbs.size(); i++)
     {
-        reverbGainSlidersBounds.removeFromLeft(10);
-        auto reverbGainSliderBounds = reverbGainSlidersBounds.removeFromLeft(controlElementWidth);
-        g.drawText("rv", reverbGainSliderBounds, juce::Justification::centred);
+        reverbSlidersBounds.removeFromLeft(10);
+        auto reverbSliderBounds = reverbSlidersBounds.removeFromLeft(controlElementWidth);
+        g.drawText("rv", reverbSliderBounds, juce::Justification::centred);
     }
 
     fixedSizeCtrlsBounds.removeFromTop(5);
@@ -181,7 +181,7 @@ void InputMixerComponent::paint(Graphics& g)
 void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
 {
     if (channel > m_inputMutes.size())
-        return;
+        setChannelCount(channel);
 
     auto muteButtonIter = m_inputMutes.begin() + channel - 1;
     if (muteButtonIter != m_inputMutes.end() && muteButtonIter->get())
@@ -191,41 +191,41 @@ void InputMixerComponent::setInputMute(unsigned int channel, bool muteState)
 void InputMixerComponent::setInputGain(unsigned int channel, float gainValue)
 {
     if (channel > m_inputGains.size())
-        return;
+        setChannelCount(channel);
 
     auto gainSliderIter = m_inputGains.begin() + channel - 1;
     if (gainSliderIter != m_inputGains.end() && gainSliderIter->get())
         gainSliderIter->get()->setValue(gainValue, juce::dontSendNotification);
 }
 
-void InputMixerComponent::setPosition(unsigned int channel, juce::Point<float> position)
+void InputMixerComponent::setInputPosition(unsigned int channel, juce::Point<float> position)
 {
     if (channel > m_inputPositions.size())
-        return;
+        setChannelCount(channel);
 
     auto positionComponentIter = m_inputPositions.begin() + channel - 1;
     if (positionComponentIter != m_inputPositions.end() && positionComponentIter->get())
         positionComponentIter->get()->setCurrentPosition(position);
 }
 
-void InputMixerComponent::setSpreadFactor(unsigned int channel, float spreadFactor)
+void InputMixerComponent::setInputSpread(unsigned int channel, float spreadValue)
 {
     if (channel > m_inputSpreads.size())
-        return;
+        setChannelCount(channel);
 
     auto spreadSliderIter = m_inputSpreads.begin() + channel - 1;
     if (spreadSliderIter != m_inputSpreads.end() && spreadSliderIter->get())
-        spreadSliderIter->get()->setValue(spreadFactor, juce::dontSendNotification);
+        spreadSliderIter->get()->setValue(spreadValue, juce::dontSendNotification);
 }
 
-void InputMixerComponent::setReverbSendGain(unsigned int channel, float reverbSendGain)
+void InputMixerComponent::setInputReverb(unsigned int channel, float reverbValue)
 {
-    if (channel > m_inputReverbGains.size())
-        return;
+    if (channel > m_inputReverbs.size())
+        setChannelCount(channel);
 
-    auto reverbGainSliderIter = m_inputReverbGains.begin() + channel - 1;
-    if (reverbGainSliderIter != m_inputReverbGains.end() && reverbGainSliderIter->get())
-        reverbGainSliderIter->get()->setValue(reverbSendGain, juce::dontSendNotification);
+    auto reverbSliderIter = m_inputReverbs.begin() + channel - 1;
+    if (reverbSliderIter != m_inputReverbs.end() && reverbSliderIter->get())
+        reverbSliderIter->get()->setValue(reverbValue, juce::dontSendNotification);
 }
 
 void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
@@ -252,13 +252,20 @@ void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
 
 void InputMixerComponent::processChanges()
 {
+    setChannelCount(m_levelData.GetChannelCount());
+
+    AbstractAudioVisualizer::processChanges();
+}
+
+void InputMixerComponent::setChannelCount(int channelCount)
+{
     auto resizeRequired = false;
 
-    if (m_inputMutes.size() != m_levelData.GetChannelCount())
+    if (m_inputMutes.size() != channelCount)
     {
-        if (m_inputMutes.size() < m_levelData.GetChannelCount())
+        if (m_inputMutes.size() < channelCount)
         {
-            auto missingCnt = m_levelData.GetChannelCount() - m_inputMutes.size();
+            auto missingCnt = channelCount - m_inputMutes.size();
             for (; missingCnt > 0; missingCnt--)
             {
                 m_inputMutes.push_back(std::make_unique<TextButton>("M"));
@@ -277,9 +284,9 @@ void InputMixerComponent::processChanges()
                 addAndMakeVisible(*m_inputMutes.back());
             }
         }
-        else if (m_inputMutes.size() > m_levelData.GetChannelCount())
+        else if (m_inputMutes.size() > channelCount)
         {
-            auto overheadCnt = m_inputMutes.size() - m_levelData.GetChannelCount();
+            auto overheadCnt = m_inputMutes.size() - channelCount;
             for (; overheadCnt; overheadCnt--)
             {
                 removeChildComponent(m_inputMutes.back().get());
@@ -290,49 +297,49 @@ void InputMixerComponent::processChanges()
         resizeRequired = true;
     }
 
-    if (m_inputReverbGains.size() != m_levelData.GetChannelCount())
+    if (m_inputReverbs.size() != channelCount)
     {
-        if (m_inputReverbGains.size() < m_levelData.GetChannelCount())
+        if (m_inputReverbs.size() < channelCount)
         {
-            auto missingCnt = m_levelData.GetChannelCount() - m_inputReverbGains.size();
+            auto missingCnt = channelCount - m_inputReverbs.size();
             for (; missingCnt > 0; missingCnt--)
             {
-                m_inputReverbGains.push_back(std::make_unique<Slider>("Rv"));
-                auto rvGainSlider = m_inputReverbGains.back().get();
+                m_inputReverbs.push_back(std::make_unique<Slider>("Rv"));
+                auto rvGainSlider = m_inputReverbs.back().get();
                 rvGainSlider->setSliderStyle(juce::Slider::SliderStyle::Rotary);
                 rvGainSlider->setTextBoxStyle(juce::Slider::NoTextBox, true, 0, 0);
                 rvGainSlider->setRange(0.0, 1.0);
                 rvGainSlider->setValue(1.0, dontSendNotification);
                 rvGainSlider->onValueChange = [rvGainSlider, this] {
-                    auto foundGainSliderIter = std::find_if(m_inputReverbGains.begin(), m_inputReverbGains.end(), [rvGainSlider](std::unique_ptr<Slider>& b) { return b.get() == rvGainSlider; });
-                    if (foundGainSliderIter == m_inputReverbGains.end())
+                    auto foundGainSliderIter = std::find_if(m_inputReverbs.begin(), m_inputReverbs.end(), [rvGainSlider](std::unique_ptr<Slider>& b) { return b.get() == rvGainSlider; });
+                    if (foundGainSliderIter == m_inputReverbs.end())
                         return;
-                    auto channelIdx = foundGainSliderIter - m_inputReverbGains.begin();
+                    auto channelIdx = foundGainSliderIter - m_inputReverbs.begin();
                     auto channel = static_cast<int>(channelIdx + 1);
                     auto gainValue = static_cast<float>(rvGainSlider->getValue());
-                    reverbSendGainChange(channel, gainValue);
+                    inputReverbChange(channel, gainValue);
                 };
-                addAndMakeVisible(*m_inputReverbGains.back());
+                addAndMakeVisible(*m_inputReverbs.back());
             }
         }
-        else if (m_inputReverbGains.size() > m_levelData.GetChannelCount())
+        else if (m_inputReverbs.size() > channelCount)
         {
-            auto overheadCnt = m_inputReverbGains.size() - m_levelData.GetChannelCount();
+            auto overheadCnt = m_inputReverbs.size() - channelCount;
             for (; overheadCnt; overheadCnt--)
             {
-                removeChildComponent(m_inputReverbGains.back().get());
-                m_inputReverbGains.erase(m_inputReverbGains.end());
+                removeChildComponent(m_inputReverbs.back().get());
+                m_inputReverbs.erase(m_inputReverbs.end());
             }
         }
 
         resizeRequired = true;
     }
 
-    if (m_inputSpreads.size() != m_levelData.GetChannelCount())
+    if (m_inputSpreads.size() != channelCount)
     {
-        if (m_inputSpreads.size() < m_levelData.GetChannelCount())
+        if (m_inputSpreads.size() < channelCount)
         {
-            auto missingCnt = m_levelData.GetChannelCount() - m_inputSpreads.size();
+            auto missingCnt = channelCount - m_inputSpreads.size();
             for (; missingCnt > 0; missingCnt--)
             {
                 m_inputSpreads.push_back(std::make_unique<Slider>("S"));
@@ -348,14 +355,14 @@ void InputMixerComponent::processChanges()
                     auto channelIdx = foundSpreadSliderIter - m_inputSpreads.begin();
                     auto channel = static_cast<int>(channelIdx + 1);
                     auto spreadValue = static_cast<float>(spreadSlider->getValue());
-                    spreadFactorChange(channel, spreadValue);
+                    inputSpreadChange(channel, spreadValue);
                 };
                 addAndMakeVisible(*m_inputSpreads.back());
             }
         }
-        else if (m_inputSpreads.size() > m_levelData.GetChannelCount())
+        else if (m_inputSpreads.size() > channelCount)
         {
-            auto overheadCnt = m_inputSpreads.size() - m_levelData.GetChannelCount();
+            auto overheadCnt = m_inputSpreads.size() - channelCount;
             for (; overheadCnt; overheadCnt--)
             {
                 removeChildComponent(m_inputSpreads.back().get());
@@ -366,30 +373,30 @@ void InputMixerComponent::processChanges()
         resizeRequired = true;
     }
 
-    if (m_inputPositions.size() != m_levelData.GetChannelCount())
+    if (m_inputPositions.size() != channelCount)
     {
-        if (m_inputPositions.size() < m_levelData.GetChannelCount())
+        if (m_inputPositions.size() < channelCount)
         {
-            auto missingCnt = m_levelData.GetChannelCount() - m_inputPositions.size();
+            auto missingCnt = channelCount - m_inputPositions.size();
             for (; missingCnt > 0; missingCnt--)
             {
                 m_inputPositions.push_back(std::make_unique<PositionEditorComponent>());
                 auto positionComponent = m_inputPositions.back().get();
                 positionComponent->setCurrentPosition(juce::Point<float>(0.5f, 0.5f));
-                positionComponent->setPositionCallback = [positionComponent, this] (juce::Component*, const juce::Point<float>& position) {
+                positionComponent->setPositionCallback = [positionComponent, this](juce::Component*, const juce::Point<float>& position) {
                     auto foundPositionComponentIter = std::find_if(m_inputPositions.begin(), m_inputPositions.end(), [positionComponent](std::unique_ptr<PositionEditorComponent>& b) { return b.get() == positionComponent; });
                     if (foundPositionComponentIter == m_inputPositions.end())
                         return;
                     auto channelIdx = foundPositionComponentIter - m_inputPositions.begin();
                     auto channel = static_cast<int>(channelIdx + 1);
-                    positionChange(channel, position);
+                    inputPositionChange(channel, position);
                 };
                 addAndMakeVisible(*m_inputPositions.back());
             }
         }
-        else if (m_inputPositions.size() > m_levelData.GetChannelCount())
+        else if (m_inputPositions.size() > channelCount)
         {
-            auto overheadCnt = m_inputPositions.size() - m_levelData.GetChannelCount();
+            auto overheadCnt = m_inputPositions.size() - channelCount;
             for (; overheadCnt; overheadCnt--)
             {
                 removeChildComponent(m_inputPositions.back().get());
@@ -400,11 +407,11 @@ void InputMixerComponent::processChanges()
         resizeRequired = true;
     }
 
-    if (m_inputGains.size() != m_levelData.GetChannelCount())
+    if (m_inputGains.size() != channelCount)
     {
-        if (m_inputGains.size() < m_levelData.GetChannelCount())
+        if (m_inputGains.size() < channelCount)
         {
-            auto missingCnt = m_levelData.GetChannelCount() - m_inputGains.size();
+            auto missingCnt = channelCount - m_inputGains.size();
             for (; missingCnt > 0; missingCnt--)
             {
                 m_inputGains.push_back(std::make_unique<Slider>("M"));
@@ -424,9 +431,9 @@ void InputMixerComponent::processChanges()
                 addAndMakeVisible(*m_inputGains.back());
             }
         }
-        else if (m_inputGains.size() > m_levelData.GetChannelCount())
+        else if (m_inputGains.size() > channelCount)
         {
-            auto overheadCnt = m_inputGains.size() - m_levelData.GetChannelCount();
+            auto overheadCnt = m_inputGains.size() - channelCount;
             for (; overheadCnt; overheadCnt--)
             {
                 removeChildComponent(m_inputGains.back().get());
@@ -439,8 +446,6 @@ void InputMixerComponent::processChanges()
 
     if (resizeRequired)
         resized();
-
-    AbstractAudioVisualizer::processChanges();
 }
 
 }
