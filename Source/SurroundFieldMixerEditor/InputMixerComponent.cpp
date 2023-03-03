@@ -145,11 +145,7 @@ void InputMixerComponent::paint(Graphics& g)
 
     auto maxcontrolElementWidth = 30;
     auto fixedSizeCtrlsHeight = 130;
-    auto dynamicSizeCtrlsHeight = usableBounds.getHeight() - fixedSizeCtrlsHeight;
-
-    auto meterBridgeBounds = usableBounds.removeFromTop(static_cast<int>(0.4f * dynamicSizeCtrlsHeight));
     auto fixedSizeCtrlsBounds = usableBounds.removeFromTop(fixedSizeCtrlsHeight);
-    auto gainCtrlBounds = usableBounds;
 
     auto controlElementWidth = fixedSizeCtrlsBounds.getWidth() / static_cast<int>(m_inputReverbs.size());
     controlElementWidth = controlElementWidth > maxcontrolElementWidth ? maxcontrolElementWidth : controlElementWidth;
@@ -252,7 +248,7 @@ void InputMixerComponent::processingDataChanged(AbstractProcessorData *data)
 
 void InputMixerComponent::processChanges()
 {
-    setChannelCount(m_levelData.GetChannelCount());
+    setChannelCount(static_cast<int>(m_levelData.GetChannelCount()));
 
     AbstractAudioVisualizer::processChanges();
 }
