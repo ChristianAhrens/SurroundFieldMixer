@@ -30,6 +30,7 @@ namespace SurroundFieldMixer
 /*
 */
 class TwoDFieldOutputComponent  :   public AbstractAudioVisualizer,
+                                    public SurroundFieldMixerProcessor::InputCommander,
                                     public SurroundFieldMixerProcessor::OutputCommander
 {
 public:
@@ -43,6 +44,12 @@ public:
     //==============================================================================
     void processingDataChanged(AbstractProcessorData *data) override;
 
+    void setInputMute(unsigned int channel, bool muteState) override { ignoreUnused(channel); ignoreUnused(muteState); };
+    void setInputGain(unsigned int channel, float gainValue) override { ignoreUnused(channel); ignoreUnused(gainValue); };
+    void setPosition(unsigned int channel, juce::Point<float> position) override;
+    void setSpreadFactor(unsigned int channel, float spreadFactor) override { ignoreUnused(channel); ignoreUnused(spreadFactor); };
+    void setReverbSendGain(unsigned int channel, float reverbSendGain) override { ignoreUnused(channel); ignoreUnused(reverbSendGain); };
+
     //==============================================================================
     void setOutputMute(unsigned int channel, bool muteState) override;
     void setOutputGain(unsigned int channel, float gainValue) override;
@@ -55,8 +62,9 @@ private:
     unsigned long   m_channelLS{ 5 };
     unsigned long   m_channelRS{ 4 };
 
-    std::map<int, bool>         m_outputMuteState;
-    std::map<int, juce::String> m_outputGainValue;
+    std::map<int, juce::Point<float>>   m_inputPositions;
+    std::map<int, bool>                 m_outputMuteState;
+    std::map<int, juce::String>         m_outputGainValue;
 
     float m_outerMargin{ 20.0f };
     float m_visuAreaWidth{ 0.0f };

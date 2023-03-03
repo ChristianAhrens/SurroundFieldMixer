@@ -65,7 +65,7 @@ public:
     bool setStateXml(XmlElement* stateXml) override;
 
 private:
-    std::unique_ptr<InputMixerComponent>   m_meterBank;
+    std::unique_ptr<InputMixerComponent>        m_mixer;
     std::unique_ptr<TwoDFieldOutputComponent>   m_surroundField;
 
     EditorLayout    m_editorLayouting{ EL_Dynamic };

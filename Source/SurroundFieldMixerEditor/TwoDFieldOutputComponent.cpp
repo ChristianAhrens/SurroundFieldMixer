@@ -28,7 +28,9 @@ namespace SurroundFieldMixer
 
 //==============================================================================
 TwoDFieldOutputComponent::TwoDFieldOutputComponent()
-    : AbstractAudioVisualizer()
+    :   AbstractAudioVisualizer(),
+        SurroundFieldMixerProcessor::InputCommander(),
+        SurroundFieldMixerProcessor::OutputCommander()
 {
     setUsesValuesInDB(true);
 
@@ -258,6 +260,18 @@ void TwoDFieldOutputComponent::paint (Graphics& g)
         rangeText = "0 ... 1";
     g.drawText(rangeText, Rectangle<float>(m_visuAreaOrigX + m_visuAreaWidth - 110.0f, m_visuAreaOrigY - m_visuAreaHeight - 5.0f, 110.0f, float(m_outerMargin)), Justification::centred, true);
 
+    // draw inputs position indicators
+    g.setFont(12.0f);
+    g.setColour(Colours::white);
+    for (auto const& position : m_inputPositions)
+    {
+        auto radius = juce::Point<float>(7.0f, 7.0f);
+        auto mappedPos = juce::Point<float>(m_visuAreaOrigX + m_visuAreaWidth * position.second.getX(), m_visuAreaOrigY - m_visuAreaHeight * position.second.getY());
+        auto indicationRect = juce::Rectangle<float>(mappedPos + radius, mappedPos - radius);
+        g.drawText(String(position.first), indicationRect, juce::Justification::centred);
+        g.drawEllipse(indicationRect, 1);
+    }
+
 }
 
 void TwoDFieldOutputComponent::resized()
@@ -297,6 +311,12 @@ void TwoDFieldOutputComponent::resized()
     m_rightSurroundMaxPoint = m_levelOrig + juce::Point<float>(rightSurroundXLength, rightSurroundYLength);
 
     AbstractAudioVisualizer::resized();
+}
+
+void TwoDFieldOutputComponent::setPosition(unsigned int channel, juce::Point<float> position)
+{
+    m_inputPositions[channel] = position;
+    repaint();
 }
 
 void TwoDFieldOutputComponent::setOutputMute(unsigned int channel, bool muteState)

@@ -31,8 +31,8 @@ namespace SurroundFieldMixer
 SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor& processor)
     : AudioProcessorEditor(processor)
 {
-    m_meterBank = std::make_unique<InputMixerComponent>();
-    addAndMakeVisible(m_meterBank.get());
+    m_mixer = std::make_unique<InputMixerComponent>();
+    addAndMakeVisible(m_mixer.get());
 
     m_surroundField = std::make_unique<TwoDFieldOutputComponent>();
     addAndMakeVisible(m_surroundField.get());
@@ -40,8 +40,9 @@ SurroundFieldMixerEditor::SurroundFieldMixerEditor(AudioProcessor& processor)
     auto SurroundFieldMixerProc = dynamic_cast<SurroundFieldMixerProcessor*>(&processor);
     if (SurroundFieldMixerProc)
     {
-        SurroundFieldMixerProc->addInputListener(m_meterBank.get());
-        SurroundFieldMixerProc->addInputCommander(m_meterBank.get());
+        SurroundFieldMixerProc->addInputListener(m_mixer.get());
+        SurroundFieldMixerProc->addInputCommander(m_mixer.get());
+        SurroundFieldMixerProc->addInputCommander(m_surroundField.get());
         SurroundFieldMixerProc->addOutputListener(m_surroundField.get());
         SurroundFieldMixerProc->addOutputCommander(m_surroundField.get());
     }
@@ -70,16 +71,16 @@ void SurroundFieldMixerEditor::paint (Graphics& g)
 void SurroundFieldMixerEditor::resized()
 {
     auto bounds = getLocalBounds();
-    auto meterBankBounds = bounds;
+    auto mixerBounds = bounds;
     auto surroundFieldBounds = bounds;
 
     // horizontal layout
     if (m_editorLayouting == EL_Horizontal || (m_editorLayouting == EL_Dynamic && bounds.getWidth() > bounds.getHeight()))
     {
-        meterBankBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.3f));
-        meterBankBounds.reduce(0, 5);
-        meterBankBounds.removeFromRight(5);
-        meterBankBounds.removeFromLeft(5);
+        mixerBounds = bounds.removeFromLeft(static_cast<int>(bounds.getWidth() * 0.3f));
+        mixerBounds.reduce(0, 5);
+        mixerBounds.removeFromRight(5);
+        mixerBounds.removeFromLeft(5);
 
         surroundFieldBounds = bounds;
         surroundFieldBounds.reduce(0, 5);
@@ -88,17 +89,17 @@ void SurroundFieldMixerEditor::resized()
     // vertical layout
     else if (m_editorLayouting == EL_Vertical || (m_editorLayouting == EL_Dynamic && bounds.getWidth() <= bounds.getHeight()))
     {
-        meterBankBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.3f));
-        meterBankBounds.reduce(5, 0);
-        meterBankBounds.removeFromTop(5);
-        meterBankBounds.removeFromBottom(5);
+        mixerBounds = bounds.removeFromBottom(static_cast<int>(bounds.getHeight() * 0.3f));
+        mixerBounds.reduce(5, 0);
+        mixerBounds.removeFromTop(5);
+        mixerBounds.removeFromBottom(5);
 
         surroundFieldBounds = bounds;
         surroundFieldBounds.reduce(5, 0);
         surroundFieldBounds.removeFromTop(5);
     }
 
-    m_meterBank->setBounds(meterBankBounds);
+    m_mixer->setBounds(mixerBounds);
     m_surroundField->setBounds(surroundFieldBounds);
 }
 

@@ -27,7 +27,7 @@ namespace SurroundFieldMixer
 
 //==============================================================================
 InputMixerComponent::InputMixerComponent()
-    : AbstractAudioVisualizer()
+    : AbstractAudioVisualizer(), SurroundFieldMixerProcessor::InputCommander()
 {
     setUsesValuesInDB(true);
 
