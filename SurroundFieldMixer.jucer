@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="InQ33m" name="SurroundFieldMixer" projectType="guiapp" defines="JUCE_USE_LAME_AUDIO_FORMAT=1,&#10;JUCE_USE_MP3AUDIOFORMAT=1,"
-              bundleIdentifier="com.ChristianAhrens.SurroundFieldMixer" version="0.1.1"
+              bundleIdentifier="com.ChristianAhrens.SurroundFieldMixer" version="0.1.2"
               companyName="Christian Ahrens" companyCopyright="2023" companyEmail="christianahrens@me.com"
               jucerFormatVersion="1" companyWebsite="https://github.com/ChristianAhrens/SurroundFieldMixer"
               headerPath="../../submodules/JUCE-AppBasics/Source/&#10;../../submodules/RemoteProtocolBridgeCore/Source/&#10;../../submodules/Servus/">
