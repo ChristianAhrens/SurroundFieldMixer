@@ -86,6 +86,9 @@
                   file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1ConnectionServer.cpp"/>
             <FILE id="UVreSx" name="Ocp1ConnectionServer.h" compile="0" resource="0"
                   file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1ConnectionServer.h"/>
+            <FILE id="jyuabS" name="Ocp1DataTypes.cpp" compile="1" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1DataTypes.cpp"/>
+            <FILE id="o8Ufjb" name="Ocp1DataTypes.h" compile="0" resource="0" file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1DataTypes.h"/>
             <FILE id="LWixhN" name="Ocp1DS100ObjectDefinitions.h" compile="0" resource="0"
                   file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1DS100ObjectDefinitions.h"/>
             <FILE id="BQcMuQ" name="Ocp1Message.cpp" compile="1" resource="0" file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1Message.cpp"/>
