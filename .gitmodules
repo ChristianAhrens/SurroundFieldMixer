@@ -10,3 +10,6 @@
 [submodule "submodules/Servus"]
 	path = submodules/Servus
 	url = https://github.com/ChristianAhrens/Servus
+[submodule "submodules/SQLiteCpp"]
+	path = submodules/SQLiteCpp
+	url = https://github.com/SRombauts/SQLiteCpp

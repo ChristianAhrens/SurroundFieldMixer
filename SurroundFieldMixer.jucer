@@ -1,12 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="InQ33m" name="SurroundFieldMixer" projectType="guiapp" defines="JUCE_USE_LAME_AUDIO_FORMAT=1,&#10;JUCE_USE_MP3AUDIOFORMAT=1,"
+<JUCERPROJECT id="InQ33m" name="SurroundFieldMixer" projectType="guiapp" defines="JUCE_USE_LAME_AUDIO_FORMAT=1,&#10;JUCE_USE_MP3AUDIOFORMAT=1,&#10;SQLITE_ENABLE_COLUMN_METADATA=1&#10;USE_DBPR_PROJECT_UTILS=1"
               bundleIdentifier="com.ChristianAhrens.SurroundFieldMixer" version="0.1.2"
               companyName="Christian Ahrens" companyCopyright="2023" companyEmail="christianahrens@me.com"
               jucerFormatVersion="1" companyWebsite="https://github.com/ChristianAhrens/SurroundFieldMixer"
-              headerPath="../../submodules/JUCE-AppBasics/Source/&#10;../../submodules/RemoteProtocolBridgeCore/Source/&#10;../../submodules/Servus/">
+              headerPath="../../submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/&#10;../../submodules/RemoteProtocolBridgeCore/Source&#10;../../submodules/JUCE-AppBasics/Source&#10;../../submodules/SQLiteCpp/include&#10;../../submodules/SQLiteCpp/sqlite3&#10;../../submodules/Servus">
   <MAINGROUP id="cIkH3v" name="SurroundFieldMixer">
     <GROUP id="{2F00D803-4C7B-B972-8DBF-6BAEC9E73388}" name="submodules">
+      <GROUP id="{C1241917-110C-D9D7-20B8-F0F763983966}" name="SQLiteCpp">
+        <GROUP id="{502AE390-6F44-A624-1D20-33B45FF086C8}" name="src">
+          <FILE id="pmNCEB" name="Backup.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Backup.cpp"/>
+          <FILE id="S8ZJiV" name="Column.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Column.cpp"/>
+          <FILE id="uzoo7x" name="Database.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Database.cpp"/>
+          <FILE id="mfTpej" name="Exception.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Exception.cpp"/>
+          <FILE id="nwx0nB" name="Savepoint.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Savepoint.cpp"/>
+          <FILE id="UeLWfj" name="Statement.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Statement.cpp"/>
+          <FILE id="MWr3I8" name="Transaction.cpp" compile="1" resource="0" file="submodules/SQLiteCpp/src/Transaction.cpp"/>
+        </GROUP>
+        <GROUP id="{E632893F-29DD-35BB-8A91-B039EC1F1C48}" name="sqlite3">
+          <FILE id="cUpyPk" name="sqlite3.c" compile="1" resource="0" file="submodules/SQLiteCpp/sqlite3/sqlite3.c"/>
+          <FILE id="DPKvgC" name="sqlite3.h" compile="0" resource="0" file="submodules/SQLiteCpp/sqlite3/sqlite3.h"/>
+        </GROUP>
+        <GROUP id="{A0CE6481-AC8C-6F95-462D-37FB60CC7ACE}" name="include">
+          <FILE id="ol08tc" name="Assertion.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Assertion.h"/>
+          <FILE id="dIlCUO" name="Backup.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Backup.h"/>
+          <FILE id="NAW3Fr" name="Column.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Column.h"/>
+          <FILE id="qIpLVF" name="Database.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Database.h"/>
+          <FILE id="RLJUTi" name="Exception.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Exception.h"/>
+          <FILE id="z1QUE9" name="ExecuteMany.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/ExecuteMany.h"/>
+          <FILE id="Fv341h" name="Savepoint.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Savepoint.h"/>
+          <FILE id="v47G4v" name="SQLiteCpp.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/SQLiteCpp.h"/>
+          <FILE id="motcbU" name="SQLiteCppExport.h" compile="0" resource="0"
+                file="submodules/SQLiteCpp/include/SQLiteCpp/SQLiteCppExport.h"/>
+          <FILE id="TjzAB9" name="Statement.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Statement.h"/>
+          <FILE id="VNHIeO" name="Transaction.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Transaction.h"/>
+          <FILE id="soDjVf" name="Utils.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/Utils.h"/>
+          <FILE id="NeUtTW" name="VariadicBind.h" compile="0" resource="0" file="submodules/SQLiteCpp/include/SQLiteCpp/VariadicBind.h"/>
+        </GROUP>
+      </GROUP>
       <GROUP id="{2404553C-385D-9C88-3558-E6CB98810F5F}" name="Servus">
         <GROUP id="{94E6BD1C-27B3-A58D-3E7F-D0BBFA1FB56C}" name="servus">
           <GROUP id="{AA064A20-4BEB-3430-857F-A103601A32C5}" name="avahi">
@@ -43,6 +74,26 @@
         </GROUP>
       </GROUP>
       <GROUP id="{841D0E45-8D36-8B0B-5504-370165681A4C}" name="RemoteProtocolBridgeCore">
+        <GROUP id="{3B5186B0-4250-6DC5-EAB7-7BB93E12C508}" name="submodules">
+          <GROUP id="{BE5AB823-4A06-C5E2-7B24-0C82CE2F075C}" name="NanoOcp">
+            <FILE id="ChhaKZ" name="NanoOcp1.cpp" compile="1" resource="0" file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/NanoOcp1.cpp"/>
+            <FILE id="joLUKR" name="NanoOcp1.h" compile="0" resource="0" file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/NanoOcp1.h"/>
+            <FILE id="bBNRwc" name="Ocp1Connection.cpp" compile="1" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1Connection.cpp"/>
+            <FILE id="MGqwW5" name="Ocp1Connection.h" compile="0" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1Connection.h"/>
+            <FILE id="Pvax26" name="Ocp1ConnectionServer.cpp" compile="1" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1ConnectionServer.cpp"/>
+            <FILE id="UVreSx" name="Ocp1ConnectionServer.h" compile="0" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1ConnectionServer.h"/>
+            <FILE id="LWixhN" name="Ocp1DS100ObjectDefinitions.h" compile="0" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1DS100ObjectDefinitions.h"/>
+            <FILE id="BQcMuQ" name="Ocp1Message.cpp" compile="1" resource="0" file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1Message.cpp"/>
+            <FILE id="oaPpqY" name="Ocp1Message.h" compile="0" resource="0" file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1Message.h"/>
+            <FILE id="bRKc7R" name="Ocp1ObjectDefinitions.h" compile="0" resource="0"
+                  file="submodules/RemoteProtocolBridgeCore/submodules/NanoOcp/Source/Ocp1ObjectDefinitions.h"/>
+          </GROUP>
+        </GROUP>
         <GROUP id="{2D73F130-0C5C-3687-3AD5-102D2E52CB78}" name="Source">
           <GROUP id="{13A01986-7D3B-DDA8-2B15-DC0102C74933}" name="ProcessingEngine">
             <GROUP id="{C2FFE3BB-4849-E31B-727C-BCC45552175F}" name="ObjectDataHandling">
@@ -192,11 +243,11 @@
                 <FILE id="t5nhuw" name="YmhOSCProtocolProcessor.h" compile="0" resource="0"
                       file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OSCProtocolProcessor/YmhOSCProtocolProcessor.h"/>
               </GROUP>
-              <GROUP id="{62B3872E-7DC2-062F-330F-95F5AAF94870}" name="OCAProtocolProcessor">
-                <FILE id="lNSoXh" name="OCAProtocolProcessor.cpp" compile="1" resource="0"
-                      file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OCAProtocolProcessor/OCAProtocolProcessor.cpp"/>
-                <FILE id="yVDqFR" name="OCAProtocolProcessor.h" compile="0" resource="0"
-                      file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OCAProtocolProcessor/OCAProtocolProcessor.h"/>
+              <GROUP id="{62B3872E-7DC2-062F-330F-95F5AAF94870}" name="OCP1ProtocolProcessor">
+                <FILE id="HwaHLd" name="OCP1ProtocolProcessor.cpp" compile="1" resource="0"
+                      file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OCP1ProtocolProcessor/OCP1ProtocolProcessor.cpp"/>
+                <FILE id="RFgmSV" name="OCP1ProtocolProcessor.h" compile="0" resource="0"
+                      file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/OCP1ProtocolProcessor/OCP1ProtocolProcessor.h"/>
               </GROUP>
               <GROUP id="{886C01A2-9F37-8AE7-91F4-74552FC5D082}" name="MIDIProtocolProcessor">
                 <FILE id="txGW4j" name="MIDIProtocolProcessor.cpp" compile="1" resource="0"
@@ -204,6 +255,10 @@
                 <FILE id="etBnL9" name="MIDIProtocolProcessor.h" compile="0" resource="0"
                       file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/MIDIProtocolProcessor/MIDIProtocolProcessor.h"/>
               </GROUP>
+              <FILE id="fTOMwy" name="NoProtocolProtocolProcessor.cpp" compile="1"
+                    resource="0" file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/NoProtocolProtocolProcessor.cpp"/>
+              <FILE id="ogl38w" name="NoProtocolProtocolProcessor.h" compile="0"
+                    resource="0" file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/NoProtocolProtocolProcessor.h"/>
               <FILE id="lYV9lo" name="NetworkProtocolProcessorBase.cpp" compile="1"
                     resource="0" file="submodules/RemoteProtocolBridgeCore/Source/ProcessingEngine/ProtocolProcessor/NetworkProtocolProcessorBase.cpp"/>
               <FILE id="dwu4gf" name="NetworkProtocolProcessorBase.h" compile="0"
@@ -238,6 +293,8 @@
                 file="submodules/RemoteProtocolBridgeCore/Source/LoggingTarget_Interface.h"/>
           <FILE id="hPoRlO" name="RemoteProtocolBridgeCommon.h" compile="0" resource="0"
                 file="submodules/RemoteProtocolBridgeCore/Source/RemoteProtocolBridgeCommon.h"/>
+          <FILE id="wxMpfi" name="dbprProjectUtils.h" compile="0" resource="0"
+                file="submodules/RemoteProtocolBridgeCore/Source/dbprProjectUtils.h"/>
         </GROUP>
       </GROUP>
       <GROUP id="{3DC4FFDC-5D34-064E-0304-3452EC534EBB}" name="JUCE-AppBasics">
