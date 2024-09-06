@@ -273,12 +273,12 @@ SurroundFieldMixerProcessor::SurroundFieldMixerProcessor() :
 {
 	// prepare max sized processing data buffer
 	m_processorChannels = new float* [s_maxChannelCount];
-	for (auto i = 0; i < s_maxChannelCount; i++)
+	for (auto channel = 0; channel < s_maxChannelCount; channel++)
 	{
-		m_processorChannels[i] = new float[s_maxNumSamples];
-		for (auto j = 0; j < s_maxNumSamples; j++)
+		m_processorChannels[channel] = new float[s_maxNumSamples];
+		for (auto sample = 0; sample < s_maxNumSamples; sample++)
 		{
-			m_processorChannels[i][j] = 0.0f;
+			m_processorChannels[channel][sample] = 0.0f;
 		}
 	}
 
